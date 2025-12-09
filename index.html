@@ -1,1 +1,762 @@
-hola mundo
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EMI BURGERS - ERP PRO V27</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Bangers&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Librerías -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* --- TEMA V27 (GOLD EDITION) --- */
+        :root {
+            --bg-body: #1f1f1f; --bg-card: #2a2a2a; --text-main: #f3f4f6;
+            --text-muted: #9ca3af; --border: #374151; --gold: #FFC107;
+            --gold-hover: #FFB300; --accent: #FF5722; --input-bg: #18181b;
+        }
+        body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Roboto', sans-serif; margin: 0; padding: 0; overflow: hidden; }
+        
+        /* Componentes Base */
+        .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .input-std { background-color: var(--input-bg); border: 1px solid #444; color: white; outline: none; width: 100%; border-radius: 0.25rem; padding: 0.5rem; font-size: 0.9rem; transition: border 0.2s; }
+        .input-std:focus { border-color: var(--gold); }
+        .btn-gold { background: var(--gold); color: black; font-weight: 900; text-transform: uppercase; border-radius: 0.25rem; border: none; padding: 0.5rem 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.1s; }
+        .btn-gold:active { transform: translateY(2px); }
+        .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1px; }
+        
+        /* Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #111; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        
+        /* Mapas */
+        .leaflet-container { height: 100%; width: 100%; border-radius: 0.5rem; z-index: 0; }
+        .custom-pin { background: transparent; border: none; font-size: 24px; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+
+        /* Ojo de Dios */
+        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: 9999; }
+        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 180px; background: #222; border: 2px solid var(--gold); border-radius: 8px; padding: 8px; display: none; flex-direction: column; gap: 4px; box-shadow: 0 5px 20px rgba(0,0,0,0.8); }
+        .gods-eye:hover .gods-menu { display: flex; }
+
+        /* Tickets */
+        .ticket-preview {
+            background: white; color: black; font-family: 'Courier Prime', monospace;
+            padding: 20px; width: 100%; max-width: 300px; margin: 0 auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5); font-size: 11px;
+            border-top: 1px dashed #ccc; display: block; white-space: pre-wrap;
+        }
+        .ticket-preview img { max-width: 50px; margin: 0 auto 10px; display: block; }
+        .ticket-preview hr { border-top: 1px dashed black; margin: 5px 0; }
+        .ticket-preview .bold { font-weight: bold; }
+        .ticket-preview .center { text-align: center; }
+
+        /* Utility Classes */
+        .border-neon-gold { border-left: 4px solid var(--gold); }
+        .border-neon-red { border-left: 4px solid #ef4444; }
+        .border-neon-green { border-left: 4px solid #22c55e; }
+        .border-neon-blue { border-left: 4px solid #3b82f6; }
+        
+        .closed-mode { background-image: url('FIN_TURNO.PNG'); background-size: cover; height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 99999; }
+        
+        /* Animaciones */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-5px); } 100% { transform: translateY(0px); } }
+        .logo-animate { animation: float 3s ease-in-out infinite; }
+
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; position: absolute; top:0; left:0; width:100%; height:auto; background:white; color:black; z-index:9999; padding:20px; font-family:'Courier Prime',monospace; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        import { 
+            Utensils, Truck, LayoutDashboard, LogOut, Plus, Minus, Search, MapPin, Printer, CreditCard, DollarSign, 
+            Smartphone, User, QrCode, Clock, CheckCircle, AlertTriangle, FileText, Settings, Menu as MenuIcon, X, 
+            Save, Trash2, ShoppingBag, Camera, Users, BarChart3, RefreshCw, Bell, Ticket, TrendingUp, Lock, 
+            Calendar as CalendarIcon, Eye, Map, Navigation, Wallet, List, ChevronRight, Package, Percent, Download, Upload, Edit, Power, Info, Calculator, LogIn, EyeOff, Shield, Send, ScrollText, Receipt
+        } from 'https://esm.sh/lucide-react@0.344.0';
+
+        const React = window.React;
+        const useState = React.useState;
+        const useEffect = React.useEffect;
+        const useRef = React.useRef;
+        
+        // --- CONSTANTES ---
+        const STORE_COORDS = [27.446885936545566, -109.94384211683136]; 
+        const LOGO_URL = "LOGO_1.png"; 
+        const BANNER_URL = "BANNER_MENU.jpg";
+        const APP_URL = window.location.href.split('?')[0];
+
+        // --- DATA LAYER (PRODUCCION) ---
+        const db = {
+            load: async () => JSON.parse(localStorage.getItem('emi_v27_prod') || JSON.stringify({
+                products: [], users: [], orders: [], supplies: [], coupons: [], 
+                cashDrawer: {current:0, initial:0}, supervisorKey: 'ADMIN123', providers: [], platforms: [],
+                attendance: [], webActive: true, storeOpen: true, notifications: [],
+                salaries: { cajero: {base:0, bono:0}, cocina: {base:0, bono:0}, repartidor: {base:0, bono:0} },
+                expenses: [], liquidations: []
+            })),
+            save: async (data) => localStorage.setItem('emi_v27_prod', JSON.stringify(data))
+        };
+        const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val || 0);
+        const generateId = () => Math.random().toString(36).substr(2, 6).toUpperCase();
+
+        // --- HELPERS ---
+        const printContent = (html) => {
+            const w = window.open('', '', 'width=400,height=600');
+            w.document.write(`<html><head><title>Print</title><style>body{font-family:'Courier Prime',monospace;font-size:12px;margin:0;padding:10px;color:black;} img{max-width:50px;margin:0 auto 10px;display:block;} .header{text-align:center;margin-bottom:10px;} .header h2{font-size:14px;margin:0;font-weight:bold;} .header p{margin:2px 0;font-size:10px;} hr{border-top:1px dashed #000;margin:5px 0;} .bold{font-weight:bold;} .center{text-align:center;} .right{text-align:right;} .flex-row{display:flex;justify-content:space-between;}</style></head><body>${html}</body></html>`);
+            w.document.close(); w.focus(); setTimeout(() => { w.print(); w.close(); }, 500);
+        };
+        const TicketHeader = () => `
+            <img src="${LOGO_URL}" />
+            <div class="header">
+                <h2>EMI BURGERS</h2>
+                <p>Calle Gaviotas 408</p>
+                <p>Cd. Obregón, Sonora</p>
+                <p>Tel: 631-155-1533</p>
+            </div>
+            <hr>
+        `;
+
+        // --- COMPONENTES UI GENERICOS ---
+        const Modal = ({ title, onClose, children, footer, size }) => (
+            <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4 animate-in fade-in zoom-in duration-200">
+                <div className={`card w-full ${size || 'max-w-lg'} p-6 max-h-[90vh] flex flex-col relative bg-[var(--bg-card)] border border-[var(--gold)]`}>
+                    <div className="flex justify-between items-center mb-4 border-b border-[#444] pb-2">
+                        <h2 className="font-brand text-2xl text-[var(--gold)]">{title}</h2>
+                        <button onClick={onClose}><X className="text-gray-400 hover:text-red-500"/></button>
+                    </div>
+                    <div className="overflow-y-auto custom-scroll flex-1">{children}</div>
+                    {footer && <div className="mt-4 pt-4 border-t border-[#444]">{footer}</div>}
+                </div>
+            </div>
+        );
+
+        const NavBtn = ({ id, icon, label, active, set }) => (
+            <button onClick={()=>set(id)} className={`flex items-center gap-2 px-4 py-3 rounded-lg font-bold whitespace-nowrap transition border-2 ${active===id ? 'bg-[var(--gold)] text-black border-[var(--gold)] shadow-lg' : 'bg-transparent text-[var(--text-muted)] border-transparent hover:border-[var(--gold)] hover:text-[var(--gold)]'}`}>
+                {icon} {label}
+            </button>
+        );
+
+        const LeafletMap = ({ markers, center, zoom }) => {
+            const mapRef = useRef(null);
+            const containerRef = useRef(null);
+            useEffect(() => {
+                if (!containerRef.current) return;
+                if (!mapRef.current) {
+                    mapRef.current = L.map(containerRef.current).setView(center || STORE_COORDS, zoom || 14);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapRef.current);
+                }
+                if(center) mapRef.current.setView(center);
+                mapRef.current.eachLayer(layer => { if (layer instanceof L.Marker) mapRef.current.removeLayer(layer); });
+                (markers || []).forEach(m => {
+                    const icon = L.divIcon({ className: 'custom-pin', html: `<div style="font-size: 28px; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));">${m.emoji}</div>`, iconSize: [40, 40], iconAnchor: [20, 20] });
+                    L.marker(m.pos, {icon}).addTo(mapRef.current).bindPopup(m.popup);
+                });
+                setTimeout(() => mapRef.current.invalidateSize(), 300);
+            }, [markers, center]);
+            return <div ref={containerRef} className="h-full w-full rounded-lg z-0 border border-[#333]"></div>;
+        };
+
+        // --- COMPONENTES GLOBALES ---
+        function LoginScreen({ onLogin, users }) {
+            const [creds, setCreds] = useState({u:'', p:''});
+            return (
+                <div className="h-screen flex items-center justify-center bg-[url('https://www.transparenttextures.com/patterns/brick-wall-dark.png')] p-4">
+                    <div className="card p-8 w-full max-w-sm text-center border-t-4 border-[var(--gold)] shadow-2xl bg-[#222]">
+                        <img src={LOGO_URL} className="w-40 mx-auto mb-6 object-contain logo-animate" onError={(e)=>e.target.style.display='none'}/>
+                        <h1 className="font-brand text-4xl text-[var(--gold)] mb-6">EMI BURGERS</h1>
+                        <input className="input-std bg-[#18181b] p-3 text-center mb-3" placeholder="USUARIO" value={creds.u} onChange={e=>setCreds({...creds, u:e.target.value})}/>
+                        <input className="input-std bg-[#18181b] p-3 text-center mb-4" type="password" placeholder="CONTRASEÑA" value={creds.p} onChange={e=>setCreds({...creds, p:e.target.value})}/>
+                        <button onClick={()=>{
+                            if(creds.u==='admin' && creds.p==='admin') return onLogin({role:'admin', name:'Super Admin', uid:'admin'});
+                            const u = users.find(x => x.username===creds.u && x.password===creds.p);
+                            if(u) onLogin(u); else alert('Error de credenciales');
+                        }} className="btn-gold w-full py-3 text-xl">ENTRAR</button>
+                    </div>
+                </div>
+            );
+        }
+
+        function GodsEye({ onSwitch }) {
+            return (
+                <div className="gods-eye group">
+                    <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-2 border-white hover:scale-110 transition z-50"><Eye size={28} className="text-black"/></button>
+                    <div className="gods-menu">
+                        <button onClick={()=>onSwitch('admin')} className="text-left p-2 rounded text-sm text-white hover:bg-[#333]">👮 Admin</button>
+                        <button onClick={()=>onSwitch('cajero')} className="text-left p-2 rounded text-sm text-white hover:bg-[#333]">🏪 Caja</button>
+                        <button onClick={()=>onSwitch('cocina')} className="text-left p-2 rounded text-sm text-white hover:bg-[#333]">👨‍🍳 Cocina</button>
+                        <button onClick={()=>onSwitch('repartidor')} className="text-left p-2 rounded text-sm text-white hover:bg-[#333]">🛵 Repartidor</button>
+                    </div>
+                </div>
+            );
+        }
+
+        function EditSupplyModal({ item, onSave, onDelete, onClose }) {
+            const [local, setLocal] = useState({...item});
+            return (
+                <div className="fixed inset-0 bg-black/90 z-[8000] flex items-center justify-center p-4">
+                    <div className="bg-[#1c1c1c] w-full max-w-md rounded-lg border border-[#333] p-6 relative shadow-2xl">
+                        <div className="flex justify-between items-center mb-6"><h3 className="text-[var(--gold)] font-bold text-lg">Editar Insumo</h3><button onClick={onClose}><X className="text-gray-500 hover:text-white"/></button></div>
+                        <div className="space-y-4 mb-6">
+                            <input className="input-std bg-[#222] border-[#333]" value={local.name} onChange={e=>setLocal({...local, name:e.target.value})} />
+                            <div className="flex gap-2">
+                                <input className="input-std bg-[#222] border-[#333]" type="number" value={local.stock} onChange={e=>setLocal({...local, stock:e.target.value})} />
+                                <span className="p-2 text-gray-500 text-sm self-center uppercase">{local.unit}</span>
+                            </div>
+                            <div className="flex gap-2">
+                                <div className="w-1/2"><label className="text-xs text-gray-500">Caducidad</label><input type="date" className="input-std bg-[#222]" value={local.expiry} onChange={e=>setLocal({...local, expiry:e.target.value})} /></div>
+                                <div className="w-1/2"><label className="text-xs text-gray-500">Barras</label><input className="input-std bg-[#222]" value={local.barcode} onChange={e=>setLocal({...local, barcode:e.target.value})} /></div>
+                            </div>
+                            <button onClick={()=>onDelete(item.id)} className="w-full bg-red-600 text-white py-2 rounded font-bold hover:bg-red-700 transition uppercase tracking-wide">Eliminar</button>
+                        </div>
+                        <div className="flex justify-end gap-3 pt-4 border-t border-[#333]"><button onClick={onClose} className="px-4 py-2 bg-gray-600 text-white rounded font-bold text-sm">Cancelar</button><button onClick={()=>onSave(local)} className="px-6 py-2 bg-[var(--gold)] text-black rounded font-bold text-sm">GUARDAR</button></div>
+                    </div>
+                </div>
+            )
+        }
+
+        // --- 1. ALERTAS ---
+        function ExpiryAlertModal({ supplies, onClose }) {
+            const expiring = (supplies || []).filter(s => {
+                const days = s.expiry ? Math.ceil((new Date(s.expiry) - new Date()) / 86400000) : 99;
+                return days <= 2 || parseFloat(s.stock) <= 2;
+            });
+            if (expiring.length === 0) return null;
+            return (
+                <div className="fixed inset-0 bg-black/90 z-[9000] flex items-center justify-center p-4">
+                    <div className="bg-[#1c1c1c] w-full max-w-lg rounded-xl border-2 border-red-600 p-6 relative shadow-[0_0_50px_rgba(220,38,38,0.2)] animate-pulse">
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white"><X/></button>
+                        <h2 className="text-2xl font-brand text-red-600 mb-6 flex items-center gap-2 uppercase tracking-widest"><AlertTriangle/> ALERTA STOCK</h2>
+                        <div className="space-y-3 mb-6">
+                            {expiring.map((s, i) => (
+                                <div key={i} className="bg-[#2a2a2a] p-3 rounded flex justify-between items-center border border-[#333]">
+                                    <div><p className="font-bold text-white text-lg">{s.name}</p><p className="text-gray-500 text-sm">Stock: {s.stock} {s.unit}</p></div>
+                                    <div className="text-right"><p className="text-red-500 font-bold text-sm">CADUCA: {s.expiry}</p><p className="text-[var(--gold)] font-bold text-xs uppercase tracking-wider">BAJO</p></div>
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={onClose} className="w-full bg-white text-black font-bold py-3 rounded hover:bg-gray-200 transition">ENTENDIDO</button>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 2. REPORTES ---
+        function SalesReports({ config }) {
+            const chartRef = useRef(null);
+            const [detailModal, setDetailModal] = useState(null);
+            const orders = config.orders || [];
+            const expenses = (config.expenses || []).reduce((a,b)=>a+b.amount,0);
+            const totalSales = orders.reduce((acc, o) => acc + o.total, 0);
+            
+            // Calculate Mermas from Expenses with reason 'Merma'
+            const mermasData = (config.expenses||[]).filter(e => e.reason && e.reason.toLowerCase().includes('merma'));
+            // Group mermas
+            const mermasGrouped = mermasData.reduce((acc, curr) => {
+                acc[curr.provider] = (acc[curr.provider] || 0) + curr.amount; // Using provider field as item name for mermas
+                return acc;
+            }, {});
+            const mermasChart = Object.keys(mermasGrouped).map(k => ({name: k, amount: mermasGrouped[k]}));
+
+            const methodCount = { efectivo: 0, tarjeta: 0, plataforma: 0 };
+            const prodCount = {};
+            orders.forEach(o => {
+                const method = o.type === 'plataforma' ? 'plataforma' : o.method;
+                methodCount[method] = (methodCount[method] || 0) + o.total;
+                (typeof o.items === 'string' ? JSON.parse(o.items) : o.items || []).forEach(i => prodCount[i.name] = (prodCount[i.name] || 0) + i.qty);
+            });
+            const topProd = Object.keys(prodCount).map(k => ({name:k, qty:prodCount[k]})).sort((a,b)=>b.qty-a.qty).slice(0,5);
+
+            useEffect(() => {
+                if(chartRef.current) {
+                    if(window.myChart) window.myChart.destroy();
+                    window.myChart = new Chart(chartRef.current.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Efectivo', 'Plataformas', 'Web'],
+                            datasets: [{ data: [methodCount.efectivo || 0, methodCount.plataforma || 0, methodCount.web || 0], backgroundColor: ['#22c55e', '#a855f7', '#3b82f6'], borderWidth:0 }]
+                        },
+                        options: { responsive: true, cutout: '60%', plugins: { legend: { display:false } }, onClick: ()=>setDetailModal('methods') }
+                    });
+                }
+            }, [config]);
+
+            return (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="card p-4 text-center border-neon-gold"><p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">VENTAS TOTALES</p><p className="text-3xl font-black text-[var(--gold)]">{formatCurrency(totalSales)}</p></div>
+                        <div className="card p-4 text-center border-neon-red"><p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">GASTOS/SALIDAS</p><p className="text-3xl font-black text-red-500">{formatCurrency(expenses)}</p></div>
+                        <div className="card p-4 text-center border-neon-green"><p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">UTILIDAD BRUTA</p><p className="text-3xl font-black text-green-500">{formatCurrency(totalSales-expenses)}</p></div>
+                        <div className="card p-4 text-center border-neon-blue"><p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">PEDIDOS</p><p className="text-3xl font-black text-blue-400">{orders.length}</p></div>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="card p-6 border-[#333] relative">
+                            <h3 className="text-center text-gray-400 font-bold mb-4">Métodos de Pago</h3>
+                            <div className="h-40 flex justify-center items-center"><canvas ref={chartRef}></canvas></div>
+                            <div className="flex justify-center gap-2 mt-4 text-xs"><span className="text-green-500">■ Efec</span><span className="text-purple-500">■ Plat</span><span className="text-blue-500">■ Web</span></div>
+                        </div>
+                        <div className="card p-6 border-[#333] col-span-2 relative">
+                            <h3 className="text-gray-400 font-bold mb-4 flex gap-2"><TrendingUp size={18}/> Top Productos</h3>
+                            <div className="space-y-3">
+                                {topProd.length > 0 ? topProd.map((p,i)=>(
+                                    <div key={i} className="flex justify-between items-center text-sm border-b border-[#333] pb-2">
+                                        <span className="text-white">{i+1}. {p.name}</span>
+                                        <span className="font-bold text-[var(--gold)]">{p.qty} vendidos</span>
+                                    </div>
+                                )) : <p className="text-gray-500 text-sm">Sin ventas registradas.</p>}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card p-6 border-[#333]">
+                        <h3 className="text-gray-400 font-bold mb-6">Registro de Mermas (Real)</h3>
+                        {mermasChart.length > 0 ? (
+                             <div className="flex gap-4 h-24 items-end">
+                                {mermasChart.map((m,i)=>(
+                                    <div key={i} className="flex-1 bg-red-900/10 rounded-t h-full relative group flex flex-col justify-end">
+                                        <div className="w-full bg-red-600 rounded-t transition-all hover:bg-red-500" style={{height:`${Math.min(100, (m.amount/expenses)*100)}%`}}></div>
+                                        <div className="absolute bottom-2 left-0 w-full text-center text-white text-xs font-bold z-10 drop-shadow-md">{m.name} ({formatCurrency(m.amount)})</div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : <p className="text-gray-500 text-center">Sin mermas registradas.</p>}
+                    </div>
+                    {detailModal && <Modal title="DETALLE" onClose={()=>setDetailModal(null)}><div className="text-center text-white p-4">Detalle de {detailModal}</div></Modal>}
+                </div>
+            );
+        }
+
+        // --- 3. GESTION (MENU, CUPONES, INSUMOS) ---
+        const MenuManager = ({ config, updateConfig }) => {
+            const [item, setItem] = useState({name:'', price:'', cat:'', desc:'', active:true, img:''});
+            const handleCSV = (e) => { const f=e.target.files[0]; if(f){const r=new FileReader(); r.onload=evt=>{const l=evt.target.result.split('\n').slice(1); const n=l.map(x=>{const[nm,p,c,d,i]=x.split(','); return nm?{id:generateId(),name:nm,price:parseFloat(p),cat:c,desc:d,img:i,active:true}:null}).filter(Boolean); updateConfig({...config, products:[...config.products, ...n]}); alert("Cargado");}; r.readAsText(f);}};
+            const downloadTemplate = () => { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(["Nombre,Precio,Categoria,Descripcion,ImagenURL"],{type:'text/csv'})); a.download='menu_template.csv'; a.click(); };
+            const save = () => { if(!item.name) return; updateConfig({...config, products: [...config.products, {...item, id:generateId()}]}); setItem({name:'', price:'', cat:'', desc:'', active:true, img:''}); };
+            return <div className="card p-6"><h3 className="text-[var(--gold)] font-bold mb-4">MENÚ</h3><div className="grid grid-cols-4 gap-2 mb-4"><input className="input-std" placeholder="Nombre" value={item.name} onChange={e=>setItem({...item, name:e.target.value})}/><input className="input-std" placeholder="Precio" type="number" value={item.price} onChange={e=>setItem({...item, price:e.target.value})}/><input className="input-std" placeholder="Cat" value={item.cat} onChange={e=>setItem({...item, cat:e.target.value})}/><input className="input-std" placeholder="URL Imagen" value={item.img} onChange={e=>setItem({...item, img:e.target.value})}/></div><textarea className="input-std w-full mb-4" placeholder="Ingredientes..." value={item.desc} onChange={e=>setItem({...item, desc:e.target.value})}/><div className="flex justify-between"><div className="flex gap-2"><label className="text-xs text-blue-400 underline cursor-pointer">Cargar CSV<input type="file" hidden onChange={handleCSV}/></label><button onClick={downloadTemplate} className="text-xs text-blue-400 underline">Plantilla</button></div><button onClick={save} className="btn-gold">GUARDAR</button></div></div>
+        };
+
+        const MarketingManager = ({ config, updateConfig }) => {
+             const [cpn, setCpn] = useState({code:'', type:'percent', val:'', limit:'', start:'', end:''});
+             const save = () => { updateConfig({...config, coupons: [...config.coupons, {...cpn, id:generateId()}]}); };
+             return <div className="card p-6"><h3 className="text-[var(--gold)] font-bold mb-4">CUPONES</h3><div className="grid grid-cols-4 gap-2 mb-4"><input className="input-std uppercase" placeholder="CODIGO" value={cpn.code} onChange={e=>setCpn({...cpn, code:e.target.value})}/><select className="input-std" value={cpn.type} onChange={e=>setCpn({...cpn, type:e.target.value})}><option value="percent">%</option><option value="amount">$</option><option value="shipping">Envio</option></select><input className="input-std" placeholder="Valor" value={cpn.val} onChange={e=>setCpn({...cpn, val:e.target.value})}/><button onClick={save} className="btn-gold">CREAR</button></div><div className="flex gap-2"><input type="date" className="input-std" value={cpn.start} onChange={e=>setCpn({...cpn, start:e.target.value})}/><input type="date" className="input-std" value={cpn.end} onChange={e=>setCpn({...cpn, end:e.target.value})}/></div></div>
+        };
+
+        const SuppliesManager = ({ config, updateConfig }) => {
+            const [sup, setSup] = useState({name:'', stock:'', unit:'pz', expiry:'', barcode:'', type:''});
+            const [editItem, setEditItem] = useState(null);
+            const save = () => { let list = [...(config.supplies||[])]; if(editItem) { const idx = list.findIndex(s=>s.id===editItem.id); list[idx] = {...editItem, ...sup}; } else { list.push({...sup, id:generateId()}); } updateConfig({...config, supplies: list}); setSup({name:'', stock:'', unit:'pz', expiry:'', barcode:'', type:''}); setEditItem(null); };
+            const updateItem = (i) => { const list=[...config.supplies]; const idx=list.findIndex(s=>s.id===i.id); list[idx]=i; updateConfig({...config,supplies:list}); setEditItem(null); };
+            const deleteItem = (id) => { updateConfig({...config, supplies: config.supplies.filter(s=>s.id!==id)}); setEditItem(null); };
+            return (
+                <div className="card bg-[#222] p-6 border-[#333]">
+                    <h3 className="font-bold text-[var(--gold)] mb-4">INSUMOS</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-4"><input className="input-std bg-[#18181b] col-span-2" placeholder="Insumo" value={sup.name} onChange={e=>setSup({...sup, name:e.target.value})}/><input className="input-std bg-[#18181b]" placeholder="Barras" value={sup.barcode} onChange={e=>setSup({...sup, barcode:e.target.value})}/><div className="flex gap-1"><input className="input-std w-1/2 bg-[#18181b]" placeholder="#" type="number" value={sup.stock} onChange={e=>setSup({...sup, stock:e.target.value})}/><select className="input-std w-1/2 bg-[#18181b]" value={sup.unit} onChange={e=>setSup({...sup, unit:e.target.value})}><option value="pz">PZ</option><option value="kg">KG</option><option value="lts">LTS</option></select></div><input className="input-std bg-[#18181b]" type="date" value={sup.expiry} onChange={e=>setSup({...sup, expiry:e.target.value})}/><button onClick={save} className="btn-gold">+</button></div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{(config.supplies||[]).map(s=>(<div key={s.id} onClick={()=>{setSup(s); setEditItem(s)}} className="bg-[#18181b] p-3 rounded border-l-4 border-[var(--gold)] cursor-pointer hover:bg-[#333]"><p className="font-bold text-white">{s.name}</p><p className="text-xs text-gray-500">{s.stock} {s.unit}</p></div>))}</div>
+                    {editItem && <EditSupplyModal item={editItem} onSave={updateItem} onDelete={deleteItem} onClose={()=>{setEditItem(null); setSup({name:'', stock:'', unit:'pz', expiry:'', barcode:'', type:''})}} />}
+                </div>
+            )
+        };
+
+        // --- 4. PERSONAL ---
+        function UsersManager({ config, updateConfig }) {
+            const [user, setUser] = useState({name:'', username:'', password:'', role:'cajero', salary:'', bonus:'', schedule:{}});
+            const [editUser, setEditUser] = useState(null);
+            const days = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+            
+            const save = () => {
+                let list = [...(config.users||[])];
+                if(editUser) { const idx = list.findIndex(u=>u.id===editUser.id); list[idx] = {...editUser, ...user}; }
+                else { list.push({...user, id: generateId(), schedule:{}}); }
+                updateConfig({...config, users: list}); setUser({name:'', username:'', password:'', role:'cajero', salary:'', bonus:'', schedule:{}}); setEditUser(null);
+            };
+
+            const openEdit = (u) => { setUser(u); setEditUser(u); };
+
+            return (
+                <div className="space-y-6">
+                    {/* ALTA PERSONAL */}
+                    <div className="card p-6 border-l-4 border-[var(--gold)]">
+                        <h3 className="text-[var(--gold)] font-bold mb-4 text-lg">Alta Personal</h3>
+                        <div className="flex flex-wrap gap-3 items-end">
+                            <input className="input-std w-40" placeholder="Nombre" value={user.name} onChange={e=>setUser({...user, name:e.target.value})}/>
+                            <input className="input-std w-32" placeholder="Usuario" value={user.username} onChange={e=>setUser({...user, username:e.target.value})}/>
+                            <input className="input-std w-32" placeholder="Pass" value={user.password} onChange={e=>setUser({...user, password:e.target.value})}/>
+                            <select className="input-std w-32" value={user.role} onChange={e=>setUser({...user, role:e.target.value})}><option value="cajero">Cajero</option><option value="cocina">Cocina</option><option value="repartidor">Repartidor</option></select>
+                            <button onClick={save} className="bg-[var(--gold)] text-black font-bold px-4 py-2 rounded h-10 shadow-md whitespace-nowrap hover:bg-yellow-400">{editUser?'ACTUALIZAR':'AGREGAR EMPLEADO'}</button>
+                        </div>
+                    </div>
+
+                    <div className="card p-4 border border-[#333]">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-[var(--gold)] font-bold flex gap-2"><CalendarIcon size={20}/> Agenda Semanal</h3>
+                            <button onClick={()=>window.print()} className="bg-[#333] text-white px-3 py-1 rounded text-xs flex items-center gap-2 border border-[#444]"><Printer size={12}/> Imprimir Horario</button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <div className="min-w-[800px] grid grid-cols-8 gap-0 text-center text-xs text-gray-400 border-b border-[#333] pb-2 mb-2">
+                                <div className="text-left pl-2 font-bold text-white">EMPLEADO</div>
+                                {days.map(d=><div key={d}>{d}</div>)}
+                            </div>
+                            {(config.users||[]).map(u => (
+                                <div key={u.id} className="min-w-[800px] grid grid-cols-8 gap-0 items-center py-2 border-b border-[#333] hover:bg-[#2a2a2a] transition">
+                                    <div className="text-left pl-2 cursor-pointer" onClick={()=>openEdit(u)}>
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-full bg-[#444] flex items-center justify-center text-white font-bold">{u.name[0]}</div>
+                                            <div><p className="text-white font-bold uppercase text-xs">{u.name}</p><p className="text-[10px] text-gray-500 uppercase">{u.role}</p></div>
+                                        </div>
+                                    </div>
+                                    {days.map(d => {
+                                        const shift = u.schedule?.[d];
+                                        return (
+                                            <div key={d} className="px-1 h-10 flex items-center justify-center">
+                                                {shift?.in ? (
+                                                    <div className="bg-blue-900/40 text-blue-200 text-[10px] w-full h-full rounded border border-blue-800 flex flex-col justify-center items-center cursor-pointer hover:bg-blue-800/50" onClick={()=>openEdit(u)}>
+                                                        <span>{shift.in}</span><span>{shift.out}</span>
+                                                    </div>
+                                                ) : <div className="w-2 h-2 bg-[#333] rounded-full"></div>}
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    {editUser && (
+                        <Modal title={`Editar: ${editUser.name}`} onClose={()=>{setEditUser(null); setUser({name:'', username:'', password:'', role:'cajero', salary:'', bonus:'', schedule:{}})}} size="max-w-4xl">
+                            <div className="grid grid-cols-8 gap-2 text-center text-xs">
+                                <div className="font-bold text-[var(--gold)] self-center">DÍA</div>
+                                {days.map(d=><div key={d} className="font-bold p-1 bg-black/20 rounded">{d}</div>)}
+                                <div className="text-gray-400 font-bold self-center">ENTRADA</div>
+                                {days.map(d=><input key={`in-${d}`} type="time" className="bg-[#333] text-white rounded p-1 text-center border border-[#444]" value={user.schedule?.[d]?.in||''} onChange={e=>{const s={...(user.schedule||{})}; if(!s[d])s[d]={}; s[d].in=e.target.value; setUser({...user, schedule:s})}}/>)}
+                                <div className="text-gray-400 font-bold self-center">SALIDA</div>
+                                {days.map(d=><input key={`out-${d}`} type="time" className="bg-[#333] text-white rounded p-1 text-center border border-[#444]" value={user.schedule?.[d]?.out||''} onChange={e=>{const s={...(user.schedule||{})}; if(!s[d])s[d]={}; s[d].out=e.target.value; setUser({...user, schedule:s})}}/>)}
+                            </div>
+                            <div className="flex justify-end mt-4"><button onClick={save} className="btn-gold px-6">GUARDAR HORARIO</button></div>
+                        </Modal>
+                    )}
+                </div>
+            )
+        }
+
+        // --- 5. CONFIGURACION ---
+        function SettingsManager({ config, updateConfig }) {
+            const [local, setLocal] = useState({...config});
+            const [salaries, setSalaries] = useState(config.salaries || { cajero: {base:0, bono:0}, cocina: {base:0, bono:0}, repartidor: {base:0, bono:0} });
+            const [itemInput, setItemInput] = useState({prov:'', plat:''});
+            const [notif, setNotif] = useState({msg:'', target:'all'});
+
+            const save = () => { updateConfig({...local, salaries}); alert("Configuración Guardada"); };
+            const addItem = (k, v) => { if(v) { const n = [...(local[k]||[]), v]; setLocal({...local, [k]:n}); updateConfig({...local, [k]:n}); } };
+            const delItem = (k, i) => { const n = [...local[k]]; n.splice(i,1); setLocal({...local, [k]:n}); updateConfig({...local, [k]:n}); };
+            const sendPush = () => { if(!notif.msg) return; updateConfig({...config, notifications: [...config.notifications, {id:generateId(), ...notif, date:new Date()}]}); alert("Enviado"); setNotif({...notif, msg:''}); };
+
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full pb-10">
+                    <div className="card p-6 border-t-4 border-green-500">
+                        <h3 className="font-bold text-white mb-6 text-xl">TIENDA & QR</h3>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center bg-black/20 p-3 rounded"><span>Cerrar Tienda</span><button onClick={()=>setLocal({...local, storeOpen:!local.storeOpen})} className={`w-12 h-6 rounded-full relative transition ${!local.storeOpen?'bg-green-500':'bg-red-500'}`}><div className={`w-4 h-4 bg-white rounded-full absolute top-1 ${!local.storeOpen?'left-7':'left-1'}`}></div></button></div>
+                            <div className="pt-4 border-t border-[#444] text-center">
+                                <p className="text-xs text-gray-400 mb-2">Llave Supervisor</p>
+                                <div className="bg-white p-2 w-fit mx-auto rounded mb-2"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=SUPERVISOR:${local.supervisorKey}`} /></div>
+                                <input className="input-std text-center mb-4" value={local.supervisorKey} onChange={e=>setLocal({...local, supervisorKey:e.target.value})}/>
+                                
+                                {/* NOTIFICACIONES */}
+                                <div className="bg-black/20 p-3 rounded text-left mt-2">
+                                    <p className="text-xs text-blue-400 font-bold mb-2">Notificación Push</p>
+                                    <select className="input-std text-xs mb-2" value={notif.target} onChange={e=>setNotif({...notif, target:e.target.value})}><option value="all">Todos</option><option value="cajero">Caja</option><option value="cocina">Cocina</option><option value="repartidor">Repartidores</option></select>
+                                    <div className="flex gap-1"><input className="input-std text-xs" placeholder="Mensaje..." value={notif.msg} onChange={e=>setNotif({...notif, msg:e.target.value})}/><button onClick={sendPush} className="bg-blue-600 px-3 rounded text-white"><Send size={14}/></button></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card p-6 border-t-4 border-blue-500">
+                        <h3 className="font-bold text-white mb-6 text-xl">LISTAS & SUELDOS</h3>
+                        <div className="mb-4 space-y-2">
+                            <div className="flex gap-1"><input className="input-std text-xs" placeholder="Proveedor" value={itemInput.prov} onChange={e=>setItemInput({...itemInput, prov:e.target.value})}/><button onClick={()=>{addItem('providers',itemInput.prov);setItemInput({...itemInput,prov:''})}} className="text-green-500 font-bold">+</button></div>
+                            <div className="flex gap-1"><input className="input-std text-xs" placeholder="Plataforma" value={itemInput.plat} onChange={e=>setItemInput({...itemInput, plat:e.target.value})}/><button onClick={()=>{addItem('platforms',itemInput.plat);setItemInput({...itemInput,plat:''})}} className="text-green-500 font-bold">+</button></div>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-[#444]">
+                            <p className="text-xs text-[var(--gold)] font-bold mb-2">SUELDOS BASE + BONO</p>
+                            {['cajero','cocina','repartidor'].map(r=><div key={r} className="flex justify-between text-xs items-center mb-1"><span className="capitalize w-20">{r}</span><input className="input-std w-16 text-center p-1" placeholder="$" value={salaries[r]?.base} onChange={e=>setSalaries({...salaries, [r]:{...salaries[r], base:e.target.value}})}/><input className="input-std w-16 text-center p-1" placeholder="B" value={salaries[r]?.bono} onChange={e=>setSalaries({...salaries, [r]:{...salaries[r], bono:e.target.value}})}/></div>)}
+                        </div>
+                    </div>
+                    <div className="card p-6 border-t-4 border-[var(--gold)]">
+                        <h3 className="font-bold text-white mb-6 text-xl">SISTEMA</h3>
+                        <p className="text-xs text-gray-400 mb-1">Límite Caja</p><input className="input-std mb-4" type="number" value={local.maxCash||2000} onChange={e=>setLocal({...local, maxCash:e.target.value})}/>
+                        <button onClick={save} className="w-full btn-gold mt-6 py-3 font-bold text-black shadow-lg">GUARDAR CAMBIOS</button>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- CAJA (POS) V27 ---
+        function POSSystem({ config, updateConfig, userData }) {
+            const [view, setView] = useState('pos');
+            const [cart, setCart] = useState([]);
+            const [modal, setModal] = useState(null);
+            const [orderData, setOrderData] = useState({address:'', type:'', method:'efectivo'});
+            const [geoLoading, setGeoLoading] = useState(false);
+            const [scannedDriver, setScannedDriver] = useState('');
+            const webOrders = config.orders.filter(o => o.status === 'web_pending');
+
+            const handleAddressChange = (e) => {
+                const val = e.target.value; setOrderData({...orderData, address:val});
+                if(val.length > 5) {
+                    setGeoLoading(true);
+                    setTimeout(async () => {
+                        try { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val + ", Ciudad Obregon, Sonora")}`); const data = await res.json(); if(data[0]) setOrderData(p=>({...p, lat:data[0].lat, lng:data[0].lon})); setGeoLoading(false); } catch(e){setGeoLoading(false);}
+                    }, 1000);
+                }
+            };
+
+            const acceptWebOrder = (o) => {
+                const list = [...config.orders];
+                const idx = list.findIndex(x=>x.id===o.id);
+                list[idx].status = 'pending'; // To kitchen
+                updateConfig({...config, orders:list});
+                alert("Pedido WEB Aceptado");
+            };
+
+            const processOrder = () => {
+                const totalCash = (orderData.method === 'efectivo') ? cart.reduce((a,b)=>a+b.price,0) : 0;
+                const order = { id: generateId(), orderNumber: Math.floor(Math.random()*9000), items: JSON.stringify(cart), total: cart.reduce((a,b)=>a+b.price,0), status: 'pending', createdAt: new Date().toISOString(), details: orderData, method: orderData.method, type: orderData.type, cashReceived: totalCash };
+                printContent(`${TicketHeader()}<div class="center bold">ORDEN #${order.orderNumber}</div><br>${cart.map(i=>`<div>${i.name} - ${formatCurrency(i.price)}</div>`).join('')}<hr><div class="right bold">${formatCurrency(order.total)}</div>`);
+                updateConfig({...config, orders: [...config.orders, order], cashDrawer: {current: config.cashDrawer.current + totalCash}});
+                setCart([]); setModal(null);
+            };
+
+            return (
+                <div className="flex h-full bg-[#1f1f1f]">
+                    <div className="w-24 bg-[#2a2a2a] border-r border-[#374151] flex flex-col items-center py-4 gap-4 shadow-xl z-20">
+                        <button onClick={()=>setView('pos')} className={`p-3 rounded-xl transition ${view==='pos'?'bg-[var(--gold)] text-black scale-110':'text-gray-500 hover:bg-[#333]'}`}><LayoutDashboard size={24}/></button>
+                        <button onClick={()=>setView('web')} className={`p-3 rounded-xl transition relative ${view==='web'?'bg-blue-600 text-white scale-110':'text-gray-500 hover:bg-[#333]'}`}><Bell size={24}/>{webOrders.length>0 && <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full animate-pulse border border-white"></span>}</button>
+                        <div className="flex-1"></div>
+                        <button onClick={()=>setModal('corte')} className="p-3 rounded-xl text-red-400 bg-red-900/20"><FileText/></button>
+                    </div>
+
+                    <div className="flex-1 flex overflow-hidden">
+                        {view === 'pos' && (
+                            <div className="flex-1 flex">
+                                <div className="flex-1 p-4 grid grid-cols-4 gap-4 content-start overflow-y-auto custom-scroll">
+                                    {(config.products||[]).filter(p=>p.active).map(p => (
+                                        <div key={p.id} onClick={()=>setCart([...cart, {...p, qty:1}])} className="card h-40 flex flex-col justify-center items-center cursor-pointer hover:border-[var(--gold)] relative overflow-hidden group">
+                                            {p.img && <img src={p.img} className="absolute inset-0 w-full h-full object-cover opacity-50"/>}
+                                            <span className="font-bold text-center z-10 relative text-lg text-white">{p.name}</span>
+                                            <span className="text-[var(--gold)] font-black z-10 relative">{formatCurrency(p.price)}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="w-96 bg-[#2a2a2a] border-l border-[#374151] flex flex-col shadow-2xl">
+                                    <div className="p-4 border-b border-[#374151] text-[var(--gold)] font-brand text-2xl">ORDEN</div>
+                                    <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                                        {cart.map((i,x)=><div key={x} className="flex justify-between bg-[#18181b] p-3 rounded border border-[#333]"><span>{i.name}</span><span>{formatCurrency(i.price)}</span></div>)}
+                                    </div>
+                                    <div className="p-6 bg-black border-t border-[#374151]">
+                                        <div className="flex justify-between text-3xl font-black mb-6 text-white"><span>TOTAL</span><span>{formatCurrency(cart.reduce((a,b)=>a+b.price,0))}</span></div>
+                                        <button onClick={()=>setModal('checkout')} disabled={cart.length===0} className="btn-gold w-full py-4 text-2xl">COBRAR</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {view === 'web' && (
+                            <div className="flex-1 p-6 overflow-y-auto space-y-4">
+                                <h2 className="text-2xl text-white font-bold mb-4">PEDIDOS WEB ({webOrders.length})</h2>
+                                {webOrders.map(o=>(
+                                    <div key={o.id} className="card p-4 border-l-4 border-blue-500 flex justify-between items-center">
+                                        <div><p className="text-xl font-bold text-white">#{o.orderNumber} - {o.details.name}</p><p className="text-gray-400">{o.details.address}</p></div>
+                                        <button onClick={()=>acceptWebOrder(o)} className="btn-gold">ACEPTAR</button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {modal === 'checkout' && (
+                        <Modal title="COBRAR" onClose={()=>setModal(null)} size="max-w-4xl">
+                            <div className="flex gap-6 h-full">
+                                <div className="w-1/3 border-r border-[#444] pr-4 space-y-4">
+                                    <h3 className="text-white font-bold">TIPO DE PEDIDO</h3>
+                                    {['Comer Aquí', 'Llevar', 'Domicilio', 'Plataforma'].map(t=><button key={t} onClick={()=>setOrderData({...orderData, type:t})} className={`w-full p-3 rounded ${orderData.type===t?'bg-[var(--gold)] text-black':'bg-[#333] text-gray-400'}`}>{t}</button>)}
+                                    {orderData.type === 'Domicilio' && <div className="relative"><input className="input-std" placeholder="Dirección" value={orderData.address} onChange={handleAddressChange}/>{geoLoading && <span className="absolute right-2 top-2 text-xs text-green-500">Buscando...</span>}</div>}
+                                </div>
+                                <div className="flex-1 pl-4">
+                                    <h3 className="text-white font-bold mb-4">MÉTODO DE PAGO</h3>
+                                    <div className="grid grid-cols-2 gap-4 mb-6">
+                                        <button onClick={()=>setOrderData({...orderData, method:'efectivo'})} className={`p-6 rounded-xl border-2 font-bold text-xl ${orderData.method==='efectivo'?'border-green-500 bg-green-900/20 text-green-400':'border-[#444] bg-[#333] text-gray-500'}`}>EFECTIVO</button>
+                                        <button onClick={()=>setOrderData({...orderData, method:'tarjeta'})} className={`p-6 rounded-xl border-2 font-bold text-xl ${orderData.method==='tarjeta'?'border-blue-500 bg-blue-900/20 text-blue-400':'border-[#444] bg-[#333] text-gray-500'}`}>TARJETA</button>
+                                    </div>
+                                    <button onClick={processOrder} className="btn-gold w-full py-4 text-2xl shadow-lg mt-auto">CONFIRMAR VENTA</button>
+                                </div>
+                            </div>
+                        </Modal>
+                    )}
+                </div>
+            );
+        }
+
+        // --- COCINA ---
+        function KitchenDisplay({ config, updateConfig }) {
+            const pending = (config.orders||[]).filter(o => o.status === 'pending');
+            const preparing = (config.orders||[]).filter(o => o.status === 'preparing');
+            const move = (id, st) => {
+                const list=[...config.orders]; const i=list.findIndex(o=>o.id===id);
+                list[i].status = st; updateConfig({...config, orders:list});
+            };
+            return (
+                <div className="h-full bg-[#1f1f1f] grid grid-cols-2 gap-4 p-4 text-white">
+                    <div className="bg-[#2a2a2a] p-4 rounded border-t-4 border-gray-500">
+                        <h2 className="text-2xl font-bold mb-4">PENDIENTES ({pending.length})</h2>
+                        <div className="space-y-4">{pending.map(o=><div key={o.id} onClick={()=>move(o.id,'preparing')} className="bg-white text-black p-4 rounded cursor-pointer hover:bg-gray-200"><h3 className="font-bold text-xl">#{o.orderNumber}</h3><ul>{(JSON.parse(o.items)||[]).map((i,x)=><li key={x}>{i.qty} {i.name}</li>)}</ul></div>)}</div>
+                    </div>
+                    <div className="bg-[#2a2a2a] p-4 rounded border-t-4 border-[var(--gold)]">
+                        <h2 className="text-2xl font-bold mb-4 text-[var(--gold)]">PREPARANDO ({preparing.length})</h2>
+                        <div className="space-y-4">{preparing.map(o=><div key={o.id} onClick={()=>move(o.id,'ready')} className="bg-[var(--gold)] text-black p-4 rounded cursor-pointer hover:bg-yellow-400"><h3 className="font-bold text-xl">#{o.orderNumber}</h3><p className="font-bold mt-2 text-center">LISTO</p></div>)}</div>
+                    </div>
+                </div>
+            )
+        }
+
+        // --- REPARTIDOR ---
+        function DeliveryApp({ config, user }) {
+            const [view, setView] = useState('map');
+            const myOrders = (config.orders||[]).filter(o => o.status === 'delivering');
+            return (
+                <div className="h-full flex flex-col bg-[#1f1f1f] text-white pb-16">
+                    <div className="p-4 bg-[#2a2a2a] shadow"><h2 className="font-bold">Hola, {user.name}</h2></div>
+                    <div className="flex-1 relative">
+                        {view === 'map' && <LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, emoji:'🏪'}, ...myOrders.map(o=>({pos:[27.49, -109.94], emoji:'🍔', popup:o.details.address}))]} />}
+                        {view === 'list' && <div className="p-4 space-y-4">{myOrders.map(o=><div key={o.id} className="card p-4 border-l-4 border-[var(--gold)]"><p className="font-bold">#{o.orderNumber}</p><p className="text-sm text-gray-400">{o.details.address}</p></div>)}</div>}
+                        {view === 'wallet' && <div className="h-full flex items-center justify-center flex-col"><div className="bg-white p-2 rounded mb-4"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=PAY:${user.id}`}/></div><p className="text-2xl font-bold">{formatCurrency(user.cashOnHand||0)}</p></div>}
+                    </div>
+                    <div className="fixed bottom-0 left-0 w-full bg-[#2a2a2a] border-t border-[#374151] flex justify-around p-3 z-50">
+                        <button onClick={()=>setView('map')} className={view==='map'?'text-[var(--gold)]':'text-gray-500'}><MapPin/></button>
+                        <button onClick={()=>setView('list')} className={view==='list'?'text-[var(--gold)]':'text-gray-500'}><List/></button>
+                        <button onClick={()=>setView('wallet')} className={view==='wallet'?'text-[var(--gold)]':'text-gray-500'}><Wallet/></button>
+                    </div>
+                </div>
+            )
+        }
+
+        // --- CLIENTE WEB ---
+        function CustomerMenuApp({ config, updateConfig, isAdminMirror }) {
+            const [cart, setCart] = useState([]);
+            return (
+                <div className={`h-full flex flex-col bg-[#1f1f1f] ${isAdminMirror?'border-4 border-red-500':''}`}>
+                    {isAdminMirror && <div className="bg-red-500 text-white text-center font-bold text-xs">MODO ESPEJO</div>}
+                    <div className="h-48 bg-cover bg-center border-b-4 border-[var(--gold)] relative shadow-xl" style={{backgroundImage: `url('${BANNER_URL}')`}}></div>
+                    <div className="flex-1 overflow-y-auto p-4 pb-20 space-y-4">
+                        {(config.products||[]).filter(p=>p.active).map(p=>(<div key={p.id} className="bg-[#2a2a2a] p-4 rounded flex justify-between items-center shadow border border-[#333]"><div><h3 className="text-white font-bold">{p.name}</h3><p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p></div><button onClick={()=>setCart([...cart,p])} className="bg-[var(--accent)] text-white px-4 py-2 rounded text-sm font-bold">AGREGAR</button></div>))}
+                    </div>
+                    {cart.length>0 && <div className="fixed bottom-0 w-full bg-[#222] p-4 text-center border-t-2 border-[var(--gold)]"><button className="btn-gold w-full py-3">VER PEDIDO ({formatCurrency(cart.reduce((a,b)=>a+b.price,0))})</button></div>}
+                </div>
+            )
+        }
+
+        // --- TICKETS PREVIEW ---
+        function TicketsPreview() {
+            const MockTicket = ({ title, content }) => <div className="ticket-preview"><img src={LOGO_URL} /><div className="header"><h2>EMI BURGERS</h2><p>Calle Gaviotas 408</p></div><hr/><div className="center bold mb-2">{title}</div><div className="whitespace-pre-wrap">{content}</div><hr/><div className="center">¡Gracias!</div></div>;
+            return (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+                    <MockTicket title="TICKET DE VENTA" content={`#8492 - 12/12/2025\n\n1x EMI Clásica   $95.00\n------------------------\nTOTAL:          $95.00`} />
+                    <MockTicket title="TICKET COCINA" content={`#8492 - LLEVAR\n\n1x EMI Clásica\n > S/Cebolla`} />
+                    <MockTicket title="CORTE DE CAJA" content={`CORTE #102\nFondo:   $1000.00\nVentas:  $3500.00\n------------------------\nCAJA:    $4500.00`} />
+                    <MockTicket title="LIQUIDACIÓN" content={`DRIVER: Pedro\nEntregas: 5\nCobrado: $850.00\n\nFirma: ___________`} />
+                </div>
+            );
+        }
+
+        // --- ADMIN PANEL ---
+        function AdminPanel({ config, updateConfig }) {
+            const [view, setView] = useState('reports');
+            return (
+                <div className="flex h-full flex-col bg-[var(--bg-body)]">
+                    <div className="flex gap-2 bg-[var(--bg-card)] p-2 shadow overflow-x-auto no-print border-b border-[#333]">
+                        <NavBtn id="reports" icon={<BarChart3 size={18}/>} label="Reportes" active={view} set={setView} />
+                        <NavBtn id="menu" icon={<MenuIcon size={18}/>} label="Menú" active={view} set={setView} />
+                        <NavBtn id="marketing" icon={<Ticket size={18}/>} label="Cupones" active={view} set={setView} />
+                        <NavBtn id="supplies" icon={<Package size={18}/>} label="Insumos" active={view} set={setView} />
+                        <NavBtn id="users" icon={<Users size={18}/>} label="Personal" active={view} set={setView} />
+                        <NavBtn id="tickets" icon={<Receipt size={18}/>} label="Tickets" active={view} set={setView} />
+                        <NavBtn id="settings" icon={<Settings size={18}/>} label="Configuración" active={view} set={setView} />
+                        <NavBtn id="client_mirror" icon={<Eye size={18}/>} label="Ver Cliente" active={view} set={setView} />
+                    </div>
+                    <div className="flex-1 p-6 overflow-y-auto custom-scroll">
+                        {view === 'reports' && <SalesReports config={config} />}
+                        {view === 'menu' && <MenuManager config={config} updateConfig={updateConfig}/>}
+                        {view === 'marketing' && <MarketingManager config={config} updateConfig={updateConfig}/>}
+                        {view === 'supplies' && <SuppliesManager config={config} updateConfig={updateConfig}/>}
+                        {view === 'users' && <UsersManager config={config} updateConfig={updateConfig}/>}
+                        {view === 'settings' && <SettingsManager config={config} updateConfig={updateConfig}/>}
+                        {view === 'client_mirror' && <CustomerMenuApp config={config} updateConfig={updateConfig} isAdminMirror={true}/>}
+                        {view === 'tickets' && <TicketsPreview />}
+                    </div>
+                </div>
+            );
+        }
+
+        // --- APP ROOT ---
+        function App() {
+            const [user, setUser] = useState(null);
+            const [config, setConfig] = useState(null);
+            const [simRole, setSimRole] = useState(null);
+            
+            useEffect(() => { db.load().then(setConfig); }, []);
+            const handleUpdate = (newData) => { setConfig(newData); db.save(newData); };
+
+            if(!config) return <div className="h-screen bg-[#1f1f1f] flex items-center justify-center text-[var(--gold)] text-2xl font-brand animate-pulse">CARGANDO...</div>;
+            if(new URLSearchParams(window.location.search).get('mode')==='menu') return <CustomerMenuApp config={config} updateConfig={handleUpdate}/>;
+            if(!user) return <LoginScreen onLogin={setUser} users={config.users || []} />;
+
+            const activeRole = simRole || user.role;
+
+            return (
+                <div className="h-screen w-full overflow-hidden flex flex-col relative">
+                    <header className="bg-[#2a2a2a] p-3 flex justify-between items-center border-b border-[#374151] z-40 shadow-md">
+                        <div className="flex items-center gap-3"><div className="bg-[var(--gold)] text-black font-brand px-2 py-1 rounded shadow">EB</div><span className="font-brand text-xl text-white tracking-wide">EMI BURGERS <span className="text-xs font-sans bg-[#18181b] text-gray-400 px-2 py-1 rounded ml-2 uppercase border border-[#333]">{activeRole} {simRole&&'(Simulado)'}</span></span></div>
+                        <button onClick={()=>setUser(null)} className="text-red-500 hover:bg-[#333] p-2 rounded transition"><LogOut size={20}/></button>
+                    </header>
+                    <main className="flex-1 overflow-hidden relative">
+                        {activeRole === 'admin' && <AdminPanel config={config} updateConfig={handleUpdate} />}
+                        {activeRole === 'cajero' && <POSSystem config={config} updateConfig={handleUpdate} userData={user}/>}
+                        {activeRole === 'cocina' && <KitchenDisplay config={config} updateConfig={handleUpdate} />}
+                        {activeRole === 'repartidor' && <DeliveryApp config={config} user={user} />}
+                    </main>
+                    {user.role === 'admin' && (
+                        <div className="gods-eye group">
+                            <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,193,7,0.5)] border-2 border-white hover:scale-110 transition z-50"><Eye size={28} className="text-black"/></button>
+                            <div className="gods-menu">
+                                <button onClick={()=>setSimRole('admin')} className="text-left p-2 rounded text-sm text-white hover:bg-[#333]">👮 Admin</button>
+                                <button onClick={()=>setSimRole('cajero')} className="text-left p-2 rounded text-sm text-white hover:bg-[#333]">🏪 Caja</button>
+                                <button onClick={()=>setSimRole('cocina')} className="text-left p-2 rounded text-sm text-white hover:bg-[#333]">👨‍🍳 Cocina</button>
+                                <button onClick={()=>setSimRole('repartidor')} className="text-left p-2 rounded text-sm text-white hover:bg-[#333]">🛵 Repartidor</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
