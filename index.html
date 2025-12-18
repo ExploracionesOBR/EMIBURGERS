@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMI BURGERS - ERP V52 FULL</title>
+    <title>EMI BURGERS - ERP V63 STABLE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
     
+    <!-- React & Dependencies -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -33,14 +36,24 @@
             font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; 
             user-select: none; -webkit-tap-highlight-color: transparent;
             transition: background-color 0.3s, color 0.3s;
+            height: 100vh; width: 100vw;
         }
         
+        #root { height: 100%; width: 100%; overflow: hidden; }
+
         .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
         .font-mono { font-family: 'Courier Prime', monospace; }
         
         .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .input-std { background-color: var(--input-bg); border: 1px solid var(--border); color: var(--text-main); outline: none; width: 100%; border-radius: 0.5rem; padding: 0.75rem; transition: border 0.2s; }
-        .input-std:focus { border-color: var(--gold); }
+        
+        /* Fixed Input Styling for Themes */
+        .input-std { 
+            background-color: var(--input-bg) !important; 
+            border: 1px solid var(--border) !important; 
+            color: var(--text-main) !important; 
+            outline: none; width: 100%; border-radius: 0.5rem; padding: 0.75rem; transition: border 0.2s; 
+        }
+        .input-std:focus { border-color: var(--gold) !important; }
         
         .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; text-transform: uppercase; border-radius: 0.75rem; padding: 0.8rem; border: none; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); transition: transform 0.1s; display: flex; justify-content: center; items-center; gap: 0.5rem; cursor: pointer; }
         .btn-gold:active { transform: scale(0.96); }
@@ -49,9 +62,12 @@
         .custom-pin { background: none; border: none; font-size: 32px; text-align: center; filter: drop-shadow(0 2px 3px black); cursor: pointer; transition: transform 0.2s; }
         .driver-pin { font-size: 20px; background: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold); box-shadow: 0 0 15px var(--gold); z-index: 1000; }
         
-        .gods-eye { position: fixed; bottom: 80px; left: 20px; z-index: 9999; }
-        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 200px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 10px; display: none; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
-        .gods-eye:hover .gods-menu { display: flex; }
+        /* UI Elements Positioning */
+        .theme-toggle { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: var(--bg-card); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; }
+        
+        /* God's Eye - Raised higher */
+        .gods-eye { position: fixed; bottom: 150px; left: 20px; z-index: 9999; }
+        .gods-menu { position: absolute; bottom: 70px; left: 0; width: 200px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .bill-btn { width: 100%; height: 70px; background-size: contain; background-repeat: no-repeat; background-position: center; border-radius: 8px; border: 1px solid #444; cursor: pointer; transition: transform 0.1s; background-color: #333; }
@@ -63,16 +79,112 @@
         .mode-btn.active { border-color: var(--gold); background: rgba(255, 215, 0, 0.1); color: var(--gold); }
         
         .scroll-hide::-webkit-scrollbar { display: none; }
-        .theme-toggle { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: var(--bg-card); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; }
         
-        .push-toast { position: fixed; top: 20px; right: 20px; background: #333; border-left: 5px solid var(--gold); padding: 15px; border-radius: 5px; color: white; z-index: 10000; animation: slideIn 0.3s; display: flex; gap: 10px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        /* Custom Toast Notification */
+        .custom-toast { position: fixed; top: 20px; right: 20px; background: #e74c3c; border-left: 5px solid #c0392b; padding: 15px; border-radius: 5px; color: white; z-index: 10000; animation: slideIn 0.3s; display: flex; gap: 10px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-weight: bold; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
         .progress-bar { height: 8px; border-radius: 4px; background: #333; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
         
-        .promo-video-container { position: fixed; bottom: 0; left: 0; width: 100%; height: 180px; z-index: 5; pointer-events: none; overflow: hidden; opacity: 0.8; mask-image: linear-gradient(to top, black, transparent); }
-        .promo-video-container video { width: 100%; height: 100%; object-fit: cover; }
+        .client-promo-video {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 120px;
+            z-index: 50; pointer-events: none; overflow: hidden;
+            mask-image: linear-gradient(to top, black 60%, transparent 100%);
+        }
+        .client-promo-video video { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+
+        /* Floating Share Button */
+        .share-btn {
+            position: fixed; top: 30%; right: 0; transform: translateY(-50%);
+            background: var(--gold); border-radius: 20px 0 0 20px; padding: 12px;
+            z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3);
+            transition: all 0.3s; opacity: 0.5;
+        }
+        .share-btn:hover, .share-btn:active { opacity: 1; transform: translateY(-50%) scale(1.1); }
+
+        /* Admin Menu FAB - Adjusted Position */
+        .admin-fab {
+            position: fixed; bottom: 80px; left: 20px; z-index: 9000;
+        }
+        .admin-fab-menu {
+            position: absolute; bottom: 70px; left: 0; 
+            display: flex; flex-direction: column; gap: 10px; align-items: flex-start;
+            animation: slideUp 0.2s ease-out;
+        }
+
+        /* Install App Button - Adjusted Position */
+        .install-btn {
+            position: fixed; bottom: 80px; left: 20px; z-index: 9999;
+            background: black; border: 2px solid var(--gold);
+            border-radius: 50%; width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        /* Scrollbar custom */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #111; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+        /* Logout Button Ghost Area */
+        .logout-ghost {
+            position: fixed; top: 0; right: 0; padding: 20px; z-index: 9999;
+            opacity: 0; transition: opacity 0.2s;
+        }
+        .logout-ghost:hover, .logout-ghost:active { opacity: 1; }
+
+        /* GPS Pulse Animation */
+        .gps-btn { position: relative; overflow: hidden; }
+        .gps-btn::after {
+            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 100%; height: 100%; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: ripple 1.5s infinite;
+        }
+        @keyframes ripple { 0% { width: 0; height: 0; opacity: 0.5; } 100% { width: 200%; height: 200%; opacity: 0; } }
+
+        /* Camera Scanner Animation */
+        .scanner-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) inset;
+            pointer-events: none;
+        }
+        .scanner-line {
+            position: absolute; width: 100%; height: 2px; background: red;
+            box-shadow: 0 0 10px red;
+            animation: scan 2s infinite linear;
+        }
+        @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+
+        /* Loading Pulse for Address */
+        @keyframes pulse-bg { 0% { background-color: var(--input-bg); } 50% { background-color: #332b00; } 100% { background-color: var(--input-bg); } }
+        .locating { animation: pulse-bg 1.5s infinite; }
+        
+        /* Ticket Visualization Style */
+        .ticket-view {
+            font-family: 'Courier Prime', monospace;
+            background: white; color: black;
+            padding: 10px; width: 100%;
+            border: 1px solid #ccc;
+            font-size: 10px;
+            white-space: pre-wrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Responsive Container for Mobile Apps */
+        .app-container {
+            width: 100%; height: 100%;
+        }
+        @media (min-width: 768px) {
+            .app-view-mobile {
+                max-width: 480px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333;
+                box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            }
+        }
     </style>
 </head>
 <body class="dark">
@@ -84,49 +196,65 @@
             Smartphone, User, QrCode, Clock, CheckCircle, AlertTriangle, FileText, Settings, Menu as MenuIcon, X, 
             Save, Trash2, ShoppingBag, Camera, Users, BarChart3, Bell, Ticket, TrendingUp, Lock, Eye, Send, Map, Navigation, 
             Wallet, Receipt, ArrowRight, Banknote, Power, Wifi, WifiOff, RefreshCw, Crosshair, Home, UserCheck, Calendar, Globe, QrCode as QRIcon,
-            Package, Percent, Edit, Phone, Table, ArrowLeft, MessageCircle, Sun, Moon, Video, Copy, ClipboardList, PieChart, Link as LinkIcon
+            Package, Percent, Edit, Phone, Table, ArrowLeft, MessageCircle, Sun, Moon, Video, Copy, ClipboardList, PieChart, Link as LinkIcon, PenTool, Share2, MoreVertical, Download
         } from 'https://esm.sh/lucide-react@0.344.0';
 
         const React = window.React;
         const ReactDOM = window.ReactDOM;
-        const { useState, useEffect, useRef, useMemo } = React;
+        const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
         // --- CONSTANTS ---
-        const STORE_COORDS = [27.446885, -109.943842]; 
+        const STORE_COORDS = [27.4828, -109.9304]; // Ciudad Obregón Approx Center
+        const CITY_SUFFIX = ", Ciudad Obregón, Sonora, Mexico";
         const SUPER_USER_PASS = "OBR1995@";
         const LOGO_URL = "LOGO_1.png";
         const BANNER_URL = "BANNER_MENU.jpg"; 
         const VIDEO_URL = "WEB_PROMOCIONES.mp4";
-        const CLOSED_IMG = "FIN_TURNO.png"; 
+        const CLOSED_IMG = "CERRADO_OFF.png"; 
         
         const generateId = () => Math.random().toString(36).substr(2, 9).toUpperCase();
         const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val || 0);
 
-        // --- DATABASE ---
+        // --- HELPER: CUSTOM TOAST ---
+        const showToast = (message) => {
+            const toast = document.createElement("div");
+            toast.className = "custom-toast";
+            toast.innerHTML = `<span class="font-bold">⚠️ ${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = "slideIn 0.3s reverse";
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        };
+
+        // --- HELPER: ROBUST COPY TO CLIPBOARD ---
+        const copyToClipboard = (text) => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? 'Enlace copiado al portapapeles' : 'No se pudo copiar';
+                alert(msg);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                alert("Error al copiar. Hazlo manualmente.");
+            }
+            document.body.removeChild(textArea);
+        };
+
+        // --- DATABASE (CLEAN SLATE) ---
         const initialDB = {
-            products: [
-                { id: '1', name: 'Hamburguesa Clásica', price: 95, cat: 'Burgers', active: true, img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=300', desc: 'Carne 150g, queso americano.' },
-                { id: '2', name: 'BBQ Bacon Master', price: 135, cat: 'Burgers', active: true, img: 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&w=300', desc: 'Doble carne, tocino ahumado.' },
-                { id: '3', name: 'Papas Gajo', price: 55, cat: 'Sides', active: true, img: 'https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?auto=format&fit=crop&w=300', desc: 'Sazonadas.' }
-            ],
+            products: [], 
             users: [
                 { id: 'u1', name: 'Admin', username: 'admin', password: '123', role: 'admin', salary: 0, schedule: {}, attendance: [] },
-                { id: 'u2', name: 'Cajero Alex', username: 'caja', password: '123', role: 'cajero', salary: 1200, schedule: {Lun:{in:'09:00',out:'17:00'}, Mar:{in:'09:00',out:'17:00'}}, attendance: [] },
-                { id: 'u3', name: 'Chef Mike', username: 'cocina', password: '123', role: 'cocina', salary: 1500, schedule: {}, attendance: [] },
-                { id: 'u4', name: 'Juan Moto', username: 'moto', password: '123', role: 'repartidor', cashOnHand: 0, location: [27.448, -109.945], online: true, salary: 1000, schedule: {}, attendance: [] }
             ],
-            orders: [
-                { id: 'o1', total: 150, source: 'web', method: 'card', items: [{name: 'BBQ Bacon Master', qty: 1}], status: 'delivered', createdAt: new Date().toISOString(), clientLoc: [27.45, -109.95] },
-                { id: 'o2', total: 200, source: 'store', method: 'cash', items: [{name: 'Hamburguesa Clásica', qty: 2}], status: 'delivered', createdAt: new Date().toISOString() },
-                { id: 'o3', total: 120, source: 'platform', platformName: 'Uber Eats', method: 'card', items: [{name: 'Hamburguesa Clásica', qty: 1}], status: 'delivered', createdAt: new Date().toISOString() },
-                { id: 'o4', total: 300, source: 'platform', platformName: 'DiDi Food', method: 'card', items: [{name: 'BBQ Bacon Master', qty: 2}], status: 'delivered', createdAt: new Date().toISOString() }
-            ],
-            coupons: [{ id: 'c1', code: 'PROMO10', type: 'percent', val: 10, limit: 100, used:0, start: '2023-01-01', end: '2025-12-31' }],
-            supplies: [
-                { id: 's1', name: 'Carne Molida', stock: 10, unit: 'KG', expiry: '2025-10-25', entryDate: '2025-10-20' },
-                { id: 's2', name: 'Pan Brioche', stock: 2, unit: 'PZ', expiry: '2023-10-20', entryDate: '2023-10-10' },
-                { id: 's3', name: 'Lechuga', stock: 5, unit: 'PZ', expiry: '2023-10-15', entryDate: '2023-10-01' }
-            ],
+            orders: [],
+            coupons: [],
+            supplies: [],
             settings: {
                 storeOpen: true,
                 pickupEnabled: true,
@@ -138,13 +266,14 @@
                 cashLimit: 2000,
                 providers: [], 
                 platforms: ['Uber Eats', 'DiDi Food', 'Rappi'],
-                ticketConfig: { header: 'EMI BURGERS\nCalle Gaviotas 408', footer: '¡GRACIAS POR SU COMPRA!' },
+                ticketConfig: { header: 'EMI BURGERS\nCD. OBREGON', footer: '¡GRACIAS POR SU COMPRA!' },
                 deliveryTable: [
-                    { min: 0, max: 4, price: 30 },
-                    { min: 4.1, max: 15, price: 50 }
+                    { min: 0, max: 3, price: 30 },
+                    { min: 3.1, max: 7, price: 50 },
+                    { min: 7.1, max: 15, price: 80 }
                 ]
             },
-            cashDrawer: { current: 1500, initial: 1500 },
+            cashDrawer: { current: 0, initial: 0 },
             expenses: []
         };
 
@@ -159,39 +288,37 @@
         
         const printTicket = (html) => {
             const win = window.open('', '', 'width=300,height=600');
-            win.document.write(`<html><head><style>body{font-family:monospace;font-size:12px;width:280px;margin:0;padding:10px;} .center{text-align:center;} .bold{font-weight:bold;} hr{border-top:1px dashed #000;} img{display:block;margin:0 auto;}</style></head><body>${html}</body></html>`);
-            win.document.close(); setTimeout(() => { win.print(); win.close(); }, 500);
-        };
-
-        const mockGeocode = (address) => {
-            if(!address) return null;
-            let hash = 0; for (let i = 0; i < address.length; i++) hash = address.charCodeAt(i) + ((hash << 5) - hash);
-            const latOffset = ((hash % 100) - 50) / 5000; const lngOffset = ((hash % 100) - 50) / 5000;
-            return [STORE_COORDS[0] + latOffset, STORE_COORDS[1] + lngOffset];
+            if(win){
+                win.document.write(`<html><head><style>body{font-family:monospace;font-size:12px;width:280px;margin:0;padding:10px;} .center{text-align:center;} .bold{font-weight:bold;} hr{border-top:1px dashed #000;} img{display:block;margin:0 auto;}</style></head><body><img src="${LOGO_URL}" style="width:50px;display:block;margin:0 auto 10px auto;">${html}</body></html>`);
+                win.document.close(); setTimeout(() => { win.print(); win.close(); }, 500);
+            } else { alert("Permite popups para imprimir"); }
         };
 
         // --- COMPONENTS ---
 
-        const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap }) => {
+        const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route }) => {
             const mapRef = useRef(null);
             const containerRef = useRef(null);
 
             useEffect(() => {
                 if (!containerRef.current) return;
+                
                 if (!mapRef.current) {
                     mapRef.current = L.map(containerRef.current, { zoomControl: false }).setView(center, zoom);
                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapRef.current);
                     if(onClickMap) mapRef.current.on('click', (e) => onClickMap([e.latlng.lat, e.latlng.lng]));
-                } else { mapRef.current.setView(center, zoom); }
+                } else { 
+                    mapRef.current.setView(center, zoom); 
+                }
 
                 mapRef.current.eachLayer(layer => {
-                    if (layer instanceof L.Marker || layer instanceof L.Circle) mapRef.current.removeLayer(layer);
+                    if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline) mapRef.current.removeLayer(layer);
                 });
 
                 if(showHeatmap) {
-                     markers.forEach((m) => {
-                        L.circle(m.pos, { color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 300, stroke: false }).addTo(mapRef.current);
-                     });
+                      markers.forEach((m) => {
+                         L.circle(m.pos, { color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 300, stroke: false }).addTo(mapRef.current);
+                      });
                 } else {
                     markers.forEach((m) => {
                         const el = document.createElement('div');
@@ -200,50 +327,80 @@
                         const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: m.type==='driver'?[36,36]:[40,40], iconAnchor: [20,20] });
                         const marker = L.marker(m.pos, { icon }).addTo(mapRef.current);
                         if(m.popup) marker.bindPopup(m.popup);
-                        if(onMarkerClick && m.data) marker.on('click', () => onMarkerClick(m.data));
+                        if(m.data) marker.on('click', () => { if(typeof onMarkerClick === 'function') onMarkerClick(m.data) });
                     });
                 }
-            }, [center, markers, showHeatmap]);
-            return <div ref={containerRef} className="h-full w-full rounded-lg bg-gray-200 border border-gray-300"></div>;
+
+                if(route && route.length === 2) {
+                    L.polyline(route, {color: 'blue', weight: 4, dashArray: '10, 10'}).addTo(mapRef.current);
+                }
+
+                return () => {
+                    if(mapRef.current) {
+                        mapRef.current.remove();
+                        mapRef.current = null;
+                    }
+                }
+            }, [center, markers, showHeatmap, zoom]); 
+
+            return <div ref={containerRef} className="h-full w-full rounded-lg bg-gray-200 border border-gray-300 z-0"></div>;
         };
 
-        // --- ADMIN PANEL COMPONENTS ---
+        // --- DASHBOARD ---
         const Dashboard = ({ db }) => {
+            const chartRef = useRef(null);
+            const canvasRef = useRef(null);
             const [selectedZone, setSelectedZone] = useState(null);
             const [showMermas, setShowMermas] = useState(false);
 
             const sales = db.orders.reduce((a,b)=>a+b.total,0);
             const expenses = db.expenses.reduce((a,b)=>a+b.amount,0);
             
-            const platformStats = db.orders.reduce((acc, o) => {
-                const key = o.source === 'web' ? 'WEB' : (o.source === 'platform' ? (o.platformName || 'APP') : 'TIENDA');
-                acc[key] = (acc[key] || 0) + 1;
-                return acc;
-            }, {});
-            
-            const paymentStats = db.orders.reduce((acc, o) => {
-                const key = o.method === 'cash' ? 'EFECTIVO' : 'TARJETA';
-                acc[key] = (acc[key] || 0) + 1;
-                return acc;
-            }, {});
-            const topPayment = Object.entries(paymentStats).sort((a,b)=>b[1]-a[1])[0] || ['-', 0];
+            useEffect(() => {
+                if(!canvasRef.current) return;
+                if(chartRef.current) chartRef.current.destroy();
+
+                const ctx = canvasRef.current.getContext('2d');
+                const salesByDate = {};
+                db.orders.forEach(o => {
+                    const date = new Date(o.createdAt).toLocaleDateString();
+                    salesByDate[date] = (salesByDate[date] || 0) + o.total;
+                });
+                const labels = Object.keys(salesByDate).slice(-7);
+                const data = Object.values(salesByDate).slice(-7);
+
+                chartRef.current = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels.length ? labels : ['Hoy'],
+                        datasets: [{ label: 'Ventas ($)', data: data.length ? data : [0], borderColor: '#FFD700', backgroundColor: 'rgba(255, 215, 0, 0.2)', tension: 0.4, fill: true }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white' } } }, scales: { y: { ticks: { color: 'white' }, grid: { color: '#333' } }, x: { ticks: { color: 'white' }, grid: { color: '#333' } } } }
+                });
+                return () => { if(chartRef.current) chartRef.current.destroy(); }
+            }, [db.orders]);
+
+            const platformStats = db.orders.reduce((acc, o) => { const key = o.source === 'web' ? 'WEB' : (o.source === 'platform' ? (o.platformName || 'APP') : 'TIENDA'); acc[key] = (acc[key] || 0) + 1; return acc; }, {});
+            const deliveryLocations = useMemo(() => db.orders.filter(o=>o.clientLoc).map(o=>({pos:o.clientLoc})), [db.orders]);
+            const expired = db.supplies.filter(s => new Date(s.expiry) < new Date());
 
             const topProducts = Object.entries(db.orders.reduce((acc, o) => {
                 o.items.forEach(i => acc[i.name] = (acc[i.name] || 0) + i.qty);
                 return acc;
             }, {})).sort((a,b)=>b[1]-a[1]).slice(0,5);
-
             const maxProdVal = topProducts.length > 0 ? topProducts[0][1] : 1;
-            const deliveryLocations = db.orders.filter(o=>o.clientLoc).map(o=>({pos:o.clientLoc}));
-            const expired = db.supplies.filter(s => new Date(s.expiry) < new Date());
 
             const handleMapClick = () => {
-                setSelectedZone({ name: "Zona Centro", topItem: "Hamburguesa Clásica" });
-                setTimeout(() => setSelectedZone(null), 3000);
+                if (topProducts.length > 0) {
+                    setSelectedZone({ name: "Zona Centro", topItem: topProducts[0][0] });
+                    setTimeout(() => setSelectedZone(null), 3000);
+                } else {
+                    showToast("Sin datos de ventas para mostrar zonas.");
+                }
             };
 
             return (
-                <div className="space-y-6 animate-in fade-in pb-20">
+                <div className="space-y-6 animate-in fade-in pb-20 overflow-y-auto h-full">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="card p-4 border-l-4 border-[var(--gold)]"><p className="text-gray-400 text-xs font-bold uppercase">Ventas</p><p className="text-3xl font-black text-[var(--text-main)]">{formatCurrency(sales)}</p></div>
                         <div className="card p-4 border-l-4 border-red-500"><p className="text-gray-400 text-xs font-bold uppercase">Gastos</p><p className="text-3xl font-black text-[var(--text-main)]">{formatCurrency(expenses)}</p></div>
@@ -251,19 +408,20 @@
                         <div className="card p-4 border-l-4 border-blue-500"><p className="text-gray-400 text-xs font-bold uppercase">Pedidos</p><p className="text-3xl font-black text-[var(--text-main)]">{db.orders.length}</p></div>
                     </div>
                     
-                    <div className="card p-6 relative">
-                        <h3 className="font-bold text-[var(--text-main)] mb-4 flex items-center gap-2"><Map size={20}/> Zonas Calientes (Entregas)</h3>
-                        <div className="h-64 rounded border border-[var(--border)] relative overflow-hidden mb-2 cursor-pointer" onClick={handleMapClick}>
-                           <LeafletMap center={STORE_COORDS} markers={deliveryLocations} showHeatmap={true} zoom={13}/>
-                           {selectedZone && <div className="absolute bottom-4 left-4 bg-black/80 text-white p-2 rounded z-[2000] animate-bounce">🔥 {selectedZone.name}: Más vendido -> {selectedZone.topItem}</div>}
-                        </div>
-                        <p className="text-xs text-gray-500">* Toca el mapa para ver tendencias por zona</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="card p-6 h-64"><h3 className="font-bold text-[var(--text-main)] mb-2 flex items-center gap-2"><BarChart3 size={20}/> Historial de Ventas</h3><div className="w-full h-full pb-6"><canvas ref={canvasRef}></canvas></div></div>
+                        <div className="card p-6 relative h-64"><h3 className="font-bold text-[var(--text-main)] mb-4 flex items-center gap-2"><Map size={20}/> Zonas Calientes</h3><div className="h-48 rounded border border-[var(--border)] relative overflow-hidden mb-2 cursor-pointer" onClick={handleMapClick}><LeafletMap center={STORE_COORDS} markers={deliveryLocations} showHeatmap={true} zoom={12}/>{selectedZone && <div className="absolute bottom-4 left-4 bg-black/80 text-white p-2 rounded z-[500] animate-bounce">🔥 {selectedZone.name}: Más vendido -> {selectedZone.topItem}</div>}</div></div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
                         <div className="card p-6">
                             <h3 className="font-bold text-[var(--gold)] mb-4 flex items-center gap-2"><TrendingUp size={20}/> Productos Más Vendidos</h3>
-                            {topProducts.map(([name, qty], i) => (
+                            {topProducts.length === 0 ? 
+                                <div className="text-gray-500 text-center py-4">
+                                    <p className="mb-2">Aún no hay ventas.</p>
+                                    <div className="progress-bar mb-2"><div className="progress-fill bg-[var(--gold)]" style={{width: `0%`}}></div></div>
+                                </div> 
+                            : topProducts.map(([name, qty], i) => (
                                 <div key={i} className="mb-2">
                                     <div className="flex justify-between text-sm mb-1"><span className="text-[var(--text-main)]">{i+1}. {name}</span><span className="text-[var(--gold)]">{qty}</span></div>
                                     <div className="progress-bar"><div className="progress-fill bg-[var(--gold)]" style={{width: `${(qty/maxProdVal)*100}%`}}></div></div>
@@ -274,25 +432,15 @@
                         <div className="space-y-4">
                             <div className="card p-6">
                                 <h3 className="font-bold text-[var(--text-main)] mb-4">Ventas por Canal</h3>
-                                {Object.entries(platformStats).map(([key, val]) => (
+                                {Object.keys(platformStats).length === 0 ? <p className="text-gray-500 text-sm">Sin datos</p> : Object.entries(platformStats).map(([key, val]) => (
                                      <div key={key} className="flex justify-between items-center py-2 border-b border-[var(--border)]">
                                          <span className="text-[var(--text-main)]">{key}</span><span className="bg-[#222] px-2 rounded text-white text-xs">{val}</span>
                                      </div>
                                 ))}
                             </div>
-                            <div className="card p-6 border-l-4 border-blue-500">
-                                <p className="text-gray-400 text-xs uppercase mb-1">Método Favorito</p>
-                                <p className="text-2xl font-black text-blue-500">{topPayment[0]}</p>
-                                <p className="text-xs text-[var(--text-main)]">{topPayment[1]} transacciones</p>
-                            </div>
                             <div className="card p-6 border-l-4 border-red-500 cursor-pointer hover:bg-[#222]" onClick={()=>setShowMermas(true)}>
                                 <h3 className="font-bold text-red-500 mb-2 flex items-center gap-2"><AlertTriangle size={16}/> Pérdidas / Caducados</h3>
                                 <div className="text-4xl font-black text-[var(--text-main)] mb-2">{expired.length}</div>
-                                <div className="mt-2 h-16 flex items-end gap-1">
-                                    <div className="w-1/3 bg-red-800 h-[30%] rounded-t"></div>
-                                    <div className="w-1/3 bg-red-600 h-[60%] rounded-t"></div>
-                                    <div className="w-1/3 bg-red-500 h-[40%] rounded-t"></div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -323,9 +471,10 @@
             );
         };
 
+        // --- ADMIN MANAGERS ---
         const ProductManager = ({ db, updateDB }) => {
             const [modal, setModal] = useState(null);
-            const [form, setForm] = useState({ name:'', price:'', cat:'', img:'', desc:'' });
+            const [form, setForm] = useState({ name:'', price:'', cat:'', img:'', desc:'', ingredients:'' });
             
             const handleCSV = (e) => {
                 const f = e.target.files[0];
@@ -353,7 +502,7 @@
             const remove = (id) => { if(confirm("¿Eliminar?")) updateDB({...db, products: db.products.filter(p=>p.id!==id)}); };
 
             return (
-                <div className="space-y-4">
+                <div className="space-y-4 overflow-y-auto h-full pb-20">
                     <div className="flex gap-2">
                         <button onClick={()=>{setForm({}); setModal(true);}} className="btn-gold z-10">NUEVO PRODUCTO</button>
                         <label className="btn-gold cursor-pointer bg-blue-600 text-white z-10">CARGAR CSV <input type="file" hidden onChange={handleCSV}/></label>
@@ -389,6 +538,7 @@
                                     <input className="input-std" placeholder="Categoría" value={form.cat||''} onChange={e=>setForm({...form,cat:e.target.value})}/>
                                     <input className="input-std" placeholder="URL Imagen" value={form.img||''} onChange={e=>setForm({...form,img:e.target.value})}/>
                                 </div>
+                                <input className="input-std mb-2" placeholder="Ingredientes (Separa por comas)" value={form.ingredients||''} onChange={e=>setForm({...form,ingredients:e.target.value})}/>
                                 <textarea className="input-std mb-4" placeholder="Descripción" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/>
                                 <div className="flex justify-end gap-2">
                                     <button onClick={()=>setModal(null)} className="text-gray-500">CANCELAR</button>
@@ -409,7 +559,7 @@
                 else if(newItem.name) { updateDB({...db, supplies: [...db.supplies, {...newItem, id: generateId()}]}); setNewItem({ name:'', stock:'', unit:'PZ', expiry:'' }); }
             };
             return (
-                <div className="space-y-4">
+                <div className="space-y-4 overflow-y-auto h-full pb-20">
                     <div className="card p-4 border-l-4 border-green-500 flex gap-2 items-end"><div className="flex-1"><label className="text-xs text-gray-500">Insumo</label><input className="input-std" value={newItem.name} onChange={e=>setNewItem({...newItem, name:e.target.value})}/></div><div className="w-20"><label className="text-xs text-gray-500">Stock</label><input className="input-std" type="number" value={newItem.stock} onChange={e=>setNewItem({...newItem, stock:e.target.value})}/></div><div className="w-32"><label className="text-xs text-gray-500">Caducidad</label><input className="input-std" type="date" value={newItem.expiry} onChange={e=>setNewItem({...newItem, expiry:e.target.value})}/></div><button onClick={save} className="btn-gold h-[46px]"><Plus/></button></div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{db.supplies.map(s => { const days = s.expiry ? Math.ceil((new Date(s.expiry) - new Date()) / 86400000) : 99; const isLow = s.stock < 5 || days < 3; return (<div key={s.id} className={`card p-4 flex justify-between items-center cursor-pointer relative group ${isLow?'border-red-500 border':''}`} onClick={()=>setEditItem(s)}><div><p className="font-bold text-[var(--text-main)]">{s.name}</p><p className={`text-xs ${days<3?'text-red-500 font-bold':'text-gray-400'}`}>Exp: {s.expiry}</p></div><div className="flex items-center gap-2"><p className="text-[var(--gold)] font-bold">{s.stock} {s.unit}</p><button onClick={(e)=>{e.stopPropagation(); updateDB({...db, supplies: db.supplies.filter(x=>x.id!==s.id)})}} className="text-red-500 hover:scale-110 z-10"><Trash2/></button></div></div>); })}</div>
                     {editItem && <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4"><div className="card bg-[var(--bg-card)] p-6"><h3 className="font-bold mb-4 text-[var(--text-main)]">EDITAR</h3><input className="input-std mb-2" value={editItem.name} onChange={e=>setEditItem({...editItem, name:e.target.value})}/><input className="input-std mb-2" type="number" value={editItem.stock} onChange={e=>setEditItem({...editItem, stock:e.target.value})}/><input className="input-std mb-4" type="date" value={editItem.expiry} onChange={e=>setEditItem({...editItem, expiry:e.target.value})}/><div className="flex justify-end gap-2"><button onClick={()=>setEditItem(null)} className="text-gray-500">CANCELAR</button><button onClick={save} className="btn-gold">GUARDAR</button></div></div></div>}
@@ -439,20 +589,31 @@
             };
 
             const handleCheckInOut = (u) => {
-                const last = u.attendance[u.attendance.length-1];
+                const last = (u.attendance || []).length > 0 ? u.attendance[u.attendance.length-1] : null;
                 const now = new Date();
-                if(last && !last.out && (now - new Date(last.in) < 10*60*1000)) {
-                    return alert("Debes esperar 10 min para salir");
-                }
+                
                 let newAtt;
                 if(last && !last.out) {
                     newAtt = [...u.attendance];
                     newAtt[newAtt.length-1].out = now.toISOString();
                 } else {
-                    newAtt = [...u.attendance, {in: now.toISOString(), out: null}];
+                    newAtt = [...(u.attendance || []), {in: now.toISOString(), out: null}];
                 }
                 updateDB({...db, users: db.users.map(x=>x.id===u.id?{...x, attendance: newAtt}:x)});
-                alert("Registro Exitoso");
+                showToast(`Registro Exitoso: ${u.name}`);
+            };
+            
+            const deleteUser = (id) => {
+                if(confirm("¿Eliminar empleado?")) {
+                    updateDB({...db, users: db.users.filter(u=>u.id!==id)});
+                    setEditing(null);
+                }
+            };
+
+            const printSchedule = (u) => {
+                const sched = days.map(d=>`${d}: ${u.schedule?.[d]?.in||'-'} - ${u.schedule?.[d]?.out||'-'}`).join('<br>');
+                const att = (u.attendance || []).map(a=>`${new Date(a.in).toLocaleDateString()}: ${new Date(a.in).toLocaleTimeString()} - ${a.out?new Date(a.out).toLocaleTimeString():'...'}`).join('<br>');
+                printTicket(`<b>${u.name}</b><br><hr>HORARIO:<br>${sched}<br><hr>ASISTENCIA:<br>${att}`);
             };
 
             if(mode === 'checador') return (
@@ -460,10 +621,13 @@
                     <h2 className="text-3xl font-brand text-[var(--gold)] mb-8">RELOJ CHECADOR</h2>
                     <div className="card p-8 w-full max-w-md bg-[var(--bg-card)] text-center">
                         <QrCode size={128} className="mx-auto mb-4 text-white"/>
-                        <p className="mb-4 text-gray-400">Escanea tu credencial o selecciona tu usuario</p>
+                        <p className="mb-4 text-gray-400">Selecciona tu usuario para registrar entrada/salida</p>
                         <div className="grid grid-cols-2 gap-2">
                             {db.users.filter(u=>u.role!=='admin').map(u=>(
-                                <button key={u.id} onClick={()=>handleCheckInOut(u)} className="p-3 bg-[#333] rounded text-white font-bold hover:bg-[var(--gold)] hover:text-black transition">{u.name}</button>
+                                <button key={u.id} onClick={()=>handleCheckInOut(u)} className="p-3 bg-[#333] rounded text-white font-bold hover:bg-[var(--gold)] hover:text-black transition flex flex-col items-center">
+                                    <span>{u.name}</span>
+                                    <span className="text-[10px] font-normal">{(u.attendance || []).length > 0 && !(u.attendance || [])[(u.attendance || []).length-1].out ? '🟢 EN TURNO' : '🔴 SALIDA'}</span>
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -472,7 +636,7 @@
             );
 
             return (
-                <div className="space-y-6">
+                <div className="space-y-6 overflow-y-auto h-full pb-20">
                      <div className="flex justify-between items-center mb-4">
                         <button onClick={()=>setEditing({name:'', role:'cajero', username:'', password:'', schedule:{}, salary:0})} className="btn-gold">AGREGAR EMPLEADO</button>
                         <button onClick={()=>setMode('checador')} className="bg-blue-600 text-white px-4 py-2 rounded font-bold flex gap-2"><Clock/> CHECADOR</button>
@@ -480,30 +644,33 @@
                      
                      <div className="overflow-x-auto">
                          <table className="w-full text-left text-sm text-[var(--text-main)]">
-                             <thead><tr className="border-b border-[var(--border)]"><th className="p-2">Nombre</th><th className="p-2 w-full text-center">Horario Semanal (Verde=Completo | Naranja=Inc. | Rojo=Falta)</th><th className="p-2">Nómina (Est)</th><th className="p-2">Acción</th></tr></thead>
+                             <thead><tr className="border-b border-[var(--border)]"><th className="p-2">Nombre</th><th className="p-2 w-full text-center">Horario / Progreso</th><th className="p-2">Nómina</th><th className="p-2">Acción</th></tr></thead>
                              <tbody>
-                                 {db.users.filter(u=>u.role!=='admin').map(u=>(
+                                 {db.users.filter(u=>u.role!=='admin').map(u=>{
+                                     const attendance = u.attendance || [];
+                                     const last = attendance.length > 0 ? attendance[attendance.length-1] : null;
+                                     const isWorking = last && !last.out;
+                                     const startTime = isWorking ? new Date(last.in).toLocaleTimeString() : '';
+                                     return (
                                      <tr key={u.id} className="border-b border-[var(--border)] hover:bg-[var(--input-bg)] cursor-pointer" onClick={()=>setEditing(u)}>
                                          <td className="p-2 font-bold whitespace-nowrap">{u.name}<br/><span className="text-xs text-gray-500">{u.role}</span></td>
                                          <td className="p-2">
-                                             <div className="grid grid-cols-7 gap-1">
-                                                 {days.map(d=>{
-                                                     const s = u.schedule?.[d];
-                                                     // Mock status logic
-                                                     const statusColor = s ? (Math.random()>0.2?'bg-green-500':'bg-orange-500') : 'bg-red-900/30'; 
-                                                     return (
-                                                         <div key={d} className={`h-8 rounded flex items-center justify-center text-[10px] text-white ${s ? statusColor : ''} relative group`}>
-                                                             {d[0]}
-                                                             {s && <div className="absolute bottom-full bg-black text-white text-xs p-1 rounded hidden group-hover:block">{s.in}-{s.out} | 8hrs</div>}
-                                                         </div>
-                                                     )
-                                                 })}
+                                             <div className="flex flex-col gap-1">
+                                                 <div className="grid grid-cols-7 gap-1">
+                                                     {days.map(d=><div key={d} className={`h-6 rounded flex items-center justify-center text-[10px] text-white ${u.schedule?.[d] ? 'bg-green-600' : 'bg-[#333]'}`}>{d[0]}</div>)}
+                                                 </div>
+                                                 {isWorking && (
+                                                     <div className="w-full bg-[#333] h-4 rounded mt-1 relative overflow-hidden">
+                                                         <div className="absolute top-0 left-0 h-full bg-yellow-500 animate-pulse w-full"></div>
+                                                         <span className="absolute inset-0 flex items-center justify-center text-[10px] text-black font-bold">TRABAJANDO DESDE {startTime}</span>
+                                                     </div>
+                                                 )}
                                              </div>
                                          </td>
                                          <td className="p-2 font-mono">{calculatePayroll(u)}</td>
-                                         <td className="p-2"><button onClick={(e)=>{e.stopPropagation(); alert("Imprimiendo horario...");}} className="text-[var(--gold)]"><Printer size={16}/></button></td>
+                                         <td className="p-2"><button onClick={(e)=>{e.stopPropagation(); printSchedule(u);}} className="text-[var(--gold)]"><Printer size={16}/></button></td>
                                      </tr>
-                                 ))}
+                                 )})}
                              </tbody>
                          </table>
                      </div>
@@ -522,22 +689,35 @@
                                      <div className="w-32"><label className="text-xs text-gray-500">Sueldo Semanal</label><input type="number" className="input-std" value={editing.salary} onChange={e=>setEditing({...editing, salary:parseFloat(e.target.value)})}/></div>
                                      <button onClick={()=>copyMonday(editing)} className="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold flex gap-2"><Copy size={14}/> COPIAR LUNES A SEMANA</button>
                                  </div>
-                                 
                                  <div className="grid grid-cols-7 gap-2 mb-6">
                                      {days.map(d=>(
                                          <div key={d} className="bg-[#222] p-2 rounded text-center border border-[#333]">
                                              <p className="text-[var(--gold)] font-bold text-xs mb-1">{d}</p>
                                              <input className="bg-black text-white w-full text-xs text-center mb-1 border border-[#333]" placeholder="Entrada" value={editing.schedule?.[d]?.in||''} onChange={e=>setEditing({...editing, schedule:{...editing.schedule, [d]:{...(editing.schedule?.[d]||{}), in:e.target.value}}})}/>
                                              <input className="bg-black text-white w-full text-xs text-center border border-[#333]" placeholder="Salida" value={editing.schedule?.[d]?.out||''} onChange={e=>setEditing({...editing, schedule:{...editing.schedule, [d]:{...(editing.schedule?.[d]||{}), out:e.target.value}}})}/>
-                                             <div className="h-1 w-full bg-green-500 mt-1 rounded"></div>
                                          </div>
                                      ))}
                                  </div>
-
-                                 <textarea className="input-std w-full h-20 mb-4" placeholder="Comentarios del administrador / Autorizaciones..."></textarea>
+                                 
+                                 {/* Manual Attendance Edit for Admin */}
+                                 <div className="mb-4 bg-[#222] p-2 rounded">
+                                     <p className="text-xs font-bold mb-1 text-white">Editar Último Registro (Admin)</p>
+                                     <div className="flex gap-2">
+                                          <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 ? new Date(editing.attendance[editing.attendance.length-1].in).toISOString().slice(0,16) : ''} onChange={(e)=>{
+                                              const newAtt = [...(editing.attendance || [])];
+                                              if(newAtt.length > 0) newAtt[newAtt.length-1].in = new Date(e.target.value).toISOString();
+                                              setEditing({...editing, attendance: newAtt});
+                                          }}/>
+                                          <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 && editing.attendance[editing.attendance.length-1].out ? new Date(editing.attendance[editing.attendance.length-1].out).toISOString().slice(0,16) : ''} onChange={(e)=>{
+                                              const newAtt = [...(editing.attendance || [])];
+                                              if(newAtt.length > 0) newAtt[newAtt.length-1].out = new Date(e.target.value).toISOString();
+                                              setEditing({...editing, attendance: newAtt});
+                                          }}/>
+                                     </div>
+                                 </div>
 
                                  <div className="flex justify-between">
-                                     {editing.id && <button onClick={()=>{if(confirm('Eliminar?')) {updateDB({...db, users:db.users.filter(u=>u.id!==editing.id)}); setEditing(null);}}} className="text-red-500">ELIMINAR USUARIO</button>}
+                                     {editing.id && <button onClick={()=>deleteUser(editing.id)} className="text-red-500 font-bold border border-red-500 p-2 rounded">ELIMINAR USUARIO</button>}
                                      <div className="flex gap-2">
                                          <button onClick={()=>setEditing(null)} className="text-gray-500">CANCELAR</button>
                                          <button onClick={()=>{
@@ -572,10 +752,7 @@
             const [newItem, setNewItem] = useState({prov:'', plat:''});
             
             const sendPush = () => {
-                const toast = document.createElement('div');
-                toast.className = 'push-toast';
-                toast.innerHTML = `<span>🔔 ${notif}</span> <button onclick="this.parentElement.remove()" class="text-xs bg-white text-black px-2 rounded">LEÍDO</button>`;
-                document.body.appendChild(toast);
+                showToast(`Notificación enviada: ${notif}`);
                 setNotif('');
             };
 
@@ -598,17 +775,34 @@
             const addItem = (list, val) => { if(val) { updateDB({...db, settings: {...db.settings, [list]: [...(db.settings[list]||[]), val]}}); setNewItem({...newItem, [list==='providers'?'prov':'plat']: ''}); }};
             const delItem = (list, idx) => { const n = [...db.settings[list]]; n.splice(idx,1); updateDB({...db, settings: {...db.settings, [list]: n}}); };
 
+            const addRate = () => {
+                if(tabItem.price){
+                    const newTable = [...db.settings.deliveryTable, {
+                        min: parseFloat(tabItem.min), 
+                        max: parseFloat(tabItem.max), 
+                        price: parseFloat(tabItem.price)
+                    }].sort((a,b)=>a.min-b.min);
+                    updateDB({...db, settings:{...db.settings, deliveryTable: newTable}}); 
+                    setTabItem({min:'',max:'',price:''});
+                }
+            };
+
             return (
                 <div className="h-full flex flex-col gap-4">
                     <div className="card p-4 border-l-4 border-purple-500 bg-[var(--bg-card)]">
                         <h3 className="font-bold mb-2 flex gap-2 text-[var(--text-main)]"><Bell/> ENVIAR NOTIFICACIÓN PUSH</h3>
                         <div className="flex gap-2">
-                            <select className="input-std w-40" value={target} onChange={e=>setTarget(e.target.value)}><option value="all">TODOS</option><option value="kitchen">COCINA</option><option value="delivery">REPARTIDORES</option></select>
+                            <select className="input-std w-40" value={target} onChange={e=>setTarget(e.target.value)}>
+                                <option value="all">TODOS</option>
+                                <option value="kitchen">COCINA</option>
+                                <option value="delivery">REPARTIDORES</option>
+                                <option value="cashier">CAJA</option>
+                            </select>
                             <input className="input-std" placeholder="Mensaje..." value={notif} onChange={e=>setNotif(e.target.value)}/>
                             <button onClick={sendPush} className="btn-gold px-6">ENVIAR</button>
                         </div>
                     </div>
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 overflow-hidden">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 overflow-hidden pb-20">
                         <div className="card p-4 border-t-4 border-blue-500 overflow-y-auto space-y-4">
                             <h3 className="font-bold flex gap-2 text-[var(--text-main)]"><Globe/> WEB & PAGOS</h3>
                             <div className="flex justify-between items-center bg-[#222] p-3 rounded"><div><p className="text-white text-sm font-bold">Estado Tienda</p></div><button onClick={()=>updateDB({...db, settings: {...db.settings, storeOpen: !db.settings.storeOpen}})} className={`px-4 py-1 rounded font-black text-xs uppercase ${db.settings.storeOpen?'bg-green-500 text-black':'bg-red-500 text-white'}`}>{db.settings.storeOpen?'ABIERTA':'CERRADA'}</button></div>
@@ -622,18 +816,58 @@
                         </div>
                         <div className="card p-4 border-t-4 border-[var(--gold)] overflow-y-auto space-y-4">
                             <h3 className="font-bold mb-2 text-[var(--text-main)]"><Lock/> SEGURIDAD & LISTAS</h3>
-                            <div>
-                                <label className="text-xs text-gray-500">Clave Supervisor</label>
-                                <input className="input-std text-sm" value={db.settings.supervisorKey} onChange={e=>updateDB({...db, settings:{...db.settings, supervisorKey:e.target.value}})}/>
-                                <div className="bg-white p-2 mt-2 w-fit rounded"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=SUPERVISOR:${db.settings.supervisorKey}`} className="w-20 h-20"/></div>
-                            </div>
+                            <div><label className="text-xs text-gray-500">Clave Supervisor</label><input className="input-std text-sm" value={db.settings.supervisorKey} onChange={e=>updateDB({...db, settings:{...db.settings, supervisorKey:e.target.value}})}/></div>
                             <hr className="border-[#333]"/>
-                            <div><p className="text-[var(--text-main)] text-xs font-bold mb-1">PLATAFORMAS</p><div className="flex gap-1 mb-2"><input className="input-std text-xs" value={newItem.plat} onChange={e=>setNewItem({...newItem, plat:e.target.value})}/><button onClick={()=>addItem('platforms',newItem.plat)} className="btn-gold">+</button></div><div className="h-24 overflow-y-auto bg-[#222] p-2 rounded">{db.settings.platforms.map((p,i)=><div key={i} className="flex justify-between text-gray-400 text-xs border-b border-[#333] py-1"><span>{p}</span><button onClick={()=>delItem('platforms',i)} className="text-red-500">x</button></div>)}</div></div>
+                            <div><p className="text-[var(--text-main)] text-xs font-bold mb-1">PLATAFORMAS</p><div className="flex gap-1 mb-2"><input className="input-std text-xs" value={newItem.plat} onChange={e=>setNewItem({...newItem, plat:e.target.value})}/><button onClick={()=>addItem('platforms',newItem.plat)} className="btn-gold">+</button></div><div className="h-24 overflow-y-auto bg-[#222] p-2 rounded custom-scroll">{db.settings.platforms.map((p,i)=><div key={i} className="flex justify-between text-gray-400 text-xs border-b border-[#333] py-1"><span>{p}</span><button onClick={()=>delItem('platforms',i)} className="text-red-500">x</button></div>)}</div></div>
                         </div>
                         <div className="card p-4 border-t-4 border-green-500 overflow-y-auto flex flex-col">
                             <div className="flex justify-between items-center mb-2"><h3 className="text-white font-bold flex gap-2"><Table/> TABULADOR ENVÍOS</h3><label className="text-[10px] text-blue-400 cursor-pointer">Cargar CSV<input type="file" hidden onChange={handleCSV}/></label></div>
-                            <div className="flex gap-1 mb-2 bg-[#222] p-1 rounded"><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="Min" type="number" value={tabItem.min} onChange={e=>setTabItem({...tabItem, min:e.target.value})}/><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="Max" type="number" value={tabItem.max} onChange={e=>setTabItem({...tabItem, max:e.target.value})}/><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="$" type="number" value={tabItem.price} onChange={e=>setTabItem({...tabItem, price:e.target.value})}/><button className="text-green-500 font-bold px-2" onClick={()=>{if(tabItem.price){updateDB({...db, settings:{...db.settings, deliveryTable:[...db.settings.deliveryTable, {min:parseFloat(tabItem.min), max:parseFloat(tabItem.max), price:parseFloat(tabItem.price)}].sort((a,b)=>a.min-b.min)}}); setTabItem({min:'',max:'',price:''});}}}>+</button></div>
+                            <div className="flex gap-1 mb-2 bg-[#222] p-1 rounded"><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="Min" type="number" value={tabItem.min} onChange={e=>setTabItem({...tabItem, min:e.target.value})}/><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="Max" type="number" value={tabItem.max} onChange={e=>setTabItem({...tabItem, max:e.target.value})}/><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="$" type="number" value={tabItem.price} onChange={e=>setTabItem({...tabItem, price:e.target.value})}/><button className="text-green-500 font-bold px-2" onClick={addRate}>+</button></div>
                             <div className="flex-1 bg-[#222] rounded overflow-y-auto p-2 space-y-1 custom-scroll">{db.settings.deliveryTable.map((r,i)=><div key={i} className="flex justify-between text-xs text-gray-300 border-b border-[#333] pb-1"><span>{r.min} - {r.max} KM</span><span className="text-[var(--gold)] font-bold">${r.price}</span></div>)}</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const TicketPreview = ({ db, updateDB }) => {
+            const [header, setHeader] = useState(db.settings.ticketConfig.header);
+            const [footer, setFooter] = useState(db.settings.ticketConfig.footer);
+            const saveConfig = () => { updateDB({...db, settings: {...db.settings, ticketConfig: { header, footer }}}); showToast("Guardado"); };
+            
+            const generateHTML = (type) => {
+                 const base = `<div class="center bold">${header.replace(/\n/g, '<br>')}</div><hr>`;
+                const end = `<hr><div class="center">${footer}</div>`;
+                const date = new Date().toLocaleString();
+                if(type === 'sale') return `${base}<div class="center">VENTA #1234</div><div class="center">${date}</div><hr><div>1x Burger Clásica ... $95</div><div>1x Papas ........... $55</div><hr><div class="bold right">TOTAL: $150</div>${end}`;
+                if(type === 'cut') return `${base}<div class="center bold">CORTE DE CAJA</div><div class="center">${date}</div><hr><div>Fondo Inicial: $1,000</div><div>+ Ventas Efec: $2,500</div><div>- Gastos/Retiros: $500</div><hr><div class="bold right">TOTAL ESPERADO: $3,000</div><br><br><div class="center">_______________________<br>Firma Cajera</div>${end}`;
+                if(type === 'driver_liq') return `${base}<div class="center bold">LIQUIDACIÓN DRIVER</div><div class="center">Juan Moto</div><hr><div>Pedidos Entregados: 5</div><div>Total Cobrado: $800</div><div>Ganancia Envíos: -$150</div><hr><div class="bold right">A ENTREGAR: $650</div><br><br><div class="center">_______________________<br>Firma Driver</div>${end}`;
+                if(type === 'platform') return `${base}<div class="center">PLATAFORMA (UBER)</div><div class="center">#9999</div><div class="center">${date}</div><hr><div>1x Burger ... $95</div><div class="bold right">TOTAL: $95</div>${end}<br><br>✂️ --- CORTE AQUÍ ---<br><br>${base}<div class="center">COPIA CLIENTE/DRIVER</div><div class="center">${date}</div><hr><div>1x Burger ... $0.00</div><div class="bold right">TOTAL A PAGAR: $0.00</div><div class="center">PROPINAS NO INCLUIDAS</div>${end}`;
+                return "";
+            };
+
+            const printDirect = (type) => printTicket(generateHTML(type));
+
+            return (
+                <div className="h-full overflow-y-auto pb-20">
+                    <div className="card p-6 mb-4">
+                        <h3 className="font-bold text-[var(--gold)] mb-4 flex gap-2"><Printer/> CONFIGURACIÓN TICKETS</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div><label className="text-xs text-gray-500">Cabecera</label><textarea className="input-std h-24" value={header} onChange={e=>setHeader(e.target.value)}/></div>
+                            <div><label className="text-xs text-gray-500">Pie de Página</label><textarea className="input-std h-24" value={footer} onChange={e=>setFooter(e.target.value)}/></div>
+                        </div>
+                        <button onClick={saveConfig} className="btn-gold w-full">GUARDAR CAMBIOS</button>
+                    </div>
+                    <div className="card p-6">
+                        <h3 className="font-bold text-white mb-4">VISTA PREVIA Y PRUEBA</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {['sale','cut','driver_liq','platform'].map(t => (
+                                <div key={t} className="bg-white text-black p-2 rounded text-xs font-mono border border-gray-300 relative group">
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition"><button onClick={()=>printDirect(t)} className="bg-black text-white p-1 rounded"><Printer size={16}/></button></div>
+                                    <div dangerouslySetInnerHTML={{__html: generateHTML(t)}} />
+                                    <button onClick={()=>printDirect(t)} className="w-full bg-[var(--gold)] mt-2 py-1 font-bold rounded">IMPRIMIR</button>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -645,7 +879,7 @@
             return (
                 <div className="h-full flex flex-col bg-[var(--bg-body)]">
                     <div className="flex gap-2 p-4 bg-[var(--bg-card)] border-b border-[var(--border)] overflow-x-auto scroll-hide">
-                        {['dash','menu','inv','staff','coup','conf'].map(t => <button key={t} onClick={()=>setTab(t)} className={`px-4 py-2 rounded font-bold uppercase whitespace-nowrap ${tab===t?'bg-[var(--gold)] text-black':'text-gray-500 bg-[#222]'}`}>{t}</button>)}
+                        {['dash','menu','inv','staff','coup','conf','tickets'].map(t => <button key={t} onClick={()=>setTab(t)} className={`px-4 py-2 rounded font-bold uppercase whitespace-nowrap ${tab===t?'bg-[var(--gold)] text-black':'text-gray-500 bg-[#222]'}`}>{t}</button>)}
                     </div>
                     <div className="flex-1 p-6 overflow-hidden">
                         {tab==='dash' && <Dashboard db={db}/>}
@@ -654,47 +888,98 @@
                         {tab==='staff' && <StaffManager db={db} updateDB={updateDB}/>}
                         {tab==='coup' && <CouponManager db={db} updateDB={updateDB}/>}
                         {tab==='conf' && <SettingsManager db={db} updateDB={updateDB}/>}
+                        {tab==='tickets' && <TicketPreview db={db} updateDB={updateDB}/>}
                     </div>
                 </div>
             );
         };
 
-        // --- POS (V52 - FULL LOGIC + WEB ORDERS) ---
+        // --- POS (V52) ---
         const POS = ({ db, updateDB, user }) => {
+            // ... (Same POS logic as previous versions, ensuring functionality is kept)
             const [cart, setCart] = useState([]);
             const [modal, setModal] = useState(null); 
             const [catFilter, setCatFilter] = useState('All');
             const [orderType, setOrderType] = useState('takeaway'); 
-            const [orderDetails, setOrderDetails] = useState({ name:'', phone:'', address:'', table:'', platform:'', refs:'' });
+            const [orderDetails, setOrderDetails] = useState({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
             const [payMethod, setPayMethod] = useState('cash');
             const [cashReceived, setCashReceived] = useState(0);
             const [voucher, setVoucher] = useState('');
             const [deliveryCoords, setDeliveryCoords] = useState(null);
             const [couponCode, setCouponCode] = useState('');
             const [discount, setDiscount] = useState(0);
+            const [addressTimer, setAddressTimer] = useState(null);
+            const [isLocating, setIsLocating] = useState(false);
+            const [bottomMenuOpen, setBottomMenuOpen] = useState(false);
+            const [liquidationModal, setLiquidationModal] = useState(false);
+            const [corteModal, setCorteModal] = useState(false);
+            const [driverToLiq, setDriverToLiq] = useState(null);
+            const [liqSummary, setLiqSummary] = useState(null);
+            const [newExpense, setNewExpense] = useState({desc:'', amount:''});
+            const [suggestions, setSuggestions] = useState([]);
 
-            // Web Alerts
             const webOrders = db.orders.filter(o => o.source === 'web' && o.status === 'web_pending_payment');
             
             const handleWebOrder = (order) => {
                 setCart(order.items);
-                setOrderDetails({name: order.clientName, phone: '', address: order.address, refs: ''});
+                setOrderDetails({name: order.clientName, phone: '', address: order.address, references: '', refs: ''});
                 setOrderType(order.address === 'RECOGER' ? 'takeaway' : 'delivery');
+                setDeliveryCoords(order.clientLoc);
                 setModal('cockpit');
-                // Remove temp web order
                 updateDB({...db, orders: db.orders.filter(o=>o.id!==order.id)});
             };
 
             const deliveryFee = useMemo(() => {
-                if(orderType !== 'delivery' || !orderDetails.address || orderDetails.address.length < 5) return 0;
-                const coords = mockGeocode(orderDetails.address);
-                setDeliveryCoords(coords);
-                const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], coords[0], coords[1]);
+                if(orderType !== 'delivery' || !deliveryCoords) return 0;
+                const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]);
                 return getDeliveryPrice(dist, db.settings.deliveryTable);
-            }, [orderType, orderDetails.address, db.settings.deliveryTable]);
+            }, [orderType, deliveryCoords, db.settings.deliveryTable]);
 
             const subtotal = cart.reduce((a,b)=>a+b.price*b.qty,0);
             const total = subtotal + deliveryFee - discount;
+
+            // REAL GEOCODING + AUTOCOMPLETE
+            const updateLocationFromAddress = (addr) => {
+                setOrderDetails(prev => ({...prev, address: addr}));
+                if (addressTimer) clearTimeout(addressTimer);
+                setAddressTimer(setTimeout(async () => {
+                    if(addr.length > 3) {
+                        setIsLocating(true);
+                        try {
+                            const query = `${addr} ${CITY_SUFFIX}`;
+                            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`);
+                            const data = await res.json();
+                            setSuggestions(data);
+                            if(data && data.length > 0) {
+                                setDeliveryCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+                            }
+                        } catch(e) { console.error("Geocoding error", e); }
+                        setIsLocating(false);
+                    } else { setSuggestions([]); }
+                }, 800)); 
+            };
+            
+            const handleReverseGeo = async (coords) => {
+                setDeliveryCoords(coords);
+                setIsLocating(true);
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`);
+                    const data = await res.json();
+                    if(data && data.display_name) {
+                        const addrParts = data.display_name.split(',');
+                        setOrderDetails(prev => ({...prev, address: addrParts[0] + (addrParts[1]||'')}));
+                        setSuggestions([]);
+                    }
+                } catch(e) {}
+                setIsLocating(false);
+            };
+
+            const useGPS = () => {
+                setIsLocating(true);
+                navigator.geolocation.getCurrentPosition(pos => {
+                    handleReverseGeo([pos.coords.latitude, pos.coords.longitude]);
+                }, () => setIsLocating(false));
+            };
 
             const applyCoupon = () => {
                 const c = db.coupons.find(x => x.code === couponCode);
@@ -702,8 +987,8 @@
                     if(c.type === 'shipping') setDiscount(deliveryFee);
                     else if(c.type === 'percent') setDiscount(subtotal * c.val / 100);
                     else setDiscount(c.val);
-                    alert("Cupón Aplicado");
-                } else alert("Cupón Inválido o Agotado");
+                    showToast("Cupón Aplicado");
+                } else showToast("Cupón Inválido o Agotado");
             };
 
             const addToCart = (p) => setCart(prev => {
@@ -711,49 +996,122 @@
                 return ex ? prev.map(i => i.id === p.id ? {...i, qty: i.qty + 1} : i) : [...prev, {...p, qty: 1}];
             });
 
-            const switchPayMethod = (method) => {
-                if(method === 'cash' && payMethod === 'card') {
-                    // Unlocked
+            const updateCartNote = (idx, note) => {
+                const newCart = [...cart];
+                newCart[idx].note = note;
+                setCart(newCart);
+            };
+
+            const switchPayMethod = (method) => setPayMethod(method);
+
+            const handleScanDriver = (scannedData) => {
+                if(scannedData.startsWith("LIQ:")) {
+                    const driverId = scannedData.split(':')[1];
+                    const driver = db.users.find(u => u.id === driverId);
+                    if(driver) {
+                        const deliveredOrders = db.orders.filter(o => o.driver === driver.username && o.status === 'delivered' && !o.settled);
+                        const totalCash = driver.cashOnHand || 0;
+                        const totalEarnings = deliveredOrders.reduce((acc, o) => acc + (o.driverFee || 0), 0);
+                        const netToPay = totalCash - totalEarnings;
+                        setDriverToLiq(driver);
+                        setLiqSummary({ deliveredOrders, totalCash, totalEarnings, netToPay });
+                    }
                 }
-                setPayMethod(method);
+            };
+            
+            const confirmLiquidation = () => {
+                if(!driverToLiq || !liqSummary) return;
+                updateDB({
+                    ...db,
+                    users: db.users.map(u => u.id === driverToLiq.id ? {...u, cashOnHand: 0} : u),
+                    orders: db.orders.map(o => liqSummary.deliveredOrders.find(do_ => do_.id === o.id) ? {...o, settled: true} : o)
+                });
+                showToast("Liquidación Exitosa.");
+                setLiquidationModal(false); setDriverToLiq(null);
+            };
+
+            const addExpense = () => {
+                if(!newExpense.amount) return;
+                const amt = parseFloat(newExpense.amount);
+                updateDB({
+                    ...db,
+                    expenses: [...db.expenses, {id:generateId(), desc:newExpense.desc || 'Retiro Varios', amount:amt, date:new Date().toISOString()}],
+                    cashDrawer: {...db.cashDrawer, current: db.cashDrawer.current - amt}
+                });
+                setNewExpense({desc:'', amount:''});
+                showToast("Retiro Registrado");
+            };
+
+            // Smart Cash Logic
+            const checkCashLimit = (newTotal) => {
+                const currentCash = db.cashDrawer.current + newTotal;
+                const limit = (db.cashDrawer.initial || 0) + 500;
+                if(currentCash >= limit) {
+                    const excess = currentCash - limit; // Withdraw excess amount or fixed 500
+                    const withdrawAmount = 500; // Fixed withdrawal chunk
+                    
+                    if(confirm(`⚠️ ALERTA DE EFECTIVO\n\nLa caja ha superado el límite seguro.\nSe debe realizar un retiro de $${withdrawAmount}.\n\n¿Registrar retiro ahora?`)) {
+                         updateDB(prev => ({
+                             ...prev,
+                             expenses: [...prev.expenses, {id:generateId(), desc:'RETIRO AUTOMÁTICO EXCESO', amount: withdrawAmount, date:new Date().toISOString()}],
+                             cashDrawer: {...prev.cashDrawer, current: prev.cashDrawer.current - withdrawAmount}
+                         }));
+                         // Print Withdrawal Ticket
+                         const ticket = `<div class="center bold">RETIRO DE CAJA (AUTO)</div><div class="center">${new Date().toLocaleString()}</div><hr><div>Monto Retirado: $${withdrawAmount}</div><div class="center">Motivo: Exceso de Efectivo</div><br><br><div class="center">_______________________<br>Firma Cajera</div>`;
+                         printTicket(ticket);
+                         return true; // Withdrawn
+                    }
+                }
+                return false;
             };
 
             const finalizeOrder = () => {
-                if(orderType !== 'platform') { 
-                    if(payMethod === 'card' && !voucher) return alert("Falta folio de tarjeta");
-                    if(payMethod === 'cash' && cashReceived < total) return alert("Monto insuficiente");
+                if(orderType === 'delivery') {
+                     if(!orderDetails.phone || orderDetails.phone.length !== 10) return showToast("Teléfono debe ser de 10 dígitos");
+                     if(!orderDetails.address) return showToast("Falta Dirección");
                 }
-
-                const clientLoc = orderType === 'delivery' ? deliveryCoords : null;
                 const order = {
                     id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000,
                     items: cart, total, method: payMethod, status: 'pending', createdAt: new Date().toISOString(),
-                    address: orderType === 'delivery' ? orderDetails.address : orderType.toUpperCase(),
+                    address: orderType === 'delivery' ? `${orderDetails.address} (Ref: ${orderDetails.references})` : orderType.toUpperCase(),
                     clientName: orderDetails.name || 'Cliente', clientPhone: orderDetails.phone,
                     clientLoc: orderType === 'delivery' ? deliveryCoords : null, 
                     source: orderType === 'platform' ? 'platform' : 'store',
-                    platformName: orderDetails.platform, driverAssignMode: db.settings.driverAssign
+                    platformName: orderDetails.platform, platformOrderId: orderDetails.platformOrderId,
+                    driverAssignMode: db.settings.driverAssign, deliveryFee: orderType === 'delivery' ? deliveryFee : 0,
+                    driver: null, settled: false
                 };
 
-                const updatedCoupons = db.coupons.map(c => c.code === couponCode ? {...c, used: c.used + 1} : c);
+                // Add order to DB
+                let newCashDrawer = db.cashDrawer.current;
+                if(payMethod==='cash') {
+                    newCashDrawer += total;
+                    // Check Auto Withdraw Trigger
+                    setTimeout(() => checkCashLimit(total), 1000); 
+                }
 
-                updateDB({
-                    ...db, orders: [...db.orders, order], coupons: updatedCoupons,
-                    cashDrawer: {...db.cashDrawer, current: db.cashDrawer.current + (payMethod==='cash'?total:0)}
-                });
+                updateDB({ ...db, orders: [...db.orders, order], cashDrawer: {...db.cashDrawer, current: newCashDrawer} });
 
                 const qrUrl = `ORDER:${order.id}`;
                 const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrUrl)}`;
-                const ticketBase = `<div class="center bold">EMI BURGERS</div><div class="center">Orden #${order.orderNum}</div><hr>`;
+                const ticketBase = `<div class="center bold">${db.settings.ticketConfig.header.replace(/\n/g, '<br>')}</div><div class="center">Orden #${order.orderNum}</div><div class="center">${new Date().toLocaleString()}</div><hr>`;
+                const itemsList = order.items.map(i => `<div>${i.qty}x ${i.name} ... ${formatCurrency(i.price * i.qty)}</div>${i.note ? `<div class="italic text-xs">(${i.note})</div>` : ''}`).join('');
+                const ticketEnd = `<hr><div class="center">${db.settings.ticketConfig.footer}</div><div class="center"><img src="${qrImg}" width="80"/></div>`;
                 
-                if(orderType === 'platform' && payMethod === 'cash') {
-                    printTicket(`${ticketBase}<div class="center bold">COBRAR DRIVER: ${formatCurrency(total)}</div><div class="center"><img src="${qrImg}" width="80"/></div>`);
-                    setTimeout(()=>printTicket(`${ticketBase}<div class="center">TOTAL PAGADO (APP)</div><div class="center"><img src="${qrImg}" width="80"/></div>`), 500);
+                if(orderType === 'platform') {
+                    // Double Ticket for Platform (Correct split)
+                    const driverTicket = `${ticketBase}<div class="center bold">COPIA RESTAURANTE</div><hr>${itemsList}<hr><div class="bold right">TOTAL: ${formatCurrency(total)}</div>${ticketEnd}`;
+                    const clientTicket = `${ticketBase}<div class="center">COPIA CLIENTE/DRIVER</div><hr>${order.items.map(i=>`<div>${i.qty}x ${i.name} ... $0.00</div>`).join('')}<hr><div class="bold right">TOTAL: $0.00</div><div class="center">PROPINAS NO INCLUIDAS</div>${ticketEnd}`;
+                    
+                    // Print logic with cut separator
+                    const combinedHTML = `${driverTicket}<br><br><div class="center">✂️ --- CORTE AQUÍ --- ✂️</div><br><br>${clientTicket}`;
+                    printTicket(combinedHTML);
                 } else {
-                    printTicket(`${ticketBase}<div class="center bold">TOTAL: ${formatCurrency(total)}</div><div class="center"><img src="${qrImg}" width="80"/></div>`);
+                    printTicket(`${ticketBase}${itemsList}<hr><div class="bold right">Envío: ${formatCurrency(deliveryFee)}</div><div class="bold right">TOTAL: ${formatCurrency(total)}</div>${ticketEnd}`);
                 }
 
-                setCart([]); setModal(null); setCashReceived(0); setVoucher(''); setOrderDetails({ name:'', phone:'', address:'', table:'', platform:'', refs:'' });
+                setCart([]); setModal(null); setCashReceived(0); setVoucher(''); 
+                setOrderDetails({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
             };
 
             return (
@@ -766,11 +1124,14 @@
                     <div className="flex-1 flex overflow-hidden">
                         <div className="flex-1 flex flex-col">
                             <div className="p-2 border-b border-[var(--border)] flex gap-2">{['All', 'Burgers'].map(c=><button key={c} onClick={()=>setCatFilter(c)} className="px-4 py-1 rounded-full text-xs font-bold bg-[#222] text-white hover:bg-[var(--gold)] hover:text-black">{c}</button>)}</div>
-                            <div className="flex-1 p-4 grid grid-cols-3 gap-4 overflow-y-auto content-start">
+                            <div className="flex-1 p-4 grid grid-cols-4 gap-3 overflow-y-auto content-start">
                                 {db.products.map(p=>(
-                                    <div key={p.id} onClick={()=>addToCart(p)} className="card h-40 relative overflow-hidden cursor-pointer group border-0 hover:ring-2 ring-[var(--gold)]">
+                                    <div key={p.id} onClick={()=>addToCart(p)} className="card h-32 relative overflow-hidden cursor-pointer group border-0 hover:ring-2 ring-[var(--gold)]">
                                         <img src={p.img} className="absolute inset-0 w-full h-full object-cover opacity-60"/>
-                                        <div className="absolute bottom-0 p-3 w-full bg-gradient-to-t from-black to-transparent"><p className="text-white font-bold">{p.name}</p><p className="text-[var(--gold)] font-black">{formatCurrency(p.price)}</p></div>
+                                        <div className="absolute bottom-0 p-2 w-full bg-gradient-to-t from-black to-transparent">
+                                            <p className="text-white font-bold text-sm leading-tight">{p.name}</p>
+                                            <p className="text-[var(--gold)] font-black text-sm">{formatCurrency(p.price)}</p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -790,9 +1151,12 @@
                             )}
                             <div className="flex-1 p-3 overflow-y-auto space-y-2">
                                 {cart.map((item,idx)=>(
-                                    <div key={idx} className="bg-[#222] p-2 rounded border border-[#333] flex justify-between items-center text-white text-sm">
-                                        <div><span className="font-bold">{item.qty}x</span> {item.name}</div>
-                                        <div>{formatCurrency(item.price*item.qty)}</div>
+                                    <div key={idx} className="bg-[#222] p-2 rounded border border-[#333]">
+                                        <div className="flex justify-between items-center text-white text-sm mb-1">
+                                            <div><span className="font-bold">{item.qty}x</span> {item.name}</div>
+                                            <div>{formatCurrency(item.price*item.qty)}</div>
+                                        </div>
+                                        <input className="bg-transparent text-xs text-gray-400 w-full border-b border-gray-700 outline-none placeholder-gray-600" placeholder="Nota (Sin cebolla...)" value={item.note || ''} onChange={(e)=>updateCartNote(idx, e.target.value)}/>
                                     </div>
                                 ))}
                             </div>
@@ -801,6 +1165,17 @@
                                 <button onClick={()=>setModal('cockpit')} disabled={cart.length===0} className="btn-gold w-full text-xl py-4 shadow-lg disabled:opacity-50">COBRAR</button>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="admin-fab">
+                        {bottomMenuOpen && (
+                            <div className="admin-fab-menu">
+                                <button onClick={()=>copyToClipboard(window.location.href)} className="bg-blue-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">COPIAR MENU <Share2 size={16}/></button>
+                                <button onClick={()=>setCorteModal(true)} className="bg-red-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">CORTE / RETIRO <DollarSign size={16}/></button>
+                                <button onClick={()=>setLiquidationModal(true)} className="bg-green-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">LIQUIDAR DRIVER <UserCheck size={16}/></button>
+                            </div>
+                        )}
+                        <button className="bg-[var(--gold)] text-black p-4 rounded-full shadow-[0_0_15px_var(--gold)]" onClick={()=>setBottomMenuOpen(!bottomMenuOpen)}><Plus size={24} className={`transition ${bottomMenuOpen?'rotate-45':''}`}/></button>
                     </div>
 
                     {modal === 'cockpit' && (
@@ -814,21 +1189,99 @@
                                     <button onClick={()=>setOrderType('platform')} className={`mode-btn ${orderType==='platform'?'active':''}`}>PLATAFORMA</button>
                                     <button onClick={()=>setModal(null)} className="mt-auto bg-red-900/20 text-red-500 py-4 rounded font-bold border-2 border-red-900">CANCELAR</button>
                                 </div>
-                                <div className="cockpit-col">
+                                <div className="cockpit-col overflow-y-auto">
                                     <h3 className="text-[var(--gold)] font-bold text-xl uppercase mb-2">2. DATOS</h3>
-                                    {orderType !== 'platform' && <><input className="input-std h-10 text-lg" placeholder="Nombre *" value={orderDetails.name} onChange={e=>setOrderDetails({...orderDetails, name:e.target.value})}/><input className="input-std h-10 text-lg" placeholder="Teléfono" value={orderDetails.phone} onChange={e=>setOrderDetails({...orderDetails, phone:e.target.value})}/></>}
+                                    {orderType !== 'platform' && <><input className="input-std h-10 text-lg mb-2" placeholder="Nombre *" value={orderDetails.name} onChange={e=>setOrderDetails({...orderDetails, name:e.target.value})}/><input className="input-std h-10 text-lg mb-2" placeholder="Teléfono (10 dígitos) *" value={orderDetails.phone} maxLength={10} onChange={e=>setOrderDetails({...orderDetails, phone:e.target.value})}/></>}
                                     {orderType === 'dinein' && <input className="input-std h-10 text-lg" placeholder="# Mesa" value={orderDetails.table} onChange={e=>setOrderDetails({...orderDetails, table:e.target.value})}/>}
-                                    {orderType === 'platform' && <div className="grid grid-cols-2 gap-2">{db.settings.platforms.map(p=><button key={p} onClick={()=>setOrderDetails({...orderDetails, platform:p})} className={`p-3 rounded border font-bold ${orderDetails.platform===p?'bg-blue-600 text-white':'bg-[#222] text-gray-400'}`}>{p}</button>)}</div>}
-                                    {orderType === 'delivery' && <><textarea className="input-std h-20 text-lg" placeholder="Dirección y Referencias" value={orderDetails.address} onChange={e=>setOrderDetails({...orderDetails, address:e.target.value})}/><div className="bg-[#222] p-2 rounded text-right text-sm text-white">Envío: <span className="font-bold text-[var(--gold)]">{formatCurrency(deliveryFee)}</span></div></>}
+                                    {orderType === 'platform' && (
+                                        <>
+                                            <div className="grid grid-cols-2 gap-2 mb-2">{db.settings.platforms.map(p=><button key={p} onClick={()=>setOrderDetails({...orderDetails, platform:p})} className={`p-3 rounded border font-bold ${orderDetails.platform===p?'bg-blue-600 text-white':'bg-[#222] text-gray-400'}`}>{p}</button>)}</div>
+                                            <input className="input-std h-12 text-lg font-bold border-blue-500" placeholder="ID / NOMBRE PEDIDO *" value={orderDetails.platformOrderId} onChange={e=>setOrderDetails({...orderDetails, platformOrderId:e.target.value})}/>
+                                        </>
+                                    )}
+                                    {orderType === 'delivery' && (
+                                        <>
+                                            <div className="flex gap-2 mb-2 relative">
+                                                <input className={`input-std h-10 text-lg flex-1 ${isLocating?'locating':''}`} placeholder={isLocating?"📍 Localizando...":"Calle y Número *"} value={orderDetails.address} onChange={e=>updateLocationFromAddress(e.target.value)} list="pos-address-list"/>
+                                                <datalist id="pos-address-list">
+                                                    {suggestions.map((s,i) => <option key={i} value={s.display_name} />)}
+                                                </datalist>
+                                                <button onClick={useGPS} className="bg-blue-600 text-white p-2 rounded gps-btn"><MapPin/></button>
+                                            </div>
+                                            {isLocating && <p className="text-[var(--gold)] text-xs animate-pulse mb-2">Buscando en Ciudad Obregón...</p>}
+                                            <input className="input-std h-10 text-lg mb-2" placeholder="Referencias / Colonia *" value={orderDetails.references} onChange={e=>setOrderDetails({...orderDetails, references:e.target.value})}/>
+                                            <div className="h-40 rounded border border-[var(--gold)] overflow-hidden relative mb-2">
+                                                <LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:deliveryCoords||STORE_COORDS, emoji:'📍'}]} onClickMap={handleReverseGeo} zoom={15}/>
+                                            </div>
+                                            <div className="bg-[#222] p-2 rounded text-right text-sm text-white">Envío: <span className="font-bold text-[var(--gold)]">{formatCurrency(deliveryFee)}</span></div>
+                                        </>
+                                    )}
                                     <div className="flex gap-2 mt-2"><input className="input-std h-10 flex-1" placeholder="CUPÓN" value={couponCode} onChange={e=>setCouponCode(e.target.value)}/><button onClick={applyCoupon} className="btn-gold h-10 px-4">APLICAR</button></div>
                                 </div>
                                 <div className="cockpit-col relative">
                                     <h3 className="text-[var(--gold)] font-bold text-xl uppercase mb-4 text-center">3. PAGO: {formatCurrency(total)}</h3>
                                     <div className="flex gap-2 mb-4"><button onClick={()=>switchPayMethod('cash')} className={`flex-1 py-4 rounded font-bold text-lg ${payMethod==='cash'?'bg-green-600 text-white':'bg-[#222] text-gray-500'}`}>EFECTIVO</button><button onClick={()=>switchPayMethod('card')} className={`flex-1 py-4 rounded font-bold text-lg ${payMethod==='card'?'bg-blue-600 text-white':'bg-[#222] text-gray-500'}`}>{orderType==='platform'?'APP':'TARJETA'}</button></div>
-                                    {payMethod === 'cash' && <div className="flex-1 flex flex-col gap-2"><div className="grid grid-cols-3 gap-2">{[20,50,100,200,500].map(v=><button key={v} className="bill-btn" style={{backgroundImage:`url(${v}.png)`}} onClick={()=>setCashReceived(v)}></button>)}<button onClick={()=>setCashReceived(total)} className="bg-[var(--gold)] text-black font-black rounded text-sm h-[70px]">EXACTO</button></div><div className="mt-4 p-4 bg-black rounded border border-[#333]"><div className="flex justify-between text-gray-400"><span>Recibido:</span><span className="text-white font-bold text-xl">{formatCurrency(cashReceived)}</span></div><div className="flex justify-between text-gray-400 mt-2"><span>Cambio:</span><span className={`font-bold text-2xl ${cashReceived>=total?'text-green-500':'text-red-500'}`}>{formatCurrency(cashReceived-total)}</span></div></div></div>}
+                                    {payMethod === 'cash' && <div className="flex-1 flex flex-col gap-2">
+                                        <div className="grid grid-cols-3 gap-2">{[20,50,100,200,500].map(v=><button key={v} className="bill-btn" style={{backgroundImage:`url(${v}.png)`}} onClick={()=>setCashReceived(v)}></button>)}<button onClick={()=>setCashReceived(total)} className="bg-[var(--gold)] text-black font-black rounded text-sm h-[70px]">EXACTO</button></div>
+                                        <div className="mt-4 p-4 bg-black rounded border border-[#333]">
+                                            <div className="flex justify-between text-gray-400 items-center">
+                                                <span>Recibido:</span>
+                                                <input type="number" className={`bg-transparent text-right font-black text-3xl w-40 outline-none ${!cashReceived ? 'animate-pulse text-gray-600 border-b-4 border-gray-600' : 'text-green-500 border-b-4 border-green-500'}`} placeholder="0.00" value={cashReceived || ''} onChange={e=>setCashReceived(parseFloat(e.target.value))}/>
+                                            </div>
+                                            <div className="flex justify-between text-gray-400 mt-2"><span>Cambio:</span><span className={`font-bold text-2xl ${cashReceived>=total?'text-green-500':'text-red-500'}`}>{formatCurrency(cashReceived-total)}</span></div>
+                                        </div>
+                                    </div>}
                                     {payMethod === 'card' && orderType !== 'platform' && <div className="flex-1 flex flex-col justify-center items-center"><CreditCard size={80} className="text-blue-500 mb-6 animate-pulse"/><p className="text-white font-bold mb-2 text-xl">FOLIO DE VOUCHER</p><input className="input-std text-center text-3xl tracking-widest" placeholder="0000" value={voucher} onChange={e=>setVoucher(e.target.value)} autoFocus/></div>}
                                     <button onClick={finalizeOrder} className="btn-gold py-5 text-2xl mt-4 w-full font-black rounded-xl">COBRAR AHORA</button>
                                 </div>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {liquidationModal && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
+                            <div className="card w-full max-w-lg bg-[var(--bg-card)] p-6">
+                                <h3 className="text-2xl font-bold text-[var(--gold)] mb-4">LIQUIDACIÓN REPARTIDOR</h3>
+                                {!driverToLiq ? (
+                                    <div className="text-center">
+                                         <p className="mb-4 text-gray-400">Escanea el QR del Repartidor para cargar su deuda</p>
+                                         <div className="w-64 h-64 bg-black mx-auto border-2 border-white mb-4 relative">
+                                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=LIQ:u4" className="opacity-20 absolute inset-0 w-full h-full"/>
+                                             <div className="absolute inset-0 flex items-center justify-center"><button onClick={()=>handleScanDriver("LIQ:u4")} className="btn-gold">SIMULAR SCAN (Juan Moto)</button></div>
+                                         </div>
+                                         <button onClick={()=>setLiquidationModal(false)} className="text-gray-500">CANCELAR</button>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p className="font-bold text-xl text-white mb-4">{driverToLiq.name}</p>
+                                        <div className="bg-[#222] p-4 rounded mb-4 space-y-2">
+                                            <div className="flex justify-between text-gray-400"><span>Pedidos Entregados (No Liq):</span><span className="text-white font-bold">{liqSummary.deliveredOrders.length}</span></div>
+                                            <div className="flex justify-between text-gray-400"><span>Efectivo en Mano:</span><span className="text-white font-bold">{formatCurrency(liqSummary.totalCash)}</span></div>
+                                            <div className="flex justify-between text-green-500"><span>Ganancias Envíos:</span><span className="font-bold">-{formatCurrency(liqSummary.totalEarnings)}</span></div>
+                                            <div className="border-t border-[#444] pt-2 flex justify-between text-xl font-black text-[var(--gold)]"><span>A ENTREGAR:</span><span>{formatCurrency(liqSummary.netToPay)}</span></div>
+                                        </div>
+                                        <button onClick={confirmLiquidation} className="btn-gold w-full text-lg py-3">LIQUIDAR Y CERRAR</button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {corteModal && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
+                            <div className="card w-full max-w-md bg-[var(--bg-card)] p-6">
+                                <h3 className="text-2xl font-bold text-red-500 mb-4">CORTE / RETIROS</h3>
+                                <div className="text-center mb-6">
+                                    <p className="text-gray-400">EFECTIVO EN CAJA</p>
+                                    <p className="text-4xl font-black text-white">{formatCurrency(db.cashDrawer.current)}</p>
+                                </div>
+                                <div className="bg-[#222] p-4 rounded mb-4">
+                                    <p className="text-xs text-white font-bold mb-2">NUEVO RETIRO (Pago Proveedor/Gastos)</p>
+                                    <input className="input-std mb-2" placeholder="Descripción" value={newExpense.desc} onChange={e=>setNewExpense({...newExpense, desc:e.target.value})}/>
+                                    <input className="input-std mb-2" type="number" placeholder="Monto" value={newExpense.amount} onChange={e=>setNewExpense({...newExpense, amount:e.target.value})}/>
+                                    <button onClick={addExpense} className="w-full bg-red-600 text-white font-bold py-2 rounded">REGISTRAR RETIRO</button>
+                                </div>
+                                <button onClick={()=>setCorteModal(false)} className="text-gray-500 w-full">CERRAR</button>
                             </div>
                         </div>
                     )}
@@ -836,12 +1289,306 @@
             );
         };
 
-        // 5. KITCHEN (Full KDS)
+        // 6. DRIVER APP
+        const DriverApp = ({ db, updateDB, user }) => {
+            const [view, setView] = useState('map');
+            const [selectedOrder, setSelectedOrder] = useState(null);
+            const [scanning, setScanning] = useState(false);
+            const [manualId, setManualId] = useState('');
+            const videoRef = useRef(null);
+            
+            const myDelivered = db.orders.filter(o => o.driver === user.username && o.status === 'delivered');
+            const earnings = myDelivered.reduce((acc, o) => acc + (o.driverFee||0), 0);
+            const myActiveOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivering');
+            const markers = [{ pos: STORE_COORDS, emoji: '🏪', popup: 'Base' }, ...myActiveOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', data: o }))];
+
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    navigator.geolocation.getCurrentPosition(
+                        pos => {
+                             const newLoc = [pos.coords.latitude, pos.coords.longitude];
+                             updateDB({...db, users: db.users.map(u => u.id === user.id ? {...u, location: newLoc, online: true} : u)});
+                        },
+                        null, { enableHighAccuracy: true }
+                    );
+                }, 10000); 
+                return () => clearInterval(interval);
+            }, [db, user.id]);
+
+            // Camera Activation Logic
+            useEffect(() => {
+                if (scanning && videoRef.current) {
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                        .then(stream => { videoRef.current.srcObject = stream; videoRef.current.play(); })
+                        .catch(err => { console.error("Camera error:", err); showToast("Error al acceder a la cámara"); setScanning(false); });
+                }
+                return () => {
+                    if (videoRef.current && videoRef.current.srcObject) {
+                        videoRef.current.srcObject.getTracks().forEach(track => track.stop());
+                    }
+                }
+            }, [scanning]);
+
+            const scanOrder = (content) => {
+                 if(content.startsWith("ORDER:")) {
+                     const oid = content.split(':')[1];
+                     const order = db.orders.find(o => o.id === oid);
+                     if(order && order.status === 'ready') {
+                         updateDB({...db, orders: db.orders.map(o => o.id === oid ? {...o, status: 'delivering', driver: user.username} : o)});
+                         showToast("Orden Asignada!"); setScanning(false); setManualId('');
+                     } else { showToast("Orden no válida o no lista"); }
+                 }
+            };
+
+            return (
+                <div className="h-full flex flex-col bg-black pb-16 relative app-view-mobile">
+                    {/* Share Button for Other Views */}
+                    <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>
+                    
+                    <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-black/90 to-transparent flex justify-between pointer-events-none"><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] flex items-center gap-2"><div className={`w-2 h-2 rounded-full ${user.online?'bg-green-500':'bg-red-500'}`}></div><span className="text-xs text-white font-bold">{user.name}</span></div><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] text-right"><p className="text-[10px] text-gray-500">DEUDA ACTUAL</p><p className="text-[var(--gold)] font-bold">{formatCurrency(user.cashOnHand)}</p></div></div>
+                    {view === 'map' && (
+                        <div className="flex-1 relative">
+                            <LeafletMap center={STORE_COORDS} markers={markers} onMarkerClick={setSelectedOrder} />
+                            {selectedOrder && <div className="absolute bottom-4 left-4 right-4 bg-[#141414] p-5 rounded-2xl border border-[var(--gold)] shadow-[0_0_30px_rgba(0,0,0,0.8)] z-[1000] animate-in slide-in-from-bottom"><div className="flex justify-between items-start mb-4"><div><h3 className="text-white font-bold text-xl">#{selectedOrder.orderNum} - {selectedOrder.clientName}</h3><p className="text-gray-400 text-sm mt-1">{selectedOrder.address}</p></div><button onClick={()=>setSelectedOrder(null)} className="bg-[#222] p-2 rounded-full"><X className="text-white"/></button></div><div className="grid grid-cols-2 gap-3 mb-4"><a href={`https://wa.me/52${selectedOrder.clientPhone}?text=Hola`} target="_blank" className="bg-green-600 text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><MessageCircle/> WHATSAPP</a><a href={`tel:${selectedOrder.clientPhone}`} className="bg-[#333] text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><Phone/> LLAMAR</a></div><button onClick={()=>{let cash = user.cashOnHand || 0; if(selectedOrder.method==='cash') cash += selectedOrder.total; updateDB({...db, orders: db.orders.map(x=>x.id===selectedOrder.id?{...x,status:'delivered'}:x), users: db.users.map(u=>u.id===user.id?{...u, cashOnHand: cash}:u)}); setSelectedOrder(null);}} className="w-full btn-gold py-4 text-lg rounded-xl shadow-lg">FINALIZAR ENTREGA</button></div>}
+                            <button className="absolute bottom-20 right-4 bg-[var(--gold)] p-4 rounded-full shadow-[0_0_20px_var(--gold)] z-10 animate-bounce" onClick={()=>setScanning(true)}><QRIcon size={32} className="text-black"/></button>
+                        </div>
+                    )}
+                    {scanning && (
+                        <div className="fixed inset-0 bg-black z-[2000] flex flex-col items-center justify-center p-6">
+                            <h2 className="text-[var(--gold)] text-2xl font-bold mb-4">ESCANEAR TICKET</h2>
+                            <div className="w-full max-w-sm aspect-square border-4 border-[var(--gold)] rounded-lg relative overflow-hidden mb-4">
+                                <video ref={videoRef} className="w-full h-full object-cover"></video>
+                                <div className="scanner-overlay"><div className="scanner-line"></div></div>
+                            </div>
+                            <div className="flex gap-2 w-full max-w-xs mb-4">
+                                <input className="input-std" placeholder="ID Manual si QR dañado" value={manualId} onChange={e=>setManualId(e.target.value)}/>
+                                <button onClick={()=>scanOrder(`ORDER:${manualId}`)} className="btn-gold"><PenTool/></button>
+                            </div>
+                            <button onClick={()=>setScanning(false)} className="mt-4 text-gray-500">Cancelar</button>
+                        </div>
+                    )}
+                    {view === 'list' && (
+                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                             <h2 className="text-white font-bold text-xl mb-4">HISTORIAL ENTREGAS</h2>
+                             {myDelivered.map(o=>(
+                                 <div key={o.id} className="bg-[#222] p-3 rounded border border-[#333] flex justify-between items-center">
+                                     <div>
+                                         <p className="text-white font-bold">#{o.orderNum} - {o.clientName}</p>
+                                         <p className="text-xs text-gray-500">{new Date(o.createdAt).toLocaleTimeString()}</p>
+                                     </div>
+                                     <div className="text-right">
+                                         <p className="text-green-500 font-bold">+{formatCurrency(o.driverFee||0)}</p>
+                                         <p className="text-[10px] text-gray-400">{o.settled ? 'LIQUIDADO' : 'PENDIENTE'}</p>
+                                     </div>
+                                 </div>
+                             ))}
+                        </div>
+                    )}
+                    {view === 'wallet' && (
+                        <div className="flex-1 p-6 flex flex-col items-center justify-center text-center">
+                            <h2 className="text-2xl font-bold text-white mb-2">MI BILLETERA</h2>
+                            <p className="text-gray-400 text-sm mb-6">Muestra este QR en caja para liquidar</p>
+                            <div className="bg-white p-4 rounded-xl mb-8">
+                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=LIQ:${user.id}`} className="w-64 h-64"/>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 w-full">
+                                <div className="bg-[#222] p-4 rounded border border-[#333]">
+                                    <p className="text-gray-500 text-xs">GANANCIAS HOY</p>
+                                    <p className="text-2xl font-bold text-green-500">{formatCurrency(earnings)}</p>
+                                </div>
+                                <div className="bg-[#222] p-4 rounded border border-[#333]">
+                                    <p className="text-gray-500 text-xs">DEUDA EFECTIVO</p>
+                                    <p className="text-2xl font-bold text-red-500">{formatCurrency(user.cashOnHand)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <nav className="fixed bottom-0 left-0 right-0 bg-[#111] border-t border-[#333] flex justify-around p-4 z-50"><button onClick={()=>setView('map')} className={`flex flex-col items-center ${view==='map'?'text-[var(--gold)]':'text-gray-500'}`}><Map/><span className="text-[10px] mt-1">MAPA</span></button><button onClick={()=>setView('list')} className={`flex flex-col items-center ${view==='list'?'text-[var(--gold)]':'text-gray-500'}`}><ClipboardList/><span className="text-[10px] mt-1">HISTORIAL</span></button><button onClick={()=>setView('wallet')} className={`flex flex-col items-center ${view==='wallet'?'text-[var(--gold)]':'text-gray-500'}`}><Wallet/><span className="text-[10px] mt-1">BILLETERA</span></button></nav>
+                </div>
+            );
+        };
+
+        // 7. CLIENT APP (Full V47)
+        const ClientApp = ({ db, updateDB }) => {
+            const [view, setView] = useState('menu');
+            const [cart, setCart] = useState([]);
+            const [form, setForm] = useState({name:'', phone:'', type:'delivery', address:'', references:'', pay:'card', payAmount:0});
+            const [activeOrder, setActiveOrder] = useState(null);
+            const [clientCoords, setClientCoords] = useState(null);
+            const [isLocating, setIsLocating] = useState(false);
+            const [showCashModal, setShowCashModal] = useState(false);
+            const [tempCashAmount, setTempCashAmount] = useState('');
+            const [suggestions, setSuggestions] = useState([]);
+            const [addressTimer, setAddressTimer] = useState(null);
+
+            useEffect(() => { navigator.geolocation.getCurrentPosition((pos) => setClientCoords([pos.coords.latitude, pos.coords.longitude]), () => setClientCoords(STORE_COORDS)); }, []);
+
+            const deliveryFee = useMemo(() => {
+                if(form.type==='delivery' && clientCoords) {
+                    const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], clientCoords[0], clientCoords[1]);
+                    return getDeliveryPrice(dist, db.settings.deliveryTable);
+                }
+                return 0;
+            }, [clientCoords, form.type, db.settings.deliveryTable]);
+
+            const total = cart.reduce((a,b)=>a+b.price,0) + deliveryFee;
+
+            const submit = () => {
+                if(form.type==='delivery' && !db.settings.deliveryEnabled!==false) return showToast("Servicio a domicilio no disponible");
+                if(form.type==='delivery' && (!form.phone || form.phone.length !== 10)) return showToast("Teléfono inválido (10 dígitos)");
+                if(form.pay === 'cash' && !form.payAmount) return showToast("Indica con cuánto vas a pagar");
+                
+                const order = { id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, items: cart, total, status: 'web_pending_payment', method: form.pay, payAmount: form.payAmount, createdAt: new Date().toISOString(), address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', clientName: form.name, clientPhone: form.phone, clientLoc: clientCoords, source: 'web' };
+                updateDB({...db, orders: [...db.orders, order]}); setActiveOrder(order); setView('track');
+            };
+
+            const updateLocationFromAddress = (addr) => {
+                setForm(prev => ({...prev, address: addr}));
+                
+                if (addressTimer) clearTimeout(addressTimer);
+                
+                setAddressTimer(setTimeout(async () => {
+                    if(addr.length > 3) {
+                        setIsLocating(true);
+                        try {
+                            const query = `${addr} ${CITY_SUFFIX}`;
+                            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`);
+                            const data = await res.json();
+                            setSuggestions(data);
+                            
+                            if(data && data.length > 0) {
+                                // Auto-select best match coordinates for map preview
+                                setClientCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+                            }
+                        } catch(e) {
+                            console.error("Geocoding error", e);
+                        }
+                        setIsLocating(false);
+                    } else {
+                        setSuggestions([]);
+                    }
+                }, 800)); 
+            };
+
+            const useGPS = () => {
+                 setIsLocating(true);
+                 navigator.geolocation.getCurrentPosition(pos => {
+                     const coords = [pos.coords.latitude, pos.coords.longitude];
+                     setClientCoords(coords);
+                     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
+                        .then(r=>r.json()).then(d=>{
+                            const parts = d.display_name.split(',');
+                            setForm({...form, address: parts[0] + (parts[1]||'')});
+                        });
+                     setIsLocating(false);
+                 }, () => setIsLocating(false));
+            };
+
+            const handleMapClick = async (coords) => {
+                setClientCoords(coords);
+                setIsLocating(true);
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`);
+                    const data = await res.json();
+                    if(data && data.display_name) {
+                        const addrParts = data.display_name.split(',');
+                        setForm(prev => ({...prev, address: addrParts[0] + (addrParts[1]||'')}));
+                        setSuggestions([]);
+                    }
+                } catch(e) {}
+                setIsLocating(false);
+            };
+
+            const showInstallInstructions = () => {
+                showToast("Para instalar: Toca 'Compartir' -> 'Agregar a Inicio'");
+            };
+
+            const handleCashSelect = () => {
+                setShowCashModal(true);
+            };
+
+            const confirmCash = () => {
+                if(parseFloat(tempCashAmount) < total) return showToast("El monto debe ser mayor al total");
+                setForm({...form, pay:'cash', payAmount: parseFloat(tempCashAmount)});
+                setShowCashModal(false);
+            };
+
+            const cancelCash = () => {
+                setForm({...form, pay:'card', payAmount: 0});
+                setShowCashModal(false);
+            };
+
+            if(!db.settings.storeOpen) return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
+
+            if(view === 'menu') return (
+                <div className="h-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] relative app-view-mobile">
+                    <button className="install-btn" onClick={showInstallInstructions}><img src={LOGO_URL} className="w-8 h-8 rounded-full"/></button>
+                    
+                    <div className="h-48 bg-cover bg-center relative" style={{backgroundImage:`url(${BANNER_URL})`}}></div>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-48">
+                        {db.products.length === 0 ? <p className="text-center text-gray-500 mt-10">Menú vacío. Vuelve pronto.</p> : 
+                        db.products.map(p=>(<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)]"><img src={p.img} className="w-20 h-20 rounded object-cover"/><div className="flex-1"><p className="font-bold text-[var(--text-main)]">{p.name}</p><p className="text-gray-500 text-xs line-clamp-2">{p.desc}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)]">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart,p])} className="bg-[var(--accent)] text-white w-8 h-8 rounded-full font-bold shadow">+</button></div></div></div>))}
+                    </div>
+                    <div className="client-promo-video"><video src={VIDEO_URL} autoPlay loop muted playsInline></video></div>
+                    {cart.length>0 && <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile"><button onClick={()=>setView('checkout')} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button></div>}
+                </div>
+            );
+
+            if(view === 'checkout') return (
+                <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto app-view-mobile relative">
+                    <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2"><ArrowLeft/> Volver</button>
+                    <h2 className="font-bold text-xl mb-6 text-[var(--text-main)]">RESUMEN</h2>
+                    <div className="space-y-4 mb-8">
+                        <input className="input-std" placeholder="Nombre" onChange={e=>setForm({...form,name:e.target.value})}/>
+                        <input className="input-std" type="number" placeholder="Teléfono (10 dígitos)" onChange={e=>setForm({...form,phone:e.target.value})}/>
+                        <div className="flex gap-2"><button onClick={()=>setForm({...form, type:'delivery'})} className={`flex-1 p-3 rounded font-bold border ${form.type==='delivery'?'border-[var(--accent)] text-[var(--accent)]':'border-gray-500 text-gray-500'}`}>DOMICILIO</button>{db.settings.pickupEnabled && <button onClick={()=>setForm({...form, type:'pickup'})} className={`flex-1 p-3 rounded font-bold border ${form.type==='pickup'?'border-[var(--accent)] text-[var(--accent)]':'border-gray-500 text-gray-500'}`}>RECOGER</button>}</div>
+                        {form.type==='delivery' && (
+                            <div className="space-y-2">
+                                <div className="flex gap-2 relative"><input className={`input-std h-10 flex-1 ${isLocating?'locating':''}`} placeholder={isLocating?"📍 Localizando...":"Calle y Número"} value={form.address} onChange={e=>updateLocationFromAddress(e.target.value)} list="client-address-list"/><button onClick={useGPS} className="bg-blue-600 text-white rounded p-2 gps-btn"><MapPin/></button></div>
+                                <datalist id="client-address-list">
+                                    {suggestions.map((s,i) => <option key={i} value={s.display_name} />)}
+                                </datalist>
+                                <input className="input-std" placeholder="Referencias (Casa color, portón...)" value={form.references} onChange={e=>setForm({...form,references:e.target.value})}/>
+                                <p className="text-xs text-gray-500">Toca el mapa si la ubicación no es exacta:</p>
+                                <div className="h-40 rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'📍'}]} onClickMap={handleMapClick} zoom={15} /></div>
+                                <div className="text-right text-sm text-[var(--accent)] font-bold">Costo Envío: {formatCurrency(deliveryFee)}</div>
+                            </div>
+                        )}
+                        <p className="font-bold text-[var(--text-main)]">Método de Pago</p>
+                        <div className="flex gap-2">
+                            <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='cash'?'border-green-500 text-green-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='cash'} onChange={handleCashSelect}/> Efectivo</label>
+                            <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='card'?'border-blue-500 text-blue-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='card'} onChange={()=>setForm({...form,pay:'card'})}/> Tarjeta</label>
+                        </div>
+                        {form.pay==='cash' && <p className="text-green-500 text-center font-bold text-sm">Pagarás con: {formatCurrency(form.payAmount)}</p>}
+                    </div>
+                    <button onClick={submit} className="w-full bg-[var(--accent)] text-white py-4 rounded-lg font-bold shadow-lg">ENVIAR A CAJA</button>
+
+                    {showCashModal && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
+                            <div className="bg-[var(--bg-card)] p-6 rounded-xl w-full max-w-sm text-center border border-[var(--gold)]">
+                                <h3 className="text-xl font-bold text-[var(--gold)] mb-4">¿CON CUÁNTO PAGAS?</h3>
+                                <p className="text-white mb-2">Total a pagar: {formatCurrency(total)}</p>
+                                <input type="number" className="input-std text-center text-2xl font-bold mb-4" placeholder="$0.00" value={tempCashAmount} onChange={e=>setTempCashAmount(e.target.value)} autoFocus/>
+                                <div className="flex gap-2">
+                                    <button onClick={cancelCash} className="flex-1 bg-gray-600 text-white py-2 rounded font-bold">CANCELAR</button>
+                                    <button onClick={confirmCash} className="flex-1 btn-gold py-2 rounded font-bold">CONFIRMAR</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+
+            if(view === 'track') return <div className="h-full flex flex-col bg-white"><div className="flex-1 relative"><LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, emoji:'🏪'}, {pos:clientCoords, emoji:'🏠'}]} route={[STORE_COORDS, clientCoords]} zoom={13}/></div><div className="p-6 bg-white rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] z-10"><h2 className="text-xl font-bold mb-2">ESTADO: {activeOrder?.status}</h2><button onClick={()=>setView('menu')} className="mt-4 w-full bg-black text-white py-3 rounded-xl font-bold">VOLVER AL MENU</button></div></div>;
+        };
+
+        // --- KITCHEN COMPONENT (Restored) ---
         const Kitchen = ({ db, updateDB }) => {
             const [detailOrder, setDetailOrder] = useState(null);
             const move = (o, s) => updateDB({...db, orders: db.orders.map(x=>x.id===o.id?{...x, status:s}:x)});
             return (
                 <div className="h-full bg-[#050505] p-4 flex gap-4 overflow-x-auto relative">
+                    <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>
                     {detailOrder && (
                         <div className="fixed inset-0 z-[2000] bg-black/90 flex items-center justify-center p-4">
                             <div className="card w-full max-w-2xl bg-[#141414] p-8 border border-[var(--gold)]">
@@ -861,7 +1608,7 @@
                     {['pending','preparing','ready'].map(status => (
                         <div key={status} className="w-96 flex-shrink-0 flex flex-col h-full">
                             <h2 className={`text-2xl font-brand uppercase mb-4 border-b-4 pb-2 text-center text-gray-500`}>{status === 'pending' ? 'PENDIENTES' : status === 'preparing' ? 'EN HORNO' : 'LISTOS'}</h2>
-                            <div className="space-y-4 overflow-y-auto flex-1 pb-20">
+                            <div className="space-y-4 overflow-y-auto flex-1 pb-20 custom-scroll">
                                 {db.orders.filter(o=>o.status===status).map(o=>(
                                     <div key={o.id} onClick={()=>setDetailOrder(o)} className="card p-4 border-l-8 cursor-pointer hover:bg-[#222]">
                                         <div className="flex justify-between mb-2"><span className="font-black text-2xl text-white">#{o.orderNum}</span><span className="text-sm text-gray-500 flex items-center gap-1"><Clock size={14}/> 12m</span></div>
@@ -876,132 +1623,90 @@
             );
         };
 
-        // 6. DRIVER APP (Full)
-        const DriverApp = ({ db, updateDB, user }) => {
-            const [view, setView] = useState('map');
-            const [selectedOrder, setSelectedOrder] = useState(null);
-            const [scanning, setScanning] = useState(false);
-            const myOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivering');
-            const markers = [{ pos: STORE_COORDS, emoji: '🏪', popup: 'Base' }, ...myOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', data: o }))];
-
-            useEffect(() => {
-                const watch = navigator.geolocation.watchPosition(
-                    pos => updateDB({...db, users: db.users.map(u => u.id === user.id ? {...u, location: [pos.coords.latitude, pos.coords.longitude], online: true} : u)}),
-                    null, { enableHighAccuracy: true }
-                );
-                return () => navigator.geolocation.clearWatch(watch);
-            }, []);
-
-            return (
-                <div className="h-full flex flex-col bg-black pb-16 relative">
-                    <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-black/90 to-transparent flex justify-between pointer-events-none"><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] flex items-center gap-2"><div className={`w-2 h-2 rounded-full ${user.online?'bg-green-500':'bg-red-500'}`}></div><span className="text-xs text-white font-bold">{user.name}</span></div><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] text-right"><p className="text-[10px] text-gray-500">DEUDA</p><p className="text-[var(--gold)] font-bold">{formatCurrency(user.cashOnHand)}</p></div></div>
-                    {view === 'map' && <div className="flex-1 relative"><LeafletMap center={STORE_COORDS} markers={markers} onMarkerClick={setSelectedOrder} />{selectedOrder && <div className="absolute bottom-4 left-4 right-4 bg-[#141414] p-5 rounded-2xl border border-[var(--gold)] shadow-[0_0_30px_rgba(0,0,0,0.8)] z-[1000] animate-in slide-in-from-bottom"><div className="flex justify-between items-start mb-4"><div><h3 className="text-white font-bold text-xl">#{selectedOrder.orderNum} - {selectedOrder.clientName}</h3><p className="text-gray-400 text-sm mt-1">{selectedOrder.address}</p></div><button onClick={()=>setSelectedOrder(null)} className="bg-[#222] p-2 rounded-full"><X className="text-white"/></button></div><div className="grid grid-cols-2 gap-3 mb-4"><a href={`https://wa.me/52${selectedOrder.clientPhone}?text=Hola`} target="_blank" className="bg-green-600 text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><MessageCircle/> WHATSAPP</a><a href={`tel:${selectedOrder.clientPhone}`} className="bg-[#333] text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><Phone/> LLAMAR</a></div><button onClick={()=>{let cash = user.cashOnHand || 0; if(selectedOrder.method==='cash') cash += selectedOrder.total; updateDB({...db, orders: db.orders.map(x=>x.id===selectedOrder.id?{...x,status:'delivered'}:x), users: db.users.map(u=>u.id===user.id?{...u, cashOnHand: cash}:u)}); setSelectedOrder(null);}} className="w-full btn-gold py-4 text-lg rounded-xl shadow-lg">FINALIZAR ENTREGA</button></div>}<button className="absolute bottom-20 right-4 bg-[var(--gold)] p-4 rounded-full shadow-[0_0_20px_var(--gold)] z-10 animate-bounce" onClick={()=>setScanning(true)}><QRIcon size={32} className="text-black"/></button></div>}
-                    {scanning && <div className="fixed inset-0 bg-black z-[2000] flex flex-col items-center justify-center p-6"><h2 className="text-[var(--gold)] text-2xl font-bold mb-4">ESCANEAR QR</h2><div className="w-64 h-64 border-4 border-[var(--gold)] rounded-lg relative overflow-hidden mb-4"><video className="w-full h-full object-cover opacity-50"></video><div className="absolute inset-0 flex items-center justify-center pointer-events-none text-white text-xs">CÁMARA SIMULADA</div></div><button onClick={()=>setScanning(false)} className="mt-4 text-gray-500">Cancelar</button></div>}
-                    {view === 'list' && <div className="p-4 text-white">LISTA DE PEDIDOS (Full)</div>}
-                    {view === 'wallet' && <div className="p-4 text-white text-center"><h2 className="text-2xl font-bold mb-4">MI BILLETERA</h2><img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=LIQ:${user.id}`} className="bg-white p-4 rounded mx-auto mb-4"/><p className="text-4xl font-bold text-[var(--gold)]">{formatCurrency(user.cashOnHand)}</p></div>}
-                    <nav className="fixed bottom-0 left-0 right-0 bg-[#111] border-t border-[#333] flex justify-around p-4 z-50"><button onClick={()=>setView('map')} className={`flex flex-col items-center ${view==='map'?'text-[var(--gold)]':'text-gray-500'}`}><Map/><span className="text-[10px] mt-1">MAPA</span></button><button onClick={()=>setView('list')} className={`flex flex-col items-center ${view==='list'?'text-[var(--gold)]':'text-gray-500'}`}><ClipboardList/><span className="text-[10px] mt-1">PEDIDOS</span></button><button onClick={()=>setView('wallet')} className={`flex flex-col items-center ${view==='wallet'?'text-[var(--gold)]':'text-gray-500'}`}><Wallet/><span className="text-[10px] mt-1">BILLETERA</span></button></nav>
-                </div>
-            );
-        };
-
-        // 7. CLIENT APP (Full V47)
-        const ClientApp = ({ db, updateDB }) => {
-            const [view, setView] = useState('menu');
-            const [cart, setCart] = useState([]);
-            const [form, setForm] = useState({name:'', phone:'', type:'delivery', address:'', pay:'card', payAmount:0});
-            const [activeOrder, setActiveOrder] = useState(null);
-            const [clientCoords, setClientCoords] = useState(null);
-
-            useEffect(() => { navigator.geolocation.getCurrentPosition((pos) => setClientCoords([pos.coords.latitude, pos.coords.longitude]), () => setClientCoords(STORE_COORDS)); }, []);
-
-            const deliveryFee = form.type==='delivery' && clientCoords ? getDeliveryPrice(5, db.settings.deliveryTable) : 0; 
-            const total = cart.reduce((a,b)=>a+b.price,0) + deliveryFee;
-
-            const submit = () => {
-                if(form.type==='delivery' && !db.settings.deliveryEnabled!==false) return alert("Servicio a domicilio no disponible");
-                const order = { id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, items: cart, total, status: 'web_pending_payment', method: form.pay, createdAt: new Date().toISOString(), address: form.type==='delivery' ? (form.address || "Mapa") : 'RECOGER', clientName: form.name, clientLoc: clientCoords, source: 'web' };
-                updateDB({...db, orders: [...db.orders, order]}); setActiveOrder(order); setView('track');
-            };
-
-            if(!db.settings.storeOpen) return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
-
-            if(view === 'menu') return (
-                <div className="h-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] relative">
-                    <div className="h-48 bg-cover bg-center relative" style={{backgroundImage:`url(${BANNER_URL})`}}><button onClick={()=>setView('promo_video')} className="absolute bottom-4 right-4 bg-white/20 backdrop-blur p-2 rounded-full border border-white text-white animate-pulse"><Video/></button></div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">{db.products.map(p=>(<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)]"><img src={p.img} className="w-20 h-20 rounded object-cover"/><div className="flex-1"><p className="font-bold text-[var(--text-main)]">{p.name}</p><p className="text-gray-500 text-xs line-clamp-2">{p.desc}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)]">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart,p])} className="bg-[var(--accent)] text-white w-8 h-8 rounded-full font-bold shadow">+</button></div></div></div>))}</div>
-                    {cart.length>0 && <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-20"><button onClick={()=>setView('checkout')} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button></div>}
-                </div>
-            );
-
-            if(view === 'promo_video') return <div className="h-full bg-black flex flex-col items-center justify-center relative"><video src={VIDEO_URL} autoPlay loop controls className="w-full max-h-[80vh]"/><button onClick={()=>setView('menu')} className="absolute top-4 left-4 bg-white text-black px-4 py-2 rounded-full font-bold z-10 flex gap-2"><ArrowLeft/> Volver al Menú</button></div>;
-
-            if(view === 'checkout') return (
-                <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto">
-                    <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2"><ArrowLeft/> Volver</button>
-                    <h2 className="font-bold text-xl mb-6 text-[var(--text-main)]">RESUMEN</h2>
-                    <div className="space-y-4 mb-8">
-                        <input className="input-std" placeholder="Nombre" onChange={e=>setForm({...form,name:e.target.value})}/>
-                        <div className="flex gap-2"><button onClick={()=>setForm({...form, type:'delivery'})} className={`flex-1 p-3 rounded font-bold border ${form.type==='delivery'?'border-[var(--accent)] text-[var(--accent)]':'border-gray-500 text-gray-500'}`}>DOMICILIO</button>{db.settings.pickupEnabled && <button onClick={()=>setForm({...form, type:'pickup'})} className={`flex-1 p-3 rounded font-bold border ${form.type==='pickup'?'border-[var(--accent)] text-[var(--accent)]':'border-gray-500 text-gray-500'}`}>RECOGER</button>}</div>
-                        {form.type==='delivery' && <div className="space-y-2"><textarea className="input-std h-20" placeholder="Dirección" value={form.address} onChange={e=>setForm({...form,address:e.target.value})}/><div className="h-32 rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'📍'}]} zoom={15} onClickMap={(pos)=>{setClientCoords(pos); setForm({...form, address:"Ubicación Mapa"});}}/></div></div>}
-                        <p className="font-bold text-[var(--text-main)]">Método de Pago</p>
-                        {db.settings.paymentMethods.cash && <label className="input-std flex items-center gap-2"><input type="radio" name="pay" onChange={()=>setForm({...form,pay:'cash'})}/> Efectivo {form.pay==='cash' && <input type="number" className="ml-2 bg-transparent border-b w-24 text-center" placeholder="Monto" onChange={e=>setForm({...form,payAmount:parseFloat(e.target.value)})}/>}</label>}
-                        {db.settings.paymentMethods.card && <label className="input-std flex items-center gap-2"><input type="radio" name="pay" onChange={()=>setForm({...form,pay:'card'})}/> Tarjeta</label>}
-                    </div>
-                    <button onClick={submit} className="w-full bg-[var(--accent)] text-white py-4 rounded-lg font-bold shadow-lg">ENVIAR A CAJA</button>
-                </div>
-            );
-
-            if(view === 'track') return <div className="h-full flex flex-col bg-white"><div className="flex-1 relative"><LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, emoji:'🏪'}, {pos:clientCoords, emoji:'🏠'}]} route={[STORE_COORDS, clientCoords]} zoom={13}/></div><div className="p-6 bg-white rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] z-10"><h2 className="text-xl font-bold mb-2">ESTADO: {activeOrder?.status}</h2><button onClick={()=>setView('menu')} className="mt-4 w-full bg-black text-white py-3 rounded-xl font-bold">VOLVER AL MENU</button></div></div>;
-        };
-
         // --- APP ROOT ---
         const App = () => {
             const [theme, setTheme] = useState('dark');
             const [db, setDB] = useState(initialDB);
             const [user, setUser] = useState(null);
             const [loginData, setLoginData] = useState({u:'', p:''});
+            const [godMenuOpen, setGodMenuOpen] = useState(false);
             
-            useEffect(() => { const s=localStorage.getItem('emi_v52_db'); if(s) setDB(JSON.parse(s)); }, []);
-            const updateDB = (n) => { setDB(n); localStorage.setItem('emi_v52_db', JSON.stringify(n)); };
+            useEffect(() => { 
+                try {
+                    const s = localStorage.getItem('emi_v63_db'); 
+                    if(s) setDB(JSON.parse(s)); 
+                } catch(e) { console.error("Error loading DB", e); }
+            }, []);
+
+            const updateDB = (n) => { setDB(n); localStorage.setItem('emi_v63_db', JSON.stringify(n)); };
             useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
             
             const toggleTheme = () => { const newT = theme==='dark'?'light':'dark'; setTheme(newT); document.body.className = newT; };
-            const handleLogin = () => { 
+            
+            const requestPermissions = async () => {
+                try {
+                    await navigator.mediaDevices.getUserMedia({ video: true });
+                    await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject));
+                    if ('Notification' in window) await Notification.requestPermission();
+                } catch (e) { console.log("Permisos limitados"); }
+            };
+
+            const handleLogin = async () => { 
+                await requestPermissions();
                 if(loginData.p === SUPER_USER_PASS) return setUser({role:'admin', name:'Super Admin', superUser:true});
                 const found = db.users.find(u => u.username === loginData.u && u.password === loginData.p);
-                if(found) setUser(found); else alert("Credenciales incorrectas");
+                if(found) setUser(found); else showToast("Credenciales incorrectas");
+            };
+
+            const resetApp = () => {
+                if(confirm("¿RESET DE FÁBRICA? Se borrarán todos los datos.")) {
+                    localStorage.removeItem('emi_v63_db');
+                    window.location.reload();
+                }
             };
 
             if(!user) return (
-                <div className="h-screen flex items-center justify-center bg-[var(--bg-body)]">
+                <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
                     <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
                     <div className="card p-8 w-full max-w-sm text-center bg-[var(--bg-card)]">
-                        <img src={LOGO_URL} className="w-24 mx-auto mb-4"/>
-                        <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI V52</h1>
+                        <img src={LOGO_URL} className="w-24 mx-auto mb-4" onError={(e) => e.target.style.display='none'} />
+                        <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI V63</h1>
                         <input className="input-std text-center mb-2" placeholder="Usuario" value={loginData.u} onChange={e=>setLoginData({...loginData, u:e.target.value})}/>
                         <input className="input-std text-center mb-4" type="password" placeholder="Contraseña" value={loginData.p} onChange={e=>setLoginData({...loginData, p:e.target.value})}/>
                         <button onClick={handleLogin} className="btn-gold w-full text-xl shadow-lg">ENTRAR</button>
-                        <button onClick={()=>setUser({role:'cliente',name:'Guest'})} className="block w-full p-3 bg-gray-500 text-white rounded text-center text-sm font-bold mt-4">CLIENTE WEB</button>
+                        <button onClick={()=>{requestPermissions(); setUser({role:'cliente',name:'Guest'})}} className="block w-full p-3 bg-gray-500 text-white rounded text-center text-sm font-bold mt-4">CLIENTE WEB</button>
                     </div>
                 </div>
             );
 
             return (
                 <div className={`h-screen w-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] ${theme}`}>
-                    <div className="fixed top-4 right-4 z-50"><button onClick={()=>setUser(null)} className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold">SALIR</button></div>
+                    
+                    {/* Invisible Logout Trigger */}
+                    <div className="logout-ghost">
+                        <button onClick={()=>setUser(null)} className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold shadow-lg">SALIR</button>
+                    </div>
+
                     <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
+                    
+                    {/* Share Button for Admin/POS Global (Hidden for Clients) */}
+                    {user.role!=='cajero' && user.role!=='cliente' && <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>}
+
                     {user.role==='admin' && <AdminPanel db={db} updateDB={updateDB}/>}
-                    {user.role==='cajero' && <POS db={db} updateDB={updateDB}/>}
+                    {user.role==='cajero' && <POS db={db} updateDB={updateDB} user={user}/>}
                     {user.role==='cliente' && <ClientApp db={db} updateDB={updateDB}/>}
                     {user.role==='repartidor' && <DriverApp db={db} updateDB={updateDB} user={user}/>}
                     {user.role==='cocina' && <Kitchen db={db} updateDB={updateDB}/>}
                     
                     {user.name==='Super Admin' && (
                         <div className="gods-eye group">
-                            <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,193,7,0.6)] border-2 border-white hover:scale-110 transition z-50"><Eye size={28} className="text-black"/></button>
-                            <div className="gods-menu">
-                                {['admin','cajero','cliente','repartidor','cocina'].map(r=><button key={r} onClick={()=>setUser({...user, role:r})} className="text-left p-2 rounded text-sm text-white hover:bg-[#333] capitalize">{r}</button>)}
-                            </div>
+                            {godMenuOpen && (
+                                <div className="gods-menu">
+                                    {['admin','cajero','cliente','repartidor','cocina'].map(r=><button key={r} onClick={()=>{setUser({...user, role:r}); setGodMenuOpen(false);}} className="text-left p-2 rounded text-sm text-white hover:bg-[#333] capitalize">{r}</button>)}
+                                    <button onClick={resetApp} className="text-left p-2 rounded text-sm text-red-500 hover:bg-[#333] font-bold border-t border-[#333] mt-2">RESET APP</button>
+                                </div>
+                            )}
+                            <button onClick={()=>setGodMenuOpen(!godMenuOpen)} className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,193,7,0.6)] border-2 border-white hover:scale-110 transition z-50"><Eye size={28} className="text-black"/></button>
                         </div>
                     )}
                 </div>
