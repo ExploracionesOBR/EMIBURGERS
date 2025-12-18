@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMI BURGERS - ERP V63 STABLE</title>
+    <title>EMI BURGERS - ERP V70 FINAL</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
@@ -65,8 +65,11 @@
         /* UI Elements Positioning */
         .theme-toggle { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: var(--bg-card); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; }
         
-        /* God's Eye - Raised higher */
-        .gods-eye { position: fixed; bottom: 150px; left: 20px; z-index: 9999; }
+        /* God's Eye */
+        .gods-eye { position: fixed; bottom: 150px; left: 20px; z-index: 9999; transition: all 0.3s; opacity: 0.8; transform: scale(0.9); }
+        .gods-eye:active { transform: scale(0.95); }
+        
+        /* Menu controlled by React state now, removed hover CSS */
         .gods-menu { position: absolute; bottom: 70px; left: 0; width: 200px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -183,6 +186,7 @@
             .app-view-mobile {
                 max-width: 480px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333;
                 box-shadow: 0 0 50px rgba(0,0,0,0.5);
+                position: relative; /* Fix relative positioning context */
             }
         }
     </style>
@@ -204,7 +208,7 @@
         const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
         // --- CONSTANTS ---
-        const STORE_COORDS = [27.4828, -109.9304]; // Ciudad Obregón Approx Center
+        const STORE_COORDS = [27.446895, -109.943874]; 
         const CITY_SUFFIX = ", Ciudad Obregón, Sonora, Mexico";
         const SUPER_USER_PASS = "OBR1995@";
         const LOGO_URL = "LOGO_1.png";
@@ -227,21 +231,25 @@
             }, 3000);
         };
 
-        // --- HELPER: ROBUST COPY TO CLIPBOARD ---
+        // --- HELPER: ROBUST COPY TO CLIPBOARD + SHARE MENU LINK ---
         const copyToClipboard = (text) => {
+            const urlObj = new URL(text);
+            urlObj.searchParams.set('menu', 'true');
+            const menuLink = urlObj.toString();
+
             const textArea = document.createElement("textarea");
-            textArea.value = text;
+            textArea.value = menuLink;
             textArea.style.position = "fixed";  
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
             try {
                 const successful = document.execCommand('copy');
-                const msg = successful ? 'Enlace copiado al portapapeles' : 'No se pudo copiar';
-                alert(msg);
+                const msg = successful ? 'Enlace de menú copiado' : 'No se pudo copiar';
+                showToast(msg);
             } catch (err) {
                 console.error('Fallback: Oops, unable to copy', err);
-                alert("Error al copiar. Hazlo manualmente.");
+                showToast("Error al copiar.");
             }
             document.body.removeChild(textArea);
         };
@@ -260,7 +268,7 @@
                 pickupEnabled: true,
                 deliveryEnabled: true,
                 paymentMethods: { cash: true, card: true },
-                deliveryRadius: 15,
+                deliveryRadius: 15, // Default radius in KM
                 driverAssign: 'manual',
                 supervisorKey: 'ADMIN123',
                 cashLimit: 2000,
@@ -280,7 +288,9 @@
         // --- HELPERS ---
         const calculateDistance = (lat1, lon1, lat2, lon2) => {
             if(!lat1 || !lon1 || !lat2 || !lon2) return 0;
-            const R = 6371; const dLat = (lat2 - lat1) * Math.PI / 180; const dLon = (lon2 - lon1) * Math.PI / 180;
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180; 
+            const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
         };
@@ -289,14 +299,14 @@
         const printTicket = (html) => {
             const win = window.open('', '', 'width=300,height=600');
             if(win){
-                win.document.write(`<html><head><style>body{font-family:monospace;font-size:12px;width:280px;margin:0;padding:10px;} .center{text-align:center;} .bold{font-weight:bold;} hr{border-top:1px dashed #000;} img{display:block;margin:0 auto;}</style></head><body><img src="${LOGO_URL}" style="width:50px;display:block;margin:0 auto 10px auto;">${html}</body></html>`);
+                win.document.write(`<html><head><base href="${window.location.origin}${window.location.pathname}"><style>body{font-family:monospace;font-size:12px;width:280px;margin:0;padding:10px;} .center{text-align:center;} .bold{font-weight:bold;} hr{border-top:1px dashed #000;} img{display:block;margin:0 auto;}</style></head><body><img src="${LOGO_URL}" style="width:50px;margin-bottom:10px;">${html}</body></html>`);
                 win.document.close(); setTimeout(() => { win.print(); win.close(); }, 500);
-            } else { alert("Permite popups para imprimir"); }
+            } else { showToast("Permite popups para imprimir"); }
         };
 
         // --- COMPONENTS ---
 
-        const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route }) => {
+        const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route, radius }) => {
             const mapRef = useRef(null);
             const containerRef = useRef(null);
 
@@ -309,11 +319,23 @@
                     if(onClickMap) mapRef.current.on('click', (e) => onClickMap([e.latlng.lat, e.latlng.lng]));
                 } else { 
                     mapRef.current.setView(center, zoom); 
+                    setTimeout(() => mapRef.current.invalidateSize(), 100);
                 }
 
+                // Clear previous layers
                 mapRef.current.eachLayer(layer => {
                     if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline) mapRef.current.removeLayer(layer);
                 });
+
+                // Add Radius Circle if provided
+                if (radius) {
+                    L.circle(STORE_COORDS, {
+                        color: 'red',
+                        fillColor: '#f03',
+                        fillOpacity: 0.1,
+                        radius: radius * 1000 // Convert km to meters
+                    }).addTo(mapRef.current);
+                }
 
                 if(showHeatmap) {
                       markers.forEach((m) => {
@@ -337,11 +359,10 @@
 
                 return () => {
                     if(mapRef.current) {
-                        mapRef.current.remove();
-                        mapRef.current = null;
+                        // Keep instance alive if possible, or cleanup properly if needed
                     }
                 }
-            }, [center, markers, showHeatmap, zoom]); 
+            }, [center, markers, showHeatmap, zoom, radius]); 
 
             return <div ref={containerRef} className="h-full w-full rounded-lg bg-gray-200 border border-gray-300 z-0"></div>;
         };
@@ -383,16 +404,21 @@
             const platformStats = db.orders.reduce((acc, o) => { const key = o.source === 'web' ? 'WEB' : (o.source === 'platform' ? (o.platformName || 'APP') : 'TIENDA'); acc[key] = (acc[key] || 0) + 1; return acc; }, {});
             const deliveryLocations = useMemo(() => db.orders.filter(o=>o.clientLoc).map(o=>({pos:o.clientLoc})), [db.orders]);
             const expired = db.supplies.filter(s => new Date(s.expiry) < new Date());
-
-            const topProducts = Object.entries(db.orders.reduce((acc, o) => {
+            
+            const actualTopProducts = Object.entries(db.orders.reduce((acc, o) => {
                 o.items.forEach(i => acc[i.name] = (acc[i.name] || 0) + i.qty);
                 return acc;
             }, {})).sort((a,b)=>b[1]-a[1]).slice(0,5);
-            const maxProdVal = topProducts.length > 0 ? topProducts[0][1] : 1;
+
+            const topProducts = actualTopProducts.length > 0 ? actualTopProducts : [
+                ['Producto 1', 0], ['Producto 2', 0], ['Producto 3', 0]
+            ];
+            
+            const maxProdVal = actualTopProducts.length > 0 ? actualTopProducts[0][1] : 1;
 
             const handleMapClick = () => {
-                if (topProducts.length > 0) {
-                    setSelectedZone({ name: "Zona Centro", topItem: topProducts[0][0] });
+                if (actualTopProducts.length > 0) {
+                    setSelectedZone({ name: "Zona Centro", topItem: actualTopProducts[0][0] });
                     setTimeout(() => setSelectedZone(null), 3000);
                 } else {
                     showToast("Sin datos de ventas para mostrar zonas.");
@@ -416,14 +442,9 @@
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
                         <div className="card p-6">
                             <h3 className="font-bold text-[var(--gold)] mb-4 flex items-center gap-2"><TrendingUp size={20}/> Productos Más Vendidos</h3>
-                            {topProducts.length === 0 ? 
-                                <div className="text-gray-500 text-center py-4">
-                                    <p className="mb-2">Aún no hay ventas.</p>
-                                    <div className="progress-bar mb-2"><div className="progress-fill bg-[var(--gold)]" style={{width: `0%`}}></div></div>
-                                </div> 
-                            : topProducts.map(([name, qty], i) => (
+                            {topProducts.map(([name, qty], i) => (
                                 <div key={i} className="mb-2">
-                                    <div className="flex justify-between text-sm mb-1"><span className="text-[var(--text-main)]">{i+1}. {name}</span><span className="text-[var(--gold)]">{qty}</span></div>
+                                    <div className="flex justify-between text-sm mb-1"><span className="text-[var(--text-main)]">{name}</span><span className="text-[var(--gold)]">{qty}</span></div>
                                     <div className="progress-bar"><div className="progress-fill bg-[var(--gold)]" style={{width: `${(qty/maxProdVal)*100}%`}}></div></div>
                                 </div>
                              ))}
@@ -570,11 +591,12 @@
         const StaffManager = ({ db, updateDB }) => {
             const [editing, setEditing] = useState(null);
             const [mode, setMode] = useState('list');
+            const [checadorUser, setChecadorUser] = useState('');
             const days = ['Lun','Mar','Mie','Jue','Vie','Sab','Dom'];
 
             const copyMonday = (u) => {
                 const mon = u.schedule?.['Lun'];
-                if(!mon) return alert("Configura Lunes primero");
+                if(!mon) return showToast("Configura Lunes primero");
                 const newSch = {};
                 days.forEach(d => newSch[d] = {...mon});
                 const updated = db.users.map(x=>x.id===u.id?{...x, schedule: newSch}:x);
@@ -591,7 +613,6 @@
             const handleCheckInOut = (u) => {
                 const last = (u.attendance || []).length > 0 ? u.attendance[u.attendance.length-1] : null;
                 const now = new Date();
-                
                 let newAtt;
                 if(last && !last.out) {
                     newAtt = [...u.attendance];
@@ -603,6 +624,14 @@
                 showToast(`Registro Exitoso: ${u.name}`);
             };
             
+            const handleChecadorSubmit = () => {
+                const u = db.users.find(u => u.username === checadorUser);
+                if(u) {
+                    handleCheckInOut(u);
+                    setChecadorUser('');
+                } else showToast("Usuario no encontrado");
+            };
+
             const deleteUser = (id) => {
                 if(confirm("¿Eliminar empleado?")) {
                     updateDB({...db, users: db.users.filter(u=>u.id!==id)});
@@ -621,15 +650,9 @@
                     <h2 className="text-3xl font-brand text-[var(--gold)] mb-8">RELOJ CHECADOR</h2>
                     <div className="card p-8 w-full max-w-md bg-[var(--bg-card)] text-center">
                         <QrCode size={128} className="mx-auto mb-4 text-white"/>
-                        <p className="mb-4 text-gray-400">Selecciona tu usuario para registrar entrada/salida</p>
-                        <div className="grid grid-cols-2 gap-2">
-                            {db.users.filter(u=>u.role!=='admin').map(u=>(
-                                <button key={u.id} onClick={()=>handleCheckInOut(u)} className="p-3 bg-[#333] rounded text-white font-bold hover:bg-[var(--gold)] hover:text-black transition flex flex-col items-center">
-                                    <span>{u.name}</span>
-                                    <span className="text-[10px] font-normal">{(u.attendance || []).length > 0 && !(u.attendance || [])[(u.attendance || []).length-1].out ? '🟢 EN TURNO' : '🔴 SALIDA'}</span>
-                                </button>
-                            ))}
-                        </div>
+                        <p className="mb-4 text-gray-400">Ingresa tu usuario para registrar entrada/salida</p>
+                        <input className="input-std text-center mb-4 text-xl uppercase" placeholder="USUARIO" value={checadorUser} onChange={e=>setChecadorUser(e.target.value)}/>
+                        <button onClick={handleChecadorSubmit} className="btn-gold w-full text-xl shadow-lg">REGISTRAR</button>
                     </div>
                     <button onClick={()=>setMode('list')} className="mt-8 text-gray-500 underline">Volver a Lista</button>
                 </div>
@@ -689,6 +712,7 @@
                                      <div className="w-32"><label className="text-xs text-gray-500">Sueldo Semanal</label><input type="number" className="input-std" value={editing.salary} onChange={e=>setEditing({...editing, salary:parseFloat(e.target.value)})}/></div>
                                      <button onClick={()=>copyMonday(editing)} className="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold flex gap-2"><Copy size={14}/> COPIAR LUNES A SEMANA</button>
                                  </div>
+                                 
                                  <div className="grid grid-cols-7 gap-2 mb-6">
                                      {days.map(d=>(
                                          <div key={d} className="bg-[#222] p-2 rounded text-center border border-[#333]">
@@ -699,7 +723,6 @@
                                      ))}
                                  </div>
                                  
-                                 {/* Manual Attendance Edit for Admin */}
                                  <div className="mb-4 bg-[#222] p-2 rounded">
                                      <p className="text-xs font-bold mb-1 text-white">Editar Último Registro (Admin)</p>
                                      <div className="flex gap-2">
@@ -787,21 +810,38 @@
                 }
             };
 
+            const updateRadius = (val) => {
+                 updateDB({...db, settings: {...db.settings, deliveryRadius: parseInt(val)}});
+            };
+
             return (
                 <div className="h-full flex flex-col gap-4">
-                    <div className="card p-4 border-l-4 border-purple-500 bg-[var(--bg-card)]">
-                        <h3 className="font-bold mb-2 flex gap-2 text-[var(--text-main)]"><Bell/> ENVIAR NOTIFICACIÓN PUSH</h3>
-                        <div className="flex gap-2">
-                            <select className="input-std w-40" value={target} onChange={e=>setTarget(e.target.value)}>
-                                <option value="all">TODOS</option>
-                                <option value="kitchen">COCINA</option>
-                                <option value="delivery">REPARTIDORES</option>
-                                <option value="cashier">CAJA</option>
-                            </select>
-                            <input className="input-std" placeholder="Mensaje..." value={notif} onChange={e=>setNotif(e.target.value)}/>
-                            <button onClick={sendPush} className="btn-gold px-6">ENVIAR</button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="card p-4 border-l-4 border-purple-500 bg-[var(--bg-card)]">
+                            <h3 className="font-bold mb-2 flex gap-2 text-[var(--text-main)]"><Bell/> NOTIFICACIONES</h3>
+                            <div className="flex gap-2">
+                                <select className="input-std w-40" value={target} onChange={e=>setTarget(e.target.value)}>
+                                    <option value="all">TODOS</option>
+                                    <option value="kitchen">COCINA</option>
+                                    <option value="delivery">REPARTIDORES</option>
+                                    <option value="cashier">CAJA</option>
+                                </select>
+                                <input className="input-std" placeholder="Mensaje..." value={notif} onChange={e=>setNotif(e.target.value)}/>
+                                <button onClick={sendPush} className="btn-gold px-6">ENVIAR</button>
+                            </div>
+                        </div>
+                        <div className="card p-4 border-l-4 border-[var(--gold)] bg-[var(--bg-card)]">
+                            <h3 className="font-bold mb-2 flex gap-2 text-[var(--text-main)]"><MapPin/> ZONA DE REPARTO</h3>
+                            <div className="flex items-center gap-4 mb-2">
+                                <span className="text-white text-sm">Radio: {db.settings.deliveryRadius} KM</span>
+                                <input type="range" min="1" max="50" value={db.settings.deliveryRadius} onChange={(e)=>updateRadius(e.target.value)} className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[var(--gold)]"/>
+                            </div>
+                            <div className="h-40 rounded border border-gray-600 overflow-hidden">
+                                <LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, emoji:'🏪'}]} zoom={11} radius={db.settings.deliveryRadius} />
+                            </div>
                         </div>
                     </div>
+                    
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 overflow-hidden pb-20">
                         <div className="card p-4 border-t-4 border-blue-500 overflow-y-auto space-y-4">
                             <h3 className="font-bold flex gap-2 text-[var(--text-main)]"><Globe/> WEB & PAGOS</h3>
@@ -837,10 +877,10 @@
             
             const generateHTML = (type) => {
                  const base = `<div class="center bold">${header.replace(/\n/g, '<br>')}</div><hr>`;
-                const end = `<hr><div class="center">${footer}</div>`;
+                const end = `<hr><div class="center">${footer.replace(/\n/g, '<br>')}</div>`;
                 const date = new Date().toLocaleString();
                 if(type === 'sale') return `${base}<div class="center">VENTA #1234</div><div class="center">${date}</div><hr><div>1x Burger Clásica ... $95</div><div>1x Papas ........... $55</div><hr><div class="bold right">TOTAL: $150</div>${end}`;
-                if(type === 'cut') return `${base}<div class="center bold">CORTE DE CAJA</div><div class="center">${date}</div><hr><div>Fondo Inicial: $1,000</div><div>+ Ventas Efec: $2,500</div><div>- Gastos/Retiros: $500</div><hr><div class="bold right">TOTAL ESPERADO: $3,000</div><br><br><div class="center">_______________________<br>Firma Cajera</div>${end}`;
+                if(type === 'cut') return `${base}<div class="center bold">CORTE DE CAJA</div><div class="center">${date}</div><hr><div>Fondo Inicial: $1,000</div><div>+ Ventas Efec: $2,500</div><div>- Gastos/Retiros: $500</div><hr><div class="bold right">TOTAL EN CAJA: $3,000</div><br><br><div class="center">_______________________<br>Firma Cajera</div>${end}`;
                 if(type === 'driver_liq') return `${base}<div class="center bold">LIQUIDACIÓN DRIVER</div><div class="center">Juan Moto</div><hr><div>Pedidos Entregados: 5</div><div>Total Cobrado: $800</div><div>Ganancia Envíos: -$150</div><hr><div class="bold right">A ENTREGAR: $650</div><br><br><div class="center">_______________________<br>Firma Driver</div>${end}`;
                 if(type === 'platform') return `${base}<div class="center">PLATAFORMA (UBER)</div><div class="center">#9999</div><div class="center">${date}</div><hr><div>1x Burger ... $95</div><div class="bold right">TOTAL: $95</div>${end}<br><br>✂️ --- CORTE AQUÍ ---<br><br>${base}<div class="center">COPIA CLIENTE/DRIVER</div><div class="center">${date}</div><hr><div>1x Burger ... $0.00</div><div class="bold right">TOTAL A PAGAR: $0.00</div><div class="center">PROPINAS NO INCLUIDAS</div>${end}`;
                 return "";
@@ -917,6 +957,7 @@
             const [liqSummary, setLiqSummary] = useState(null);
             const [newExpense, setNewExpense] = useState({desc:'', amount:''});
             const [suggestions, setSuggestions] = useState([]);
+            const [manualDriverId, setManualDriverId] = useState('');
 
             const webOrders = db.orders.filter(o => o.source === 'web' && o.status === 'web_pending_payment');
             
@@ -996,6 +1037,12 @@
                 return ex ? prev.map(i => i.id === p.id ? {...i, qty: i.qty + 1} : i) : [...prev, {...p, qty: 1}];
             });
 
+            const removeFromCart = (idx) => {
+                 const newCart = [...cart];
+                 newCart.splice(idx, 1);
+                 setCart(newCart);
+            };
+
             const updateCartNote = (idx, note) => {
                 const newCart = [...cart];
                 newCart[idx].note = note;
@@ -1015,7 +1062,7 @@
                         const netToPay = totalCash - totalEarnings;
                         setDriverToLiq(driver);
                         setLiqSummary({ deliveredOrders, totalCash, totalEarnings, netToPay });
-                    }
+                    } else showToast("Repartidor no encontrado");
                 }
             };
             
@@ -1026,6 +1073,8 @@
                     users: db.users.map(u => u.id === driverToLiq.id ? {...u, cashOnHand: 0} : u),
                     orders: db.orders.map(o => liqSummary.deliveredOrders.find(do_ => do_.id === o.id) ? {...o, settled: true} : o)
                 });
+                const ticket = `<div class="center bold">LIQUIDACIÓN REPARTIDOR</div><div class="center">${driverToLiq.name}</div><hr><div>Entregas: ${liqSummary.deliveredOrders.length}</div><div>Total Cobrado: ${formatCurrency(liqSummary.totalCash)}</div><div>Ganancia Envíos: -${formatCurrency(liqSummary.totalEarnings)}</div><hr><div class="bold right">ENTREGÓ: ${formatCurrency(liqSummary.netToPay)}</div><br><br><div class="center">_______________________<br>Firma</div>`;
+                printTicket(ticket);
                 showToast("Liquidación Exitosa.");
                 setLiquidationModal(false); setDriverToLiq(null);
             };
@@ -1040,6 +1089,21 @@
                 });
                 setNewExpense({desc:'', amount:''});
                 showToast("Retiro Registrado");
+            };
+            
+            const printCut = () => {
+                const initial = db.cashDrawer.initial || 0;
+                const salesCash = db.orders.filter(o => o.method === 'cash').reduce((a,b) => a + b.total, 0);
+                const withdrawals = db.expenses.reduce((a,b) => a + b.amount, 0);
+                const final = initial + salesCash - withdrawals;
+                
+                const ticket = `<div class="center bold">CORTE DE CAJA (Z)</div><div class="center">${new Date().toLocaleString()}</div><hr>
+                <div>Fondo Inicial: ${formatCurrency(initial)}</div>
+                <div>+ Ventas Efectivo: ${formatCurrency(salesCash)}</div>
+                <div>- Retiros/Gastos: -${formatCurrency(withdrawals)}</div>
+                <hr><div class="bold right">TOTAL EN CAJA: ${formatCurrency(final)}</div>
+                <br><br><div class="center">_______________________<br>Firma Cajera</div>`;
+                printTicket(ticket);
             };
 
             // Smart Cash Logic
@@ -1092,11 +1156,11 @@
 
                 updateDB({ ...db, orders: [...db.orders, order], cashDrawer: {...db.cashDrawer, current: newCashDrawer} });
 
-                const qrUrl = `ORDER:${order.id}`;
+                const qrUrl = orderType === 'delivery' ? `${window.location.href}?take_order=${order.id}` : `ORDER:${order.id}`;
                 const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrUrl)}`;
                 const ticketBase = `<div class="center bold">${db.settings.ticketConfig.header.replace(/\n/g, '<br>')}</div><div class="center">Orden #${order.orderNum}</div><div class="center">${new Date().toLocaleString()}</div><hr>`;
                 const itemsList = order.items.map(i => `<div>${i.qty}x ${i.name} ... ${formatCurrency(i.price * i.qty)}</div>${i.note ? `<div class="italic text-xs">(${i.note})</div>` : ''}`).join('');
-                const ticketEnd = `<hr><div class="center">${db.settings.ticketConfig.footer}</div><div class="center"><img src="${qrImg}" width="80"/></div>`;
+                const ticketEnd = `<hr><div class="center">${db.settings.ticketConfig.footer.replace(/\n/g, '<br>')}</div><div class="center"><img src="${qrImg}" width="80"/></div>`;
                 
                 if(orderType === 'platform') {
                     // Double Ticket for Platform (Correct split)
@@ -1124,13 +1188,13 @@
                     <div className="flex-1 flex overflow-hidden">
                         <div className="flex-1 flex flex-col">
                             <div className="p-2 border-b border-[var(--border)] flex gap-2">{['All', 'Burgers'].map(c=><button key={c} onClick={()=>setCatFilter(c)} className="px-4 py-1 rounded-full text-xs font-bold bg-[#222] text-white hover:bg-[var(--gold)] hover:text-black">{c}</button>)}</div>
-                            <div className="flex-1 p-4 grid grid-cols-4 gap-3 overflow-y-auto content-start">
+                            <div className="flex-1 p-4 grid grid-cols-5 gap-3 overflow-y-auto content-start">
                                 {db.products.map(p=>(
-                                    <div key={p.id} onClick={()=>addToCart(p)} className="card h-32 relative overflow-hidden cursor-pointer group border-0 hover:ring-2 ring-[var(--gold)]">
+                                    <div key={p.id} onClick={()=>addToCart(p)} className="card h-28 relative overflow-hidden cursor-pointer group border-0 hover:ring-2 ring-[var(--gold)]">
                                         <img src={p.img} className="absolute inset-0 w-full h-full object-cover opacity-60"/>
-                                        <div className="absolute bottom-0 p-2 w-full bg-gradient-to-t from-black to-transparent">
-                                            <p className="text-white font-bold text-sm leading-tight">{p.name}</p>
-                                            <p className="text-[var(--gold)] font-black text-sm">{formatCurrency(p.price)}</p>
+                                        <div className="absolute bottom-0 p-1 w-full bg-gradient-to-t from-black to-transparent">
+                                            <p className="text-white font-bold text-xs leading-tight">{p.name}</p>
+                                            <p className="text-[var(--gold)] font-black text-xs">{formatCurrency(p.price)}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -1151,7 +1215,8 @@
                             )}
                             <div className="flex-1 p-3 overflow-y-auto space-y-2">
                                 {cart.map((item,idx)=>(
-                                    <div key={idx} className="bg-[#222] p-2 rounded border border-[#333]">
+                                    <div key={idx} className="bg-[#222] p-2 rounded border border-[#333] relative group">
+                                        <button onClick={()=>removeFromCart(idx)} className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg z-10 font-bold">x</button>
                                         <div className="flex justify-between items-center text-white text-sm mb-1">
                                             <div><span className="font-bold">{item.qty}x</span> {item.name}</div>
                                             <div>{formatCurrency(item.price*item.qty)}</div>
@@ -1244,10 +1309,13 @@
                                 <h3 className="text-2xl font-bold text-[var(--gold)] mb-4">LIQUIDACIÓN REPARTIDOR</h3>
                                 {!driverToLiq ? (
                                     <div className="text-center">
-                                         <p className="mb-4 text-gray-400">Escanea el QR del Repartidor para cargar su deuda</p>
-                                         <div className="w-64 h-64 bg-black mx-auto border-2 border-white mb-4 relative">
-                                             <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=LIQ:u4" className="opacity-20 absolute inset-0 w-full h-full"/>
-                                             <div className="absolute inset-0 flex items-center justify-center"><button onClick={()=>handleScanDriver("LIQ:u4")} className="btn-gold">SIMULAR SCAN (Juan Moto)</button></div>
+                                         <p className="mb-4 text-gray-400">Escanea el QR o Ingresa ID:</p>
+                                         <div className="flex gap-2 justify-center mb-4">
+                                             <input id="liq-input" className="input-std w-48 text-center uppercase" placeholder="ID (ej. u4)" onChange={e=>setManualDriverId(e.target.value)}/>
+                                             <button onClick={() => handleScanDriver("LIQ:" + manualDriverId)} className="btn-gold px-4">BUSCAR</button>
+                                         </div>
+                                         <div className="w-full h-32 border border-gray-600 rounded flex items-center justify-center text-gray-500 mb-4">
+                                            [CÁMARA DE ESCANEO ACTIVA]
                                          </div>
                                          <button onClick={()=>setLiquidationModal(false)} className="text-gray-500">CANCELAR</button>
                                     </div>
@@ -1270,11 +1338,16 @@
                     {corteModal && (
                         <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
                             <div className="card w-full max-w-md bg-[var(--bg-card)] p-6">
-                                <h3 className="text-2xl font-bold text-red-500 mb-4">CORTE / RETIROS</h3>
-                                <div className="text-center mb-6">
-                                    <p className="text-gray-400">EFECTIVO EN CAJA</p>
-                                    <p className="text-4xl font-black text-white">{formatCurrency(db.cashDrawer.current)}</p>
+                                <h3 className="text-2xl font-bold text-red-500 mb-4">CORTE DE CAJA / RETIROS</h3>
+                                
+                                <div className="bg-[#111] p-4 rounded mb-6 border border-[#333]">
+                                    <div className="flex justify-between text-gray-400 text-sm"><span>Fondo Inicial:</span><span>{formatCurrency(db.cashDrawer.initial || 0)}</span></div>
+                                    <div className="flex justify-between text-green-500 text-sm"><span>+ Ventas Efectivo:</span><span>{formatCurrency(db.orders.filter(o => o.method === 'cash').reduce((a,b) => a + b.total, 0))}</span></div>
+                                    <div className="flex justify-between text-red-500 text-sm border-b border-[#333] pb-2 mb-2"><span>- Retiros/Gastos:</span><span>-{formatCurrency(db.expenses.reduce((a,b)=>a+b.amount,0))}</span></div>
+                                    <div className="flex justify-between text-xl font-black text-white"><span>TOTAL EN CAJA:</span><span>{formatCurrency(db.cashDrawer.current)}</span></div>
                                 </div>
+                                <button onClick={printCut} className="w-full bg-[var(--gold)] text-black font-bold py-3 mb-4 rounded shadow-lg flex items-center justify-center gap-2"><Printer/> IMPRIMIR CORTE Z</button>
+
                                 <div className="bg-[#222] p-4 rounded mb-4">
                                     <p className="text-xs text-white font-bold mb-2">NUEVO RETIRO (Pago Proveedor/Gastos)</p>
                                     <input className="input-std mb-2" placeholder="Descripción" value={newExpense.desc} onChange={e=>setNewExpense({...newExpense, desc:e.target.value})}/>
@@ -1330,24 +1403,34 @@
             }, [scanning]);
 
             const scanOrder = (content) => {
-                 if(content.startsWith("ORDER:")) {
-                     const oid = content.split(':')[1];
+                 // Check if it's a URL or direct ID
+                 let oid = content;
+                 if(content.includes('take_order=')) {
+                     const url = new URL(content);
+                     oid = url.searchParams.get('take_order');
+                 } else if(content.startsWith("ORDER:")) {
+                     oid = content.split(':')[1];
+                 }
+
+                 if(oid) {
                      const order = db.orders.find(o => o.id === oid);
                      if(order && order.status === 'ready') {
                          updateDB({...db, orders: db.orders.map(o => o.id === oid ? {...o, status: 'delivering', driver: user.username} : o)});
                          showToast("Orden Asignada!"); setScanning(false); setManualId('');
                      } else { showToast("Orden no válida o no lista"); }
+                 } else {
+                     showToast("QR Inválido");
                  }
             };
 
             return (
-                <div className="h-full flex flex-col bg-black pb-16 relative app-view-mobile">
+                <div className="h-full flex flex-col bg-black pb-16 relative w-full overflow-hidden">
                     {/* Share Button for Other Views */}
                     <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>
                     
                     <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-black/90 to-transparent flex justify-between pointer-events-none"><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] flex items-center gap-2"><div className={`w-2 h-2 rounded-full ${user.online?'bg-green-500':'bg-red-500'}`}></div><span className="text-xs text-white font-bold">{user.name}</span></div><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] text-right"><p className="text-[10px] text-gray-500">DEUDA ACTUAL</p><p className="text-[var(--gold)] font-bold">{formatCurrency(user.cashOnHand)}</p></div></div>
                     {view === 'map' && (
-                        <div className="flex-1 relative">
+                        <div className="flex-1 relative w-full h-full">
                             <LeafletMap center={STORE_COORDS} markers={markers} onMarkerClick={setSelectedOrder} />
                             {selectedOrder && <div className="absolute bottom-4 left-4 right-4 bg-[#141414] p-5 rounded-2xl border border-[var(--gold)] shadow-[0_0_30px_rgba(0,0,0,0.8)] z-[1000] animate-in slide-in-from-bottom"><div className="flex justify-between items-start mb-4"><div><h3 className="text-white font-bold text-xl">#{selectedOrder.orderNum} - {selectedOrder.clientName}</h3><p className="text-gray-400 text-sm mt-1">{selectedOrder.address}</p></div><button onClick={()=>setSelectedOrder(null)} className="bg-[#222] p-2 rounded-full"><X className="text-white"/></button></div><div className="grid grid-cols-2 gap-3 mb-4"><a href={`https://wa.me/52${selectedOrder.clientPhone}?text=Hola`} target="_blank" className="bg-green-600 text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><MessageCircle/> WHATSAPP</a><a href={`tel:${selectedOrder.clientPhone}`} className="bg-[#333] text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><Phone/> LLAMAR</a></div><button onClick={()=>{let cash = user.cashOnHand || 0; if(selectedOrder.method==='cash') cash += selectedOrder.total; updateDB({...db, orders: db.orders.map(x=>x.id===selectedOrder.id?{...x,status:'delivered'}:x), users: db.users.map(u=>u.id===user.id?{...u, cashOnHand: cash}:u)}); setSelectedOrder(null);}} className="w-full btn-gold py-4 text-lg rounded-xl shadow-lg">FINALIZAR ENTREGA</button></div>}
                             <button className="absolute bottom-20 right-4 bg-[var(--gold)] p-4 rounded-full shadow-[0_0_20px_var(--gold)] z-10 animate-bounce" onClick={()=>setScanning(true)}><QRIcon size={32} className="text-black"/></button>
@@ -1518,6 +1601,13 @@
                 setShowCashModal(false);
             };
 
+            const adjustQty = (idx, delta) => {
+                const newCart = [...cart];
+                newCart[idx].qty += delta;
+                if(newCart[idx].qty <= 0) newCart.splice(idx, 1);
+                setCart(newCart);
+            };
+
             if(!db.settings.storeOpen) return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
 
             if(view === 'menu') return (
@@ -1527,7 +1617,7 @@
                     <div className="h-48 bg-cover bg-center relative" style={{backgroundImage:`url(${BANNER_URL})`}}></div>
                     <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-48">
                         {db.products.length === 0 ? <p className="text-center text-gray-500 mt-10">Menú vacío. Vuelve pronto.</p> : 
-                        db.products.map(p=>(<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)]"><img src={p.img} className="w-20 h-20 rounded object-cover"/><div className="flex-1"><p className="font-bold text-[var(--text-main)]">{p.name}</p><p className="text-gray-500 text-xs line-clamp-2">{p.desc}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)]">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart,p])} className="bg-[var(--accent)] text-white w-8 h-8 rounded-full font-bold shadow">+</button></div></div></div>))}
+                        db.products.map(p=>(<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)]"><img src={p.img} className="w-20 h-20 rounded object-cover"/><div className="flex-1"><p className="font-bold text-[var(--text-main)]">{p.name}</p><p className="text-gray-500 text-xs line-clamp-2">{p.desc}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)]">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart,{...p, qty: 1}])} className="bg-[var(--accent)] text-white w-8 h-8 rounded-full font-bold shadow">+</button></div></div></div>))}
                     </div>
                     <div className="client-promo-video"><video src={VIDEO_URL} autoPlay loop muted playsInline></video></div>
                     {cart.length>0 && <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile"><button onClick={()=>setView('checkout')} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button></div>}
@@ -1538,6 +1628,24 @@
                 <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto app-view-mobile relative">
                     <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2"><ArrowLeft/> Volver</button>
                     <h2 className="font-bold text-xl mb-6 text-[var(--text-main)]">RESUMEN</h2>
+                    
+                    {/* Cart List */}
+                    <div className="mb-6 space-y-2">
+                        {cart.map((item, idx) => (
+                            <div key={idx} className="bg-[#222] p-3 rounded flex justify-between items-center">
+                                <div>
+                                    <p className="font-bold text-white">{item.name}</p>
+                                    <p className="text-xs text-[var(--gold)]">{formatCurrency(item.price)}</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <button onClick={()=>adjustQty(idx, -1)} className="w-8 h-8 bg-gray-700 text-white rounded-full flex items-center justify-center font-bold">-</button>
+                                    <span className="font-bold text-white">{item.qty}</span>
+                                    <button onClick={()=>adjustQty(idx, 1)} className="w-8 h-8 bg-[var(--gold)] text-black rounded-full flex items-center justify-center font-bold">+</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
                     <div className="space-y-4 mb-8">
                         <input className="input-std" placeholder="Nombre" onChange={e=>setForm({...form,name:e.target.value})}/>
                         <input className="input-std" type="number" placeholder="Teléfono (10 dígitos)" onChange={e=>setForm({...form,phone:e.target.value})}/>
@@ -1587,7 +1695,7 @@
             const [detailOrder, setDetailOrder] = useState(null);
             const move = (o, s) => updateDB({...db, orders: db.orders.map(x=>x.id===o.id?{...x, status:s}:x)});
             return (
-                <div className="h-full bg-[#050505] p-4 flex gap-4 overflow-x-auto relative">
+                <div className="h-full bg-[var(--bg-body)] p-4 flex gap-4 overflow-x-auto relative">
                     <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>
                     {detailOrder && (
                         <div className="fixed inset-0 z-[2000] bg-black/90 flex items-center justify-center p-4">
@@ -1633,14 +1741,24 @@
             
             useEffect(() => { 
                 try {
-                    const s = localStorage.getItem('emi_v63_db'); 
+                    const s = localStorage.getItem('emi_v70_db'); 
                     if(s) setDB(JSON.parse(s)); 
                 } catch(e) { console.error("Error loading DB", e); }
             }, []);
 
-            const updateDB = (n) => { setDB(n); localStorage.setItem('emi_v63_db', JSON.stringify(n)); };
+            const updateDB = (n) => { setDB(n); localStorage.setItem('emi_v70_db', JSON.stringify(n)); };
             useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
             
+            // MAGIC LINK CHECK
+            useEffect(() => {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('menu') === 'true') {
+                     requestPermissions();
+                     setUser({role:'cliente', name:'Invitado Web'});
+                     window.history.replaceState({}, document.title, "/");
+                }
+            }, []);
+
             const toggleTheme = () => { const newT = theme==='dark'?'light':'dark'; setTheme(newT); document.body.className = newT; };
             
             const requestPermissions = async () => {
@@ -1660,7 +1778,7 @@
 
             const resetApp = () => {
                 if(confirm("¿RESET DE FÁBRICA? Se borrarán todos los datos.")) {
-                    localStorage.removeItem('emi_v63_db');
+                    localStorage.removeItem('emi_v70_db');
                     window.location.reload();
                 }
             };
@@ -1670,11 +1788,10 @@
                     <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
                     <div className="card p-8 w-full max-w-sm text-center bg-[var(--bg-card)]">
                         <img src={LOGO_URL} className="w-24 mx-auto mb-4" onError={(e) => e.target.style.display='none'} />
-                        <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI V63</h1>
+                        <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI V70</h1>
                         <input className="input-std text-center mb-2" placeholder="Usuario" value={loginData.u} onChange={e=>setLoginData({...loginData, u:e.target.value})}/>
                         <input className="input-std text-center mb-4" type="password" placeholder="Contraseña" value={loginData.p} onChange={e=>setLoginData({...loginData, p:e.target.value})}/>
                         <button onClick={handleLogin} className="btn-gold w-full text-xl shadow-lg">ENTRAR</button>
-                        <button onClick={()=>{requestPermissions(); setUser({role:'cliente',name:'Guest'})}} className="block w-full p-3 bg-gray-500 text-white rounded text-center text-sm font-bold mt-4">CLIENTE WEB</button>
                     </div>
                 </div>
             );
