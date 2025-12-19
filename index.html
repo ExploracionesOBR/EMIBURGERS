@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMI BURGERS - ERP V72 RESPONSIVE</title>
+    <title>EMI BURGERS - ERP V76 FIXED</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
@@ -93,7 +93,6 @@
             position: fixed; bottom: 0; left: 0; width: 100%; height: 120px;
             z-index: 50; pointer-events: none; overflow: hidden;
             mask-image: linear-gradient(to top, black 60%, transparent 100%);
-            background: #000; /* Fallback for video load */
         }
         .client-promo-video video { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
 
@@ -181,6 +180,14 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
+        /* Responsive Container for Mobile Apps */
+        .app-container {
+            width: 100%; height: 100%;
+        }
+        @media (min-width: 768px) {
+            /* Full responsive */
+        }
+        
         .sync-icon {
             position: fixed; bottom: 20px; left: 80px; z-index: 9999;
             color: var(--text-main); font-size: 10px; opacity: 0.5;
@@ -215,7 +222,7 @@
         const CLOSED_IMG = "CERRADO_OFF.png"; 
         // GOOGLE APPS SCRIPT URL
         const API_URL = "https://script.google.com/macros/s/AKfycbzQC10H2zUg1yWa_mjqvTafiYUpG50-TpCPDGEFHhFURs1UpJTDovyW8cEMdEP6kxKoxg/exec";
-        const DB_ID = "main_db_v71";
+        const DB_ID = "emi_db_v76";
 
         const generateId = () => Math.random().toString(36).substr(2, 9).toUpperCase();
         const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val || 0);
@@ -237,6 +244,7 @@
             const urlObj = new URL(text);
             urlObj.searchParams.set('menu', 'true');
             const menuLink = urlObj.toString();
+
             const textArea = document.createElement("textarea");
             textArea.value = menuLink;
             textArea.style.position = "fixed";  
@@ -263,13 +271,24 @@
 
         const saveCloudDB = async (db) => {
             try {
-                // Send as text/plain to avoid preflight CORS
-                await fetch(API_URL, {
+                let res = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain' }, 
                     body: JSON.stringify({ action: 'update', id: DB_ID, data: db })
                 });
-            } catch (e) { console.error("Save Error", e); }
+                let json = await res.json();
+                if (!json.success) {
+                     await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain' }, 
+                        body: JSON.stringify({ action: 'create', id: DB_ID, collection: 'db', data: db })
+                    });
+                }
+                return true;
+            } catch (e) { 
+                console.error("Save Error", e); 
+                return false;
+            }
         };
 
         // --- DATABASE (CLEAN SLATE) ---
@@ -340,18 +359,16 @@
                     setTimeout(() => mapRef.current.invalidateSize(), 100);
                 }
 
-                // Clear previous layers
                 mapRef.current.eachLayer(layer => {
                     if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline) mapRef.current.removeLayer(layer);
                 });
 
-                // Add Radius Circle if provided
                 if (radius) {
                     L.circle(STORE_COORDS, {
                         color: 'red',
                         fillColor: '#f03',
                         fillOpacity: 0.1,
-                        radius: radius * 1000 // Convert km to meters
+                        radius: radius * 1000 
                     }).addTo(mapRef.current);
                 }
 
@@ -364,6 +381,12 @@
                         const el = document.createElement('div');
                         el.className = m.type === 'driver' ? 'driver-pin' : 'custom-pin';
                         el.innerHTML = m.emoji || '📍';
+                        if(m.label) {
+                             const lbl = document.createElement('div');
+                             lbl.className = 'absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-1 rounded whitespace-nowrap';
+                             lbl.innerText = m.label;
+                             el.appendChild(lbl);
+                        }
                         const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: m.type==='driver'?[36,36]:[40,40], iconAnchor: [20,20] });
                         const marker = L.marker(m.pos, { icon }).addTo(mapRef.current);
                         if(m.popup) marker.bindPopup(m.popup);
@@ -376,9 +399,7 @@
                 }
 
                 return () => {
-                    if(mapRef.current) {
-                        // Keep instance alive if possible
-                    }
+                    if(mapRef.current) { }
                 }
             }, [center, markers, showHeatmap, zoom, radius]); 
 
@@ -391,10 +412,21 @@
             const canvasRef = useRef(null);
             const [selectedZone, setSelectedZone] = useState(null);
             const [showMermas, setShowMermas] = useState(false);
+            const [viewMap, setViewMap] = useState(false);
 
             const sales = db.orders.reduce((a,b)=>a+b.total,0);
             const expenses = db.expenses.reduce((a,b)=>a+b.amount,0);
             
+            // Generate live map markers
+            const activeOrders = db.orders.filter(o => o.status === 'delivering' || o.status === 'pending');
+            const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
+            
+            const liveMarkers = [
+                { pos: STORE_COORDS, emoji: '🏪' },
+                ...activeOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', popup: `Pedido #${o.orderNum}` })),
+                ...drivers.map(d => ({ pos: d.location || STORE_COORDS, emoji: '🏍️', label: d.name, type: 'driver' }))
+            ];
+
             useEffect(() => {
                 if(!canvasRef.current) return;
                 if(chartRef.current) chartRef.current.destroy();
@@ -442,9 +474,33 @@
                     showToast("Sin datos de ventas para mostrar zonas.");
                 }
             };
+            
+            const hotZoneMarkers = [
+                { pos: STORE_COORDS, emoji: '🏪', popup: 'Tienda' },
+                ...db.orders.filter(o=>o.clientLoc).map(o=>({pos:o.clientLoc}))
+            ];
+
+            if (viewMap) {
+                return (
+                    <div className="h-full flex flex-col p-4">
+                         <div className="flex justify-between items-center mb-4">
+                             <h2 className="text-2xl font-bold text-[var(--gold)]">RASTREO EN VIVO</h2>
+                             <button onClick={()=>setViewMap(false)} className="bg-red-600 text-white px-4 py-2 rounded">CERRAR MAPA</button>
+                         </div>
+                         <div className="flex-1 rounded border border-[var(--gold)] overflow-hidden">
+                             <LeafletMap center={STORE_COORDS} markers={liveMarkers} zoom={13}/>
+                         </div>
+                         <div className="mt-2 flex gap-4 text-sm text-gray-400">
+                             <span className="flex items-center gap-1">🍔 Pedidos Activos</span>
+                             <span className="flex items-center gap-1">🏍️ Repartidores</span>
+                         </div>
+                    </div>
+                );
+            }
 
             return (
                 <div className="space-y-6 animate-in fade-in pb-20 overflow-y-auto h-full">
+                    <div className="flex justify-end"><button onClick={()=>setViewMap(true)} className="bg-blue-600 text-white px-4 py-2 rounded font-bold flex gap-2"><Map/> RASTREO EN VIVO</button></div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="card p-4 border-l-4 border-[var(--gold)]"><p className="text-gray-400 text-xs font-bold uppercase">Ventas</p><p className="text-3xl font-black text-[var(--text-main)]">{formatCurrency(sales)}</p></div>
                         <div className="card p-4 border-l-4 border-red-500"><p className="text-gray-400 text-xs font-bold uppercase">Gastos</p><p className="text-3xl font-black text-[var(--text-main)]">{formatCurrency(expenses)}</p></div>
@@ -454,7 +510,7 @@
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="card p-6 h-64"><h3 className="font-bold text-[var(--text-main)] mb-2 flex items-center gap-2"><BarChart3 size={20}/> Historial de Ventas</h3><div className="w-full h-full pb-6"><canvas ref={canvasRef}></canvas></div></div>
-                        <div className="card p-6 relative h-64"><h3 className="font-bold text-[var(--text-main)] mb-4 flex items-center gap-2"><Map size={20}/> Zonas Calientes</h3><div className="h-48 rounded border border-[var(--border)] relative overflow-hidden mb-2 cursor-pointer" onClick={handleMapClick}><LeafletMap center={STORE_COORDS} markers={deliveryLocations} showHeatmap={true} zoom={12}/>{selectedZone && <div className="absolute bottom-4 left-4 bg-black/80 text-white p-2 rounded z-[500] animate-bounce">🔥 {selectedZone.name}: Más vendido -> {selectedZone.topItem}</div>}</div></div>
+                        <div className="card p-6 relative h-96"><h3 className="font-bold text-[var(--text-main)] mb-4 flex items-center gap-2"><Map size={20}/> Zonas Calientes</h3><div className="h-full rounded border border-[var(--border)] relative overflow-hidden mb-2 cursor-pointer" onClick={handleMapClick}><LeafletMap center={STORE_COORDS} markers={hotZoneMarkers} showHeatmap={true} zoom={12}/>{selectedZone && <div className="absolute bottom-4 left-4 bg-black/80 text-white p-2 rounded z-[500] animate-bounce">🔥 {selectedZone.name}: Más vendido -> {selectedZone.topItem}</div>}</div></div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
@@ -874,7 +930,7 @@
                         </div>
                         <div className="card p-4 border-t-4 border-[var(--gold)] overflow-y-auto space-y-4">
                             <h3 className="font-bold mb-2 text-[var(--text-main)]"><Lock/> SEGURIDAD & LISTAS</h3>
-                            <div><label className="text-xs text-gray-500">Clave Supervisor</label><input className="input-std text-sm" value={db.settings.supervisorKey} onChange={e=>updateDB({...db, settings:{...db.settings, supervisorKey:e.target.value}})}/></div>
+                            <div><label className="text-xs text-gray-500">Clave Supervisor (QR)</label><div className="bg-white p-2 mt-2 w-fit rounded"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=SUPERVISOR:${db.settings.supervisorKey}`} className="w-24 h-24"/></div><input className="input-std text-sm mt-2" value={db.settings.supervisorKey} onChange={e=>updateDB({...db, settings:{...db.settings, supervisorKey:e.target.value}})}/></div>
                             <hr className="border-[#333]"/>
                             <div><p className="text-[var(--text-main)] text-xs font-bold mb-1">PLATAFORMAS</p><div className="flex gap-1 mb-2"><input className="input-std text-xs" value={newItem.plat} onChange={e=>setNewItem({...newItem, plat:e.target.value})}/><button onClick={()=>addItem('platforms',newItem.plat)} className="btn-gold">+</button></div><div className="h-24 overflow-y-auto bg-[#222] p-2 rounded custom-scroll">{db.settings.platforms.map((p,i)=><div key={i} className="flex justify-between text-gray-400 text-xs border-b border-[#333] py-1"><span>{p}</span><button onClick={()=>delItem('platforms',i)} className="text-red-500">x</button></div>)}</div></div>
                         </div>
@@ -954,7 +1010,6 @@
 
         // --- POS (V52) ---
         const POS = ({ db, updateDB, user }) => {
-            // ... (Same POS logic as previous versions, ensuring functionality is kept)
             const [cart, setCart] = useState([]);
             const [modal, setModal] = useState(null); 
             const [catFilter, setCatFilter] = useState('All');
@@ -976,9 +1031,19 @@
             const [newExpense, setNewExpense] = useState({desc:'', amount:''});
             const [suggestions, setSuggestions] = useState([]);
             const [manualDriverId, setManualDriverId] = useState('');
+            const [viewMap, setViewMap] = useState(false); // FIXED: Added missing state
 
             const webOrders = db.orders.filter(o => o.source === 'web' && o.status === 'web_pending_payment');
             
+            // Live map markers for POS
+            const activeOrders = db.orders.filter(o => o.status === 'delivering' || o.status === 'pending');
+            const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
+            const liveMarkers = [
+                { pos: STORE_COORDS, emoji: '🏪' },
+                ...activeOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', popup: `Pedido #${o.orderNum}` })),
+                ...drivers.map(d => ({ pos: d.location || STORE_COORDS, emoji: '🏍️', label: d.name, type: 'driver' }))
+            ];
+
             const handleWebOrder = (order) => {
                 setCart(order.items);
                 setOrderDetails({name: order.clientName, phone: '', address: order.address, references: '', refs: ''});
@@ -1196,6 +1261,39 @@
                 setOrderDetails({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
             };
 
+            // Listen for Escape key
+            useEffect(() => {
+                const handleEsc = (event) => {
+                   if (event.keyCode === 27) {
+                       setModal(null);
+                       setLiquidationModal(false);
+                       setCorteModal(false);
+                       setViewMap(false);
+                       setBottomMenuOpen(false);
+                   }
+                };
+                window.addEventListener('keydown', handleEsc);
+                return () => window.removeEventListener('keydown', handleEsc);
+            }, []);
+
+            if (viewMap) {
+                return (
+                    <div className="h-full flex flex-col p-4 bg-[var(--bg-body)]">
+                         <div className="flex justify-between items-center mb-4">
+                             <h2 className="text-2xl font-bold text-[var(--gold)]">RASTREO EN VIVO</h2>
+                             <button onClick={()=>setViewMap(false)} className="bg-red-600 text-white px-4 py-2 rounded">CERRAR MAPA (ESC)</button>
+                         </div>
+                         <div className="flex-1 rounded border border-[var(--gold)] overflow-hidden">
+                             <LeafletMap center={STORE_COORDS} markers={liveMarkers} zoom={13}/>
+                         </div>
+                         <div className="mt-2 flex gap-4 text-sm text-gray-400">
+                             <span className="flex items-center gap-1">🍔 Pedidos Activos</span>
+                             <span className="flex items-center gap-1">🏍️ Repartidores</span>
+                         </div>
+                    </div>
+                );
+            }
+
             return (
                 <div className="h-full flex flex-col bg-[var(--bg-body)]">
                     <div className="flex bg-[var(--bg-card)] border-b border-[var(--border)]">
@@ -1253,7 +1351,8 @@
                     <div className="admin-fab">
                         {bottomMenuOpen && (
                             <div className="admin-fab-menu">
-                                <button onClick={()=>copyToClipboard(window.location.href)} className="bg-blue-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">COPIAR MENU <Share2 size={16}/></button>
+                                <button onClick={()=>setViewMap(true)} className="bg-blue-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">RASTREO GPS <MapPin size={16}/></button>
+                                <button onClick={()=>copyToClipboard(window.location.href)} className="bg-purple-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">COPIAR MENU <Share2 size={16}/></button>
                                 <button onClick={()=>setCorteModal(true)} className="bg-red-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">CORTE / RETIRO <DollarSign size={16}/></button>
                                 <button onClick={()=>setLiquidationModal(true)} className="bg-green-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">LIQUIDAR DRIVER <UserCheck size={16}/></button>
                             </div>
@@ -1270,11 +1369,11 @@
                                     <button onClick={()=>setOrderType('dinein')} className={`mode-btn ${orderType==='dinein'?'active':''}`}>COMER AQUÍ</button>
                                     <button onClick={()=>setOrderType('delivery')} className={`mode-btn ${orderType==='delivery'?'active':''}`}>DOMICILIO</button>
                                     <button onClick={()=>setOrderType('platform')} className={`mode-btn ${orderType==='platform'?'active':''}`}>PLATAFORMA</button>
-                                    <button onClick={()=>setModal(null)} className="mt-auto bg-red-900/20 text-red-500 py-4 rounded font-bold border-2 border-red-900">CANCELAR</button>
+                                    <button onClick={()=>setModal(null)} className="mt-auto bg-red-900/20 text-red-500 py-4 rounded font-bold border-2 border-red-900">CANCELAR (ESC)</button>
                                 </div>
                                 <div className="cockpit-col overflow-y-auto">
                                     <h3 className="text-[var(--gold)] font-bold text-xl uppercase mb-2">2. DATOS</h3>
-                                    {orderType !== 'platform' && <><input className="input-std h-10 text-lg mb-2" placeholder="Nombre *" value={orderDetails.name} onChange={e=>setOrderDetails({...orderDetails, name:e.target.value})}/><input className="input-std h-10 text-lg mb-2" placeholder="Teléfono (10 dígitos) *" value={orderDetails.phone} maxLength={10} onChange={e=>setOrderDetails({...orderDetails, phone:e.target.value})}/></>}
+                                    {orderType !== 'platform' && <><input className="input-std h-10 text-lg mb-2" placeholder="Nombre *" value={orderDetails.name} onChange={e=>setOrderDetails({...orderDetails, name:e.target.value})}/><div className="flex gap-2 mb-2"><input className="input-std h-10 text-lg flex-1" placeholder="Teléfono (10 dígitos) *" value={orderDetails.phone} maxLength={10} onChange={e=>setOrderDetails({...orderDetails, phone:e.target.value})}/><a href={`https://wa.me/52${orderDetails.phone}`} target="_blank" className="bg-green-600 text-white rounded p-2 flex items-center justify-center w-12"><MessageCircle/></a></div></>}
                                     {orderType === 'dinein' && <input className="input-std h-10 text-lg" placeholder="# Mesa" value={orderDetails.table} onChange={e=>setOrderDetails({...orderDetails, table:e.target.value})}/>}
                                     {orderType === 'platform' && (
                                         <>
@@ -1335,7 +1434,7 @@
                                          <div className="w-full h-32 border border-gray-600 rounded flex items-center justify-center text-gray-500 mb-4">
                                             [CÁMARA DE ESCANEO ACTIVA]
                                          </div>
-                                         <button onClick={()=>setLiquidationModal(false)} className="text-gray-500">CANCELAR</button>
+                                         <button onClick={()=>setLiquidationModal(false)} className="text-gray-500">CANCELAR (ESC)</button>
                                     </div>
                                 ) : (
                                     <div>
@@ -1372,7 +1471,7 @@
                                     <input className="input-std mb-2" type="number" placeholder="Monto" value={newExpense.amount} onChange={e=>setNewExpense({...newExpense, amount:e.target.value})}/>
                                     <button onClick={addExpense} className="w-full bg-red-600 text-white font-bold py-2 rounded">REGISTRAR RETIRO</button>
                                 </div>
-                                <button onClick={()=>setCorteModal(false)} className="text-gray-500 w-full">CERRAR</button>
+                                <button onClick={()=>setCorteModal(false)} className="text-gray-500 w-full">CERRAR (ESC)</button>
                             </div>
                         </div>
                     )}
@@ -1633,6 +1732,8 @@
                 newCart[idx].qty += delta;
                 if(newCart[idx].qty <= 0) newCart.splice(idx, 1);
                 setCart(newCart);
+                // Return to menu if empty
+                if (newCart.length === 0) setView('menu');
             };
 
             if(!db.settings.storeOpen) return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
@@ -1777,7 +1878,7 @@
                     } else {
                         // If no cloud data, try local storage fallback or keep initial
                         try {
-                            const s = localStorage.getItem('emi_v71_db'); 
+                            const s = localStorage.getItem('emi_v76_db'); 
                             if(s) setDB(JSON.parse(s)); 
                         } catch(e) {}
                     }
@@ -1813,7 +1914,7 @@
                 }
                 
                 setDB(newData); 
-                localStorage.setItem('emi_v71_db', JSON.stringify(newData));
+                localStorage.setItem('emi_v76_db', JSON.stringify(newData));
                 saveCloudDB(newData);
             };
             
@@ -1825,6 +1926,7 @@
                 if (params.get('menu') === 'true') {
                      requestPermissions();
                      setUser({role:'cliente', name:'Invitado Web'});
+                     // Clean URL
                      window.history.replaceState({}, document.title, "/");
                 }
             }, []);
@@ -1848,7 +1950,7 @@
 
             const resetApp = () => {
                 if(confirm("¿RESET DE FÁBRICA? Se borrarán todos los datos.")) {
-                    localStorage.removeItem('main_config');
+                    localStorage.removeItem('emi_v76_db');
                     // Reset cloud DB too
                     saveCloudDB(initialDB);
                     window.location.reload();
@@ -1859,8 +1961,8 @@
                 <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
                     <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
                     <div className="card p-8 w-full max-w-sm text-center bg-[var(--bg-card)]">
-                        <img src={LOGO_URL} className="w-24 mx-auto mb-4" onError={(e) => e.target.style.display='none'} />
-                        <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI V71</h1>
+                        <img src={LOGO_URL} className="w-32 mx-auto mb-6" onError={(e) => e.target.style.display='none'} />
+                        <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI Burgers</h1>
                         <input className="input-std text-center mb-2" placeholder="Usuario" value={loginData.u} onChange={e=>setLoginData({...loginData, u:e.target.value})}/>
                         <input className="input-std text-center mb-4" type="password" placeholder="Contraseña" value={loginData.p} onChange={e=>setLoginData({...loginData, p:e.target.value})}/>
                         <button onClick={handleLogin} className="btn-gold w-full text-xl shadow-lg">ENTRAR</button>
