@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMI BURGERS - ERP V76 FIXED</title>
+    <title>EMI BURGERS - ERP V77 REALTIME</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
@@ -19,13 +19,13 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        /* TEMA DINÁMICO VARIABLES */
         :root {
             --gold: #FFD700;
             --accent: #FF4500;
             --success: #00e676;
             --danger: #ff3333;
             --warning: #ff9800;
+            --blue-maps: #4285F4;
         }
         
         body.dark { --bg-body: #050505; --bg-card: #141414; --text-main: #f0f0f0; --input-bg: #222; --border: #333; }
@@ -46,7 +46,6 @@
         
         .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        /* Fixed Input Styling for Themes */
         .input-std { 
             background-color: var(--input-bg) !important; 
             border: 1px solid var(--border) !important; 
@@ -62,30 +61,38 @@
         .custom-pin { background: none; border: none; font-size: 32px; text-align: center; filter: drop-shadow(0 2px 3px black); cursor: pointer; transition: transform 0.2s; }
         .driver-pin { font-size: 20px; background: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold); box-shadow: 0 0 15px var(--gold); z-index: 1000; }
         
-        /* UI Elements Positioning */
+        .gps-pulse-marker {
+            width: 20px; height: 20px;
+            background-color: var(--blue-maps);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .gps-pulse-marker::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); width: 100%; height: 100%;
+            border-radius: 50%; background-color: rgba(66, 133, 244, 0.4);
+            animation: gps-pulse 2s infinite;
+        }
+        @keyframes gps-pulse { 0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; } 100% { transform: translate(-50%, -50%) scale(3); opacity: 0; } }
+
         .theme-toggle { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: var(--bg-card); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; }
-        
-        /* God's Eye - Raised higher */
         .gods-eye { position: fixed; bottom: 150px; left: 20px; z-index: 9999; transition: all 0.3s; opacity: 0.4; transform: scale(0.8); }
         .gods-eye:hover, .gods-eye.active { opacity: 1; transform: scale(1); }
-
         .gods-menu { position: absolute; bottom: 70px; left: 0; width: 200px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .bill-btn { width: 100%; height: 70px; background-size: contain; background-repeat: no-repeat; background-position: center; border-radius: 8px; border: 1px solid #444; cursor: pointer; transition: transform 0.1s; background-color: #333; }
+        .bill-btn { width: 100%; height: 70px; background-size: 100% 100%; background-repeat: no-repeat; background-position: center; border-radius: 8px; border: 1px solid #444; cursor: pointer; transition: transform 0.1s; background-color: #333; }
         .bill-btn:active { transform: scale(0.95); filter: brightness(1.2); }
         
         .grid-cockpit { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 1.5rem; height: 100%; }
         .cockpit-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; position: relative; }
         .mode-btn { padding: 1.5rem; border: 2px solid var(--border); border-radius: 0.75rem; text-align: left; font-weight: bold; font-size: 1.1rem; color: #888; transition: all 0.2s; cursor: pointer; }
         .mode-btn.active { border-color: var(--gold); background: rgba(255, 215, 0, 0.1); color: var(--gold); }
-        
         .scroll-hide::-webkit-scrollbar { display: none; }
-        
-        /* Custom Toast Notification */
         .custom-toast { position: fixed; top: 20px; right: 20px; background: #e74c3c; border-left: 5px solid #c0392b; padding: 15px; border-radius: 5px; color: white; z-index: 10000; animation: slideIn 0.3s; display: flex; gap: 10px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-weight: bold; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
         .progress-bar { height: 8px; border-radius: 4px; background: #333; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
         
@@ -93,105 +100,44 @@
             position: fixed; bottom: 0; left: 0; width: 100%; height: 120px;
             z-index: 50; pointer-events: none; overflow: hidden;
             mask-image: linear-gradient(to top, black 60%, transparent 100%);
+            transition: bottom 0.3s ease;
         }
+        .client-promo-video.shifted { bottom: 90px; }
         .client-promo-video video { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
 
-        /* Floating Share Button */
-        .share-btn {
-            position: fixed; top: 30%; right: 0; transform: translateY(-50%);
-            background: var(--gold); border-radius: 20px 0 0 20px; padding: 12px;
-            z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3);
-            transition: all 0.3s; opacity: 0.5;
-        }
+        .share-btn { position: fixed; top: 30%; right: 0; transform: translateY(-50%); background: var(--gold); border-radius: 20px 0 0 20px; padding: 12px; z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3); transition: all 0.3s; opacity: 0.5; }
         .share-btn:hover, .share-btn:active { opacity: 1; transform: translateY(-50%) scale(1.1); }
+        
+        /* Floating Map Button for Dashboard (Punto 1) */
+        .dash-map-btn { position: fixed; top: 15%; right: 0; transform: translateY(-50%); background: #2563eb; border-radius: 20px 0 0 20px; padding: 12px; z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3); transition: all 0.3s; opacity: 0.8; color: white; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .dash-map-btn:hover { opacity: 1; padding-right: 20px; }
 
-        /* Admin Menu FAB */
-        .admin-fab {
-            position: fixed; bottom: 80px; left: 20px; z-index: 9000;
-        }
-        .admin-fab-menu {
-            position: absolute; bottom: 70px; left: 0; 
-            display: flex; flex-direction: column; gap: 10px; align-items: flex-start;
-            animation: slideUp 0.2s ease-out;
-        }
-
-        /* Install App Button */
-        .install-btn {
-            position: fixed; bottom: 80px; left: 20px; z-index: 9999;
-            background: black; border: 2px solid var(--gold);
-            border-radius: 50%; width: 50px; height: 50px;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            animation: bounce 2s infinite;
-        }
-        .install-btn img {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
-        }
+        .admin-fab { position: fixed; bottom: 80px; left: 20px; z-index: 9000; }
+        .admin-fab-menu { position: absolute; bottom: 70px; left: 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; animation: slideUp 0.2s ease-out; }
+        
+        .install-btn { position: fixed; bottom: 80px; left: 20px; z-index: 9999; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: bounce 2s infinite; }
+        .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
-        /* Scrollbar custom */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: #111; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
-
-        /* Logout Button Ghost Area */
-        .logout-ghost {
-            position: fixed; top: 0; right: 0; padding: 20px; z-index: 9999;
-            opacity: 0; transition: opacity 0.2s;
-        }
+        .logout-ghost { position: fixed; top: 0; right: 0; padding: 20px; z-index: 9999; opacity: 0; transition: opacity 0.2s; }
         .logout-ghost:hover, .logout-ghost:active { opacity: 1; }
 
-        /* GPS Pulse Animation */
         .gps-btn { position: relative; overflow: hidden; }
-        .gps-btn::after {
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100%; height: 100%; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            animation: ripple 1.5s infinite;
-        }
+        .gps-btn::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; border-radius: 50%; background: rgba(255, 255, 255, 0.3); animation: ripple 1.5s infinite; }
         @keyframes ripple { 0% { width: 0; height: 0; opacity: 0.5; } 100% { width: 200%; height: 200%; opacity: 0; } }
 
-        /* Camera Scanner Animation */
-        .scanner-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border: 2px solid var(--gold);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) inset;
-            pointer-events: none;
-        }
-        .scanner-line {
-            position: absolute; width: 100%; height: 2px; background: red;
-            box-shadow: 0 0 10px red;
-            animation: scan 2s infinite linear;
-        }
+        .scanner-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) inset; pointer-events: none; }
+        .scanner-line { position: absolute; width: 100%; height: 2px; background: red; box-shadow: 0 0 10px red; animation: scan 2s infinite linear; }
         @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
 
-        /* Loading Pulse for Address */
         @keyframes pulse-bg { 0% { background-color: var(--input-bg); } 50% { background-color: #332b00; } 100% { background-color: var(--input-bg); } }
         .locating { animation: pulse-bg 1.5s infinite; }
-        
-        /* Ticket Visualization Style */
-        .ticket-view {
-            font-family: 'Courier Prime', monospace;
-            background: white; color: black;
-            padding: 10px; width: 100%;
-            border: 1px solid #ccc;
-            font-size: 10px;
-            white-space: pre-wrap;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        /* Responsive Container for Mobile Apps */
-        .app-container {
-            width: 100%; height: 100%;
-        }
-        @media (min-width: 768px) {
-            /* Full responsive */
-        }
-        
-        .sync-icon {
-            position: fixed; bottom: 20px; left: 80px; z-index: 9999;
-            color: var(--text-main); font-size: 10px; opacity: 0.5;
-        }
+        .ticket-view { font-family: 'Courier Prime', monospace; background: white; color: black; padding: 10px; width: 100%; border: 1px solid #ccc; font-size: 10px; white-space: pre-wrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .app-container { width: 100%; height: 100%; }
+        .sync-icon { position: fixed; bottom: 20px; left: 80px; z-index: 9999; color: var(--text-main); font-size: 10px; opacity: 0.5; }
         .syncing { animation: spin 1s infinite linear; opacity: 1; color: var(--gold); }
         @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
@@ -205,29 +151,28 @@
             Smartphone, User, QrCode, Clock, CheckCircle, AlertTriangle, FileText, Settings, Menu as MenuIcon, X, 
             Save, Trash2, ShoppingBag, Camera, Users, BarChart3, Bell, Ticket, TrendingUp, Lock, Eye, Send, Map, Navigation, 
             Wallet, Receipt, ArrowRight, Banknote, Power, Wifi, WifiOff, RefreshCw, Crosshair, Home, UserCheck, Calendar, Globe, QrCode as QRIcon,
-            Package, Percent, Edit, Phone, Table, ArrowLeft, MessageCircle, Sun, Moon, Video, Copy, ClipboardList, PieChart, Link as LinkIcon, PenTool, Share2, MoreVertical, Download, Cloud
+            Package, Percent, Edit, Phone, Table, ArrowLeft, MessageCircle, Sun, Moon, Video, Copy, ClipboardList, PieChart, Link as LinkIcon, PenTool, Share2, MoreVertical, Download, Cloud, Info
         } from 'https://esm.sh/lucide-react@0.344.0';
 
         const React = window.React;
         const ReactDOM = window.ReactDOM;
         const { useState, useEffect, useRef, useMemo, useCallback } = React;
 
-        // --- CONSTANTS ---
         const STORE_COORDS = [27.446895, -109.943874]; 
         const CITY_SUFFIX = ", Ciudad Obregón, Sonora, Mexico";
         const SUPER_USER_PASS = "OBR1995@";
-        const LOGO_URL = "LOGO_1.png";
-        const BANNER_URL = "BANNER_MENU.jpg"; 
-        const VIDEO_URL = "WEB_PROMOCIONES.mp4";
-        const CLOSED_IMG = "CERRADO_OFF.png"; 
-        // GOOGLE APPS SCRIPT URL
+        
+        const LOGO_URL = "./LOGO_1.png";
+        const BANNER_URL = "./BANNER_MENU.jpg"; 
+        const VIDEO_URL = "./WEB_PROMOCIONES.mp4";
+        const CLOSED_IMG = "./CERRADO_OFF.png"; 
+
         const API_URL = "https://script.google.com/macros/s/AKfycbzQC10H2zUg1yWa_mjqvTafiYUpG50-TpCPDGEFHhFURs1UpJTDovyW8cEMdEP6kxKoxg/exec";
         const DB_ID = "emi_db_v76";
 
         const generateId = () => Math.random().toString(36).substr(2, 9).toUpperCase();
         const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val || 0);
 
-        // --- HELPER: CUSTOM TOAST ---
         const showToast = (message) => {
             const toast = document.createElement("div");
             toast.className = "custom-toast";
@@ -239,12 +184,10 @@
             }, 3000);
         };
 
-        // --- HELPER: ROBUST COPY TO CLIPBOARD + SHARE MENU LINK ---
         const copyToClipboard = (text) => {
             const urlObj = new URL(text);
             urlObj.searchParams.set('menu', 'true');
             const menuLink = urlObj.toString();
-
             const textArea = document.createElement("textarea");
             textArea.value = menuLink;
             textArea.style.position = "fixed";  
@@ -260,7 +203,6 @@
             document.body.removeChild(textArea);
         };
         
-        // --- API HELPERS ---
         const fetchCloudDB = async () => {
             try {
                 const res = await fetch(`${API_URL}?action=read&id=${DB_ID}`);
@@ -291,7 +233,6 @@
             }
         };
 
-        // --- DATABASE (CLEAN SLATE) ---
         const initialDB = {
             products: [], 
             users: [
@@ -305,7 +246,7 @@
                 pickupEnabled: true,
                 deliveryEnabled: true,
                 paymentMethods: { cash: true, card: true },
-                deliveryRadius: 15, // Default radius in KM
+                deliveryRadius: 15,
                 driverAssign: 'manual',
                 supervisorKey: 'ADMIN123',
                 cashLimit: 2000,
@@ -322,7 +263,6 @@
             expenses: []
         };
 
-        // --- HELPERS ---
         const calculateDistance = (lat1, lon1, lat2, lon2) => {
             if(!lat1 || !lon1 || !lat2 || !lon2) return 0;
             const R = 6371; 
@@ -341,9 +281,7 @@
             } else { showToast("Permite popups para imprimir"); }
         };
 
-        // --- COMPONENTS ---
-
-        const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route, radius }) => {
+        const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route, radius, onMarkerClick }) => {
             const mapRef = useRef(null);
             const containerRef = useRef(null);
 
@@ -364,49 +302,45 @@
                 });
 
                 if (radius) {
-                    L.circle(STORE_COORDS, {
-                        color: 'red',
-                        fillColor: '#f03',
-                        fillOpacity: 0.1,
-                        radius: radius * 1000 
-                    }).addTo(mapRef.current);
+                    L.circle(STORE_COORDS, { color: 'red', fillColor: '#f03', fillOpacity: 0.1, radius: radius * 1000 }).addTo(mapRef.current);
                 }
 
                 if(showHeatmap) {
-                      markers.forEach((m) => {
-                         L.circle(m.pos, { color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 300, stroke: false }).addTo(mapRef.current);
-                      });
+                       markers.forEach((m) => {
+                           L.circle(m.pos, { color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 300, stroke: false }).addTo(mapRef.current);
+                       });
                 } else {
                     markers.forEach((m) => {
                         const el = document.createElement('div');
-                        el.className = m.type === 'driver' ? 'driver-pin' : 'custom-pin';
-                        el.innerHTML = m.emoji || '📍';
-                        if(m.label) {
+                        if (m.isMyLoc) {
+                            el.className = 'gps-pulse-marker';
+                        } else {
+                            el.className = m.type === 'driver' ? 'driver-pin' : 'custom-pin';
+                            el.innerHTML = m.emoji || '📍';
+                        }
+                        if(m.label && !m.isMyLoc) {
                              const lbl = document.createElement('div');
                              lbl.className = 'absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white text-[10px] px-1 rounded whitespace-nowrap';
                              lbl.innerText = m.label;
                              el.appendChild(lbl);
                         }
-                        const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: m.type==='driver'?[36,36]:[40,40], iconAnchor: [20,20] });
+                        const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: m.isMyLoc ? [20,20] : (m.type==='driver'?[36,36]:[40,40]), iconAnchor: m.isMyLoc ? [10,10] : [20,20] });
                         const marker = L.marker(m.pos, { icon }).addTo(mapRef.current);
                         if(m.popup) marker.bindPopup(m.popup);
-                        if(m.data) marker.on('click', () => { if(typeof onMarkerClick === 'function') onMarkerClick(m.data) });
+                        if(m.data) {
+                            marker.on('click', () => { if(typeof onMarkerClick === 'function') onMarkerClick(m.data) });
+                        }
                     });
                 }
 
                 if(route && route.length === 2) {
                     L.polyline(route, {color: 'blue', weight: 4, dashArray: '10, 10'}).addTo(mapRef.current);
                 }
-
-                return () => {
-                    if(mapRef.current) { }
-                }
             }, [center, markers, showHeatmap, zoom, radius]); 
 
             return <div ref={containerRef} className="h-full w-full rounded-lg bg-gray-200 border border-gray-300 z-0"></div>;
         };
 
-        // --- DASHBOARD ---
         const Dashboard = ({ db }) => {
             const chartRef = useRef(null);
             const canvasRef = useRef(null);
@@ -417,7 +351,6 @@
             const sales = db.orders.reduce((a,b)=>a+b.total,0);
             const expenses = db.expenses.reduce((a,b)=>a+b.amount,0);
             
-            // Generate live map markers
             const activeOrders = db.orders.filter(o => o.status === 'delivering' || o.status === 'pending');
             const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
             
@@ -452,18 +385,19 @@
             }, [db.orders]);
 
             const platformStats = db.orders.reduce((acc, o) => { const key = o.source === 'web' ? 'WEB' : (o.source === 'platform' ? (o.platformName || 'APP') : 'TIENDA'); acc[key] = (acc[key] || 0) + 1; return acc; }, {});
-            const deliveryLocations = useMemo(() => db.orders.filter(o=>o.clientLoc).map(o=>({pos:o.clientLoc})), [db.orders]);
+            const paymentStats = db.orders.reduce((acc, o) => {
+                const method = o.method === 'cash' ? 'EFECTIVO' : 'TARJETA';
+                acc[method] = (acc[method] || 0) + 1;
+                return acc;
+            }, {});
+            const topPayment = Object.entries(paymentStats).sort((a,b)=>b[1]-a[1])[0] || ['Ninguno', 0];
+
             const expired = db.supplies.filter(s => new Date(s.expiry) < new Date());
-            
             const actualTopProducts = Object.entries(db.orders.reduce((acc, o) => {
                 o.items.forEach(i => acc[i.name] = (acc[i.name] || 0) + i.qty);
                 return acc;
             }, {})).sort((a,b)=>b[1]-a[1]).slice(0,5);
-
-            const topProducts = actualTopProducts.length > 0 ? actualTopProducts : [
-                ['Producto 1', 0], ['Producto 2', 0], ['Producto 3', 0]
-            ];
-            
+            const topProducts = actualTopProducts.length > 0 ? actualTopProducts : [['Producto 1', 0], ['Producto 2', 0], ['Producto 3', 0]];
             const maxProdVal = actualTopProducts.length > 0 ? actualTopProducts[0][1] : 1;
 
             const handleMapClick = () => {
@@ -500,7 +434,9 @@
 
             return (
                 <div className="space-y-6 animate-in fade-in pb-20 overflow-y-auto h-full">
-                    <div className="flex justify-end"><button onClick={()=>setViewMap(true)} className="bg-blue-600 text-white px-4 py-2 rounded font-bold flex gap-2"><Map/> RASTREO EN VIVO</button></div>
+                    {/* Punto 1: Botón Flotante para Rastreo */}
+                    <button className="dash-map-btn" onClick={()=>setViewMap(true)}><Map size={24}/> RASTREO</button>
+
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="card p-4 border-l-4 border-[var(--gold)]"><p className="text-gray-400 text-xs font-bold uppercase">Ventas</p><p className="text-3xl font-black text-[var(--text-main)]">{formatCurrency(sales)}</p></div>
                         <div className="card p-4 border-l-4 border-red-500"><p className="text-gray-400 text-xs font-bold uppercase">Gastos</p><p className="text-3xl font-black text-[var(--text-main)]">{formatCurrency(expenses)}</p></div>
@@ -509,8 +445,30 @@
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="card p-6 h-64"><h3 className="font-bold text-[var(--text-main)] mb-2 flex items-center gap-2"><BarChart3 size={20}/> Historial de Ventas</h3><div className="w-full h-full pb-6"><canvas ref={canvasRef}></canvas></div></div>
-                        <div className="card p-6 relative h-96"><h3 className="font-bold text-[var(--text-main)] mb-4 flex items-center gap-2"><Map size={20}/> Zonas Calientes</h3><div className="h-full rounded border border-[var(--border)] relative overflow-hidden mb-2 cursor-pointer" onClick={handleMapClick}><LeafletMap center={STORE_COORDS} markers={hotZoneMarkers} showHeatmap={true} zoom={12}/>{selectedZone && <div className="absolute bottom-4 left-4 bg-black/80 text-white p-2 rounded z-[500] animate-bounce">🔥 {selectedZone.name}: Más vendido -> {selectedZone.topItem}</div>}</div></div>
+                        <div className="flex flex-col gap-4">
+                            <div className="card p-6 h-64 flex-shrink-0">
+                                <h3 className="font-bold text-[var(--text-main)] mb-2 flex items-center gap-2"><BarChart3 size={20}/> Historial de Ventas</h3>
+                                <div className="w-full h-full pb-6"><canvas ref={canvasRef}></canvas></div>
+                            </div>
+                            <div className="card p-4 flex justify-between items-center bg-[#222] border-l-4 border-purple-500 h-full flex flex-col justify-center">
+                                <div className="w-full flex justify-between items-center">
+                                    <div>
+                                        <p className="text-gray-400 text-xs font-bold uppercase">Método Pago Preferido</p>
+                                        <p className="text-2xl font-black text-white">{topPayment[0]}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[var(--gold)] font-bold text-xl">{topPayment[1]} ordenes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="card p-6 relative h-96 md:h-auto min-h-[300px]">
+                            <h3 className="font-bold text-[var(--text-main)] mb-4 flex items-center gap-2"><Map size={20}/> Zonas Calientes</h3>
+                            <div className="h-full rounded border border-[var(--border)] relative overflow-hidden mb-2 cursor-pointer" onClick={handleMapClick}>
+                                <LeafletMap center={STORE_COORDS} markers={hotZoneMarkers} showHeatmap={true} zoom={12}/>
+                                {selectedZone && <div className="absolute bottom-4 left-4 bg-black/80 text-white p-2 rounded z-[500] animate-bounce">🔥 {selectedZone.name}: Más vendido -> {selectedZone.topItem}</div>}
+                            </div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
@@ -529,7 +487,7 @@
                                 <h3 className="font-bold text-[var(--text-main)] mb-4">Ventas por Canal</h3>
                                 {Object.keys(platformStats).length === 0 ? <p className="text-gray-500 text-sm">Sin datos</p> : Object.entries(platformStats).map(([key, val]) => (
                                      <div key={key} className="flex justify-between items-center py-2 border-b border-[var(--border)]">
-                                         <span className="text-[var(--text-main)]">{key}</span><span className="bg-[#222] px-2 rounded text-white text-xs">{val}</span>
+                                          <span className="text-[var(--text-main)]">{key}</span><span className="bg-[#222] px-2 rounded text-white text-xs">{val}</span>
                                      </div>
                                 ))}
                             </div>
@@ -566,7 +524,7 @@
             );
         };
 
-        // --- ADMIN MANAGERS ---
+        // --- ADMIN MANAGERS (Product, Inventory, Staff, etc) ---
         const ProductManager = ({ db, updateDB }) => {
             const [modal, setModal] = useState(null);
             const [form, setForm] = useState({ name:'', price:'', cat:'', img:'', desc:'', ingredients:'' });
@@ -593,9 +551,9 @@
                 else products.push({ ...form, id: generateId(), active: true });
                 updateDB({...db, products}); setModal(null);
             };
-
+            
             const remove = (id) => { if(confirm("¿Eliminar?")) updateDB({...db, products: db.products.filter(p=>p.id!==id)}); };
-
+            
             return (
                 <div className="space-y-4 overflow-y-auto h-full pb-20">
                     <div className="flex gap-2">
@@ -606,7 +564,6 @@
                              const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv); a.download='plantilla.csv'; a.click();
                         }} className="btn-gold bg-green-600 text-white z-10">PLANTILLA</button>
                     </div>
-                    
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {db.products.map(p => (
                             <div key={p.id} className="card p-3 flex gap-3 items-center group">
@@ -622,7 +579,6 @@
                             </div>
                         ))}
                     </div>
-
                     {modal && (
                         <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
                             <div className="card w-full max-w-lg bg-[var(--bg-card)] p-6">
@@ -734,100 +690,100 @@
 
             return (
                 <div className="space-y-6 overflow-y-auto h-full pb-20">
-                     <div className="flex justify-between items-center mb-4">
+                      <div className="flex justify-between items-center mb-4">
                         <button onClick={()=>setEditing({name:'', role:'cajero', username:'', password:'', schedule:{}, salary:0})} className="btn-gold">AGREGAR EMPLEADO</button>
                         <button onClick={()=>setMode('checador')} className="bg-blue-600 text-white px-4 py-2 rounded font-bold flex gap-2"><Clock/> CHECADOR</button>
-                     </div>
-                     
-                     <div className="overflow-x-auto">
-                         <table className="w-full text-left text-sm text-[var(--text-main)]">
-                             <thead><tr className="border-b border-[var(--border)]"><th className="p-2">Nombre</th><th className="p-2 w-full text-center">Horario / Progreso</th><th className="p-2">Nómina</th><th className="p-2">Acción</th></tr></thead>
-                             <tbody>
-                                 {db.users.filter(u=>u.role!=='admin').map(u=>{
-                                     const attendance = u.attendance || [];
-                                     const last = attendance.length > 0 ? attendance[attendance.length-1] : null;
-                                     const isWorking = last && !last.out;
-                                     const startTime = isWorking ? new Date(last.in).toLocaleTimeString() : '';
-                                     return (
-                                     <tr key={u.id} className="border-b border-[var(--border)] hover:bg-[var(--input-bg)] cursor-pointer" onClick={()=>setEditing(u)}>
-                                         <td className="p-2 font-bold whitespace-nowrap">{u.name}<br/><span className="text-xs text-gray-500">{u.role}</span></td>
-                                         <td className="p-2">
-                                             <div className="flex flex-col gap-1">
-                                                 <div className="grid grid-cols-7 gap-1">
-                                                     {days.map(d=><div key={d} className={`h-6 rounded flex items-center justify-center text-[10px] text-white ${u.schedule?.[d] ? 'bg-green-600' : 'bg-[#333]'}`}>{d[0]}</div>)}
-                                                 </div>
-                                                 {isWorking && (
-                                                     <div className="w-full bg-[#333] h-4 rounded mt-1 relative overflow-hidden">
-                                                         <div className="absolute top-0 left-0 h-full bg-yellow-500 animate-pulse w-full"></div>
-                                                         <span className="absolute inset-0 flex items-center justify-center text-[10px] text-black font-bold">TRABAJANDO DESDE {startTime}</span>
-                                                     </div>
-                                                 )}
-                                             </div>
-                                         </td>
-                                         <td className="p-2 font-mono">{calculatePayroll(u)}</td>
-                                         <td className="p-2"><button onClick={(e)=>{e.stopPropagation(); printSchedule(u);}} className="text-[var(--gold)]"><Printer size={16}/></button></td>
-                                     </tr>
-                                 )})}
-                             </tbody>
-                         </table>
-                     </div>
+                      </div>
+                      
+                      <div className="overflow-x-auto">
+                          <table className="w-full text-left text-sm text-[var(--text-main)]">
+                              <thead><tr className="border-b border-[var(--border)]"><th className="p-2">Nombre</th><th className="p-2 w-full text-center">Horario / Progreso</th><th className="p-2">Nómina</th><th className="p-2">Acción</th></tr></thead>
+                              <tbody>
+                                  {db.users.filter(u=>u.role!=='admin').map(u=>{
+                                      const attendance = u.attendance || [];
+                                      const last = attendance.length > 0 ? attendance[attendance.length-1] : null;
+                                      const isWorking = last && !last.out;
+                                      const startTime = isWorking ? new Date(last.in).toLocaleTimeString() : '';
+                                      return (
+                                      <tr key={u.id} className="border-b border-[var(--border)] hover:bg-[var(--input-bg)] cursor-pointer" onClick={()=>setEditing(u)}>
+                                          <td className="p-2 font-bold whitespace-nowrap">{u.name}<br/><span className="text-xs text-gray-500">{u.role}</span></td>
+                                          <td className="p-2">
+                                              <div className="flex flex-col gap-1">
+                                                  <div className="grid grid-cols-7 gap-1">
+                                                      {days.map(d=><div key={d} className={`h-6 rounded flex items-center justify-center text-[10px] text-white ${u.schedule?.[d] ? 'bg-green-600' : 'bg-[#333]'}`}>{d[0]}</div>)}
+                                                  </div>
+                                                  {isWorking && (
+                                                      <div className="w-full bg-[#333] h-4 rounded mt-1 relative overflow-hidden">
+                                                          <div className="absolute top-0 left-0 h-full bg-yellow-500 animate-pulse w-full"></div>
+                                                          <span className="absolute inset-0 flex items-center justify-center text-[10px] text-black font-bold">TRABAJANDO DESDE {startTime}</span>
+                                                      </div>
+                                                  )}
+                                              </div>
+                                          </td>
+                                          <td className="p-2 font-mono">{calculatePayroll(u)}</td>
+                                          <td className="p-2"><button onClick={(e)=>{e.stopPropagation(); printSchedule(u);}} className="text-[var(--gold)]"><Printer size={16}/></button></td>
+                                      </tr>
+                                  )})}
+                              </tbody>
+                          </table>
+                      </div>
 
-                     {editing && (
-                         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-                             <div className="card w-full max-w-4xl bg-[var(--bg-card)] p-6 max-h-[90vh] overflow-y-auto">
-                                 <h3 className="font-bold text-xl mb-4 text-[var(--text-main)]">{editing.id ? 'EDITAR' : 'NUEVO'} EMPLEADO</h3>
-                                 <div className="grid grid-cols-4 gap-4 mb-4">
-                                     <input className="input-std" placeholder="Nombre" value={editing.name} onChange={e=>setEditing({...editing, name:e.target.value})}/>
-                                     <input className="input-std" placeholder="Usuario" value={editing.username} onChange={e=>setEditing({...editing, username:e.target.value})}/>
-                                     <input className="input-std" placeholder="Contraseña" value={editing.password} onChange={e=>setEditing({...editing, password:e.target.value})}/>
-                                     <select className="input-std" value={editing.role} onChange={e=>setEditing({...editing, role:e.target.value})}><option value="cajero">Cajero</option><option value="cocina">Cocina</option><option value="repartidor">Repartidor</option></select>
-                                 </div>
-                                 <div className="flex gap-4 mb-2 items-center">
-                                     <div className="w-32"><label className="text-xs text-gray-500">Sueldo Semanal</label><input type="number" className="input-std" value={editing.salary} onChange={e=>setEditing({...editing, salary:parseFloat(e.target.value)})}/></div>
-                                     <button onClick={()=>copyMonday(editing)} className="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold flex gap-2"><Copy size={14}/> COPIAR LUNES A SEMANA</button>
-                                 </div>
-                                 
-                                 <div className="grid grid-cols-7 gap-2 mb-6">
-                                     {days.map(d=>(
-                                         <div key={d} className="bg-[#222] p-2 rounded text-center border border-[#333]">
-                                             <p className="text-[var(--gold)] font-bold text-xs mb-1">{d}</p>
-                                             <input className="bg-black text-white w-full text-xs text-center mb-1 border border-[#333]" placeholder="Entrada" value={editing.schedule?.[d]?.in||''} onChange={e=>setEditing({...editing, schedule:{...editing.schedule, [d]:{...(editing.schedule?.[d]||{}), in:e.target.value}}})}/>
-                                             <input className="bg-black text-white w-full text-xs text-center border border-[#333]" placeholder="Salida" value={editing.schedule?.[d]?.out||''} onChange={e=>setEditing({...editing, schedule:{...editing.schedule, [d]:{...(editing.schedule?.[d]||{}), out:e.target.value}}})}/>
-                                         </div>
-                                     ))}
-                                 </div>
-                                 
-                                 <div className="mb-4 bg-[#222] p-2 rounded">
-                                     <p className="text-xs font-bold mb-1 text-white">Editar Último Registro (Admin)</p>
-                                     <div className="flex gap-2">
-                                          <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 ? new Date(editing.attendance[editing.attendance.length-1].in).toISOString().slice(0,16) : ''} onChange={(e)=>{
-                                              const newAtt = [...(editing.attendance || [])];
-                                              if(newAtt.length > 0) newAtt[newAtt.length-1].in = new Date(e.target.value).toISOString();
-                                              setEditing({...editing, attendance: newAtt});
-                                          }}/>
-                                          <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 && editing.attendance[editing.attendance.length-1].out ? new Date(editing.attendance[editing.attendance.length-1].out).toISOString().slice(0,16) : ''} onChange={(e)=>{
-                                              const newAtt = [...(editing.attendance || [])];
-                                              if(newAtt.length > 0) newAtt[newAtt.length-1].out = new Date(e.target.value).toISOString();
-                                              setEditing({...editing, attendance: newAtt});
-                                          }}/>
-                                     </div>
-                                 </div>
+                      {editing && (
+                          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+                              <div className="card w-full max-w-4xl bg-[var(--bg-card)] p-6 max-h-[90vh] overflow-y-auto">
+                                  <h3 className="font-bold text-xl mb-4 text-[var(--text-main)]">{editing.id ? 'EDITAR' : 'NUEVO'} EMPLEADO</h3>
+                                  <div className="grid grid-cols-4 gap-4 mb-4">
+                                      <input className="input-std" placeholder="Nombre" value={editing.name} onChange={e=>setEditing({...editing, name:e.target.value})}/>
+                                      <input className="input-std" placeholder="Usuario" value={editing.username} onChange={e=>setEditing({...editing, username:e.target.value})}/>
+                                      <input className="input-std" placeholder="Contraseña" value={editing.password} onChange={e=>setEditing({...editing, password:e.target.value})}/>
+                                      <select className="input-std" value={editing.role} onChange={e=>setEditing({...editing, role:e.target.value})}><option value="cajero">Cajero</option><option value="cocina">Cocina</option><option value="repartidor">Repartidor</option></select>
+                                  </div>
+                                  <div className="flex gap-4 mb-2 items-center">
+                                      <div className="w-32"><label className="text-xs text-gray-500">Sueldo Semanal</label><input type="number" className="input-std" value={editing.salary} onChange={e=>setEditing({...editing, salary:parseFloat(e.target.value)})}/></div>
+                                      <button onClick={()=>copyMonday(editing)} className="bg-blue-600 text-white px-4 py-2 rounded text-xs font-bold flex gap-2"><Copy size={14}/> COPIAR LUNES A SEMANA</button>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-7 gap-2 mb-6">
+                                      {days.map(d=>(
+                                          <div key={d} className="bg-[#222] p-2 rounded text-center border border-[#333]">
+                                              <p className="text-[var(--gold)] font-bold text-xs mb-1">{d}</p>
+                                              <input className="bg-black text-white w-full text-xs text-center mb-1 border border-[#333]" placeholder="Entrada" value={editing.schedule?.[d]?.in||''} onChange={e=>setEditing({...editing, schedule:{...editing.schedule, [d]:{...(editing.schedule?.[d]||{}), in:e.target.value}}})}/>
+                                              <input className="bg-black text-white w-full text-xs text-center border border-[#333]" placeholder="Salida" value={editing.schedule?.[d]?.out||''} onChange={e=>setEditing({...editing, schedule:{...editing.schedule, [d]:{...(editing.schedule?.[d]||{}), out:e.target.value}}})}/>
+                                          </div>
+                                      ))}
+                                  </div>
+                                  
+                                  <div className="mb-4 bg-[#222] p-2 rounded">
+                                      <p className="text-xs font-bold mb-1 text-white">Editar Último Registro (Admin)</p>
+                                      <div className="flex gap-2">
+                                           <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 ? new Date(editing.attendance[editing.attendance.length-1].in).toISOString().slice(0,16) : ''} onChange={(e)=>{
+                                               const newAtt = [...(editing.attendance || [])];
+                                               if(newAtt.length > 0) newAtt[newAtt.length-1].in = new Date(e.target.value).toISOString();
+                                               setEditing({...editing, attendance: newAtt});
+                                           }}/>
+                                           <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 && editing.attendance[editing.attendance.length-1].out ? new Date(editing.attendance[editing.attendance.length-1].out).toISOString().slice(0,16) : ''} onChange={(e)=>{
+                                               const newAtt = [...(editing.attendance || [])];
+                                               if(newAtt.length > 0) newAtt[newAtt.length-1].out = new Date(e.target.value).toISOString();
+                                               setEditing({...editing, attendance: newAtt});
+                                           }}/>
+                                      </div>
+                                  </div>
 
-                                 <div className="flex justify-between">
-                                     {editing.id && <button onClick={()=>deleteUser(editing.id)} className="text-red-500 font-bold border border-red-500 p-2 rounded">ELIMINAR USUARIO</button>}
-                                     <div className="flex gap-2">
-                                         <button onClick={()=>setEditing(null)} className="text-gray-500">CANCELAR</button>
-                                         <button onClick={()=>{
-                                             let users = [...db.users];
-                                             if(editing.id) users = users.map(u=>u.id===editing.id?editing:u);
-                                             else users.push({...editing, id:generateId()});
-                                             updateDB({...db, users}); setEditing(null);
-                                         }} className="btn-gold">GUARDAR CAMBIOS</button>
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
-                     )}
+                                  <div className="flex justify-between">
+                                      {editing.id && <button onClick={()=>deleteUser(editing.id)} className="text-red-500 font-bold border border-red-500 p-2 rounded">ELIMINAR USUARIO</button>}
+                                      <div className="flex gap-2">
+                                          <button onClick={()=>setEditing(null)} className="text-gray-500">CANCELAR</button>
+                                          <button onClick={()=>{
+                                              let users = [...db.users];
+                                              if(editing.id) users = users.map(u=>u.id===editing.id?editing:u);
+                                              else users.push({...editing, id:generateId()});
+                                              updateDB({...db, users}); setEditing(null);
+                                          }} className="btn-gold">GUARDAR CAMBIOS</button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      )}
                 </div>
             );
         };
@@ -1008,7 +964,6 @@
             );
         };
 
-        // --- POS (V52) ---
         const POS = ({ db, updateDB, user }) => {
             const [cart, setCart] = useState([]);
             const [modal, setModal] = useState(null); 
@@ -1031,11 +986,15 @@
             const [newExpense, setNewExpense] = useState({desc:'', amount:''});
             const [suggestions, setSuggestions] = useState([]);
             const [manualDriverId, setManualDriverId] = useState('');
-            const [viewMap, setViewMap] = useState(false); // FIXED: Added missing state
+            const [viewMap, setViewMap] = useState(false); 
+
+            // FIX PUNTO 3: Ingredientes Toggle
+            const showIngredients = (p) => {
+                alert(p.ingredients || "Sin ingredientes especificados.");
+            };
 
             const webOrders = db.orders.filter(o => o.source === 'web' && o.status === 'web_pending_payment');
             
-            // Live map markers for POS
             const activeOrders = db.orders.filter(o => o.status === 'delivering' || o.status === 'pending');
             const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
             const liveMarkers = [
@@ -1062,7 +1021,6 @@
             const subtotal = cart.reduce((a,b)=>a+b.price*b.qty,0);
             const total = subtotal + deliveryFee - discount;
 
-            // REAL GEOCODING + AUTOCOMPLETE
             const updateLocationFromAddress = (addr) => {
                 setOrderDetails(prev => ({...prev, address: addr}));
                 if (addressTimer) clearTimeout(addressTimer);
@@ -1189,13 +1147,12 @@
                 printTicket(ticket);
             };
 
-            // Smart Cash Logic
             const checkCashLimit = (newTotal) => {
                 const currentCash = db.cashDrawer.current + newTotal;
                 const limit = (db.cashDrawer.initial || 0) + 500;
                 if(currentCash >= limit) {
-                    const excess = currentCash - limit; // Withdraw excess amount or fixed 500
-                    const withdrawAmount = 500; // Fixed withdrawal chunk
+                    const excess = currentCash - limit; 
+                    const withdrawAmount = 500; 
                     
                     if(confirm(`⚠️ ALERTA DE EFECTIVO\n\nLa caja ha superado el límite seguro.\nSe debe realizar un retiro de $${withdrawAmount}.\n\n¿Registrar retiro ahora?`)) {
                          updateDB(prev => ({
@@ -1203,10 +1160,9 @@
                              expenses: [...prev.expenses, {id:generateId(), desc:'RETIRO AUTOMÁTICO EXCESO', amount: withdrawAmount, date:new Date().toISOString()}],
                              cashDrawer: {...prev.cashDrawer, current: prev.cashDrawer.current - withdrawAmount}
                          }));
-                         // Print Withdrawal Ticket
                          const ticket = `<div class="center bold">RETIRO DE CAJA (AUTO)</div><div class="center">${new Date().toLocaleString()}</div><hr><div>Monto Retirado: $${withdrawAmount}</div><div class="center">Motivo: Exceso de Efectivo</div><br><br><div class="center">_______________________<br>Firma Cajera</div>`;
                          printTicket(ticket);
-                         return true; // Withdrawn
+                         return true; 
                     }
                 }
                 return false;
@@ -1229,11 +1185,9 @@
                     driver: null, settled: false
                 };
 
-                // Add order to DB
                 let newCashDrawer = db.cashDrawer.current;
                 if(payMethod==='cash') {
                     newCashDrawer += total;
-                    // Check Auto Withdraw Trigger
                     setTimeout(() => checkCashLimit(total), 1000); 
                 }
 
@@ -1246,11 +1200,8 @@
                 const ticketEnd = `<hr><div class="center">${db.settings.ticketConfig.footer.replace(/\n/g, '<br>')}</div><div class="center"><img src="${qrImg}" width="80"/></div>`;
                 
                 if(orderType === 'platform') {
-                    // Double Ticket for Platform (Correct split)
                     const driverTicket = `${ticketBase}<div class="center bold">COPIA RESTAURANTE</div><hr>${itemsList}<hr><div class="bold right">TOTAL: ${formatCurrency(total)}</div>${ticketEnd}`;
                     const clientTicket = `${ticketBase}<div class="center">COPIA CLIENTE/DRIVER</div><hr>${order.items.map(i=>`<div>${i.qty}x ${i.name} ... $0.00</div>`).join('')}<hr><div class="bold right">TOTAL: $0.00</div><div class="center">PROPINAS NO INCLUIDAS</div>${ticketEnd}`;
-                    
-                    // Print logic with cut separator
                     const combinedHTML = `${driverTicket}<br><br><div class="center">✂️ --- CORTE AQUÍ --- ✂️</div><br><br>${clientTicket}`;
                     printTicket(combinedHTML);
                 } else {
@@ -1261,7 +1212,6 @@
                 setOrderDetails({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
             };
 
-            // Listen for Escape key
             useEffect(() => {
                 const handleEsc = (event) => {
                    if (event.keyCode === 27) {
@@ -1308,6 +1258,7 @@
                                 {db.products.map(p=>(
                                     <div key={p.id} onClick={()=>addToCart(p)} className="card h-28 relative overflow-hidden cursor-pointer group border-0 hover:ring-2 ring-[var(--gold)]">
                                         <img src={p.img} className="absolute inset-0 w-full h-full object-cover opacity-60"/>
+                                        <div className="absolute top-1 right-1 z-20 bg-black/50 rounded-full p-1 hover:bg-[var(--gold)] hover:text-black text-white" onClick={(e)=>{e.stopPropagation(); showIngredients(p);}}><Info size={16}/></div>
                                         <div className="absolute bottom-0 p-1 w-full bg-gradient-to-t from-black to-transparent">
                                             <p className="text-white font-bold text-xs leading-tight">{p.name}</p>
                                             <p className="text-[var(--gold)] font-black text-xs">{formatCurrency(p.price)}</p>
@@ -1385,6 +1336,7 @@
                                         <>
                                             <div className="flex gap-2 mb-2 relative">
                                                 <input className={`input-std h-10 text-lg flex-1 ${isLocating?'locating':''}`} placeholder={isLocating?"📍 Localizando...":"Calle y Número *"} value={orderDetails.address} onChange={e=>updateLocationFromAddress(e.target.value)} list="pos-address-list"/>
+                                                {/* FIX PUNTO 8: AUTOCOMPLETADO VISIBLE */}
                                                 <datalist id="pos-address-list">
                                                     {suggestions.map((s,i) => <option key={i} value={s.display_name} />)}
                                                 </datalist>
@@ -1479,33 +1431,45 @@
             );
         };
 
-        // 6. DRIVER APP
+        // 6. DRIVER APP (FIXED PUNTO 1, 3, 4, 5)
         const DriverApp = ({ db, updateDB, user }) => {
             const [view, setView] = useState('map');
             const [selectedOrder, setSelectedOrder] = useState(null);
             const [scanning, setScanning] = useState(false);
             const [manualId, setManualId] = useState('');
+            const [gpsError, setGpsError] = useState(false); 
             const videoRef = useRef(null);
             
+            // --- PUNTO 5: FORZAR UBICACIÓN TIEMPO REAL ---
+            useEffect(() => {
+                const watchId = navigator.geolocation.watchPosition(
+                    (pos) => {
+                         const newLoc = [pos.coords.latitude, pos.coords.longitude];
+                         setGpsError(false); 
+                         updateDB(prev => ({
+                             ...prev, 
+                             users: prev.users.map(u => u.id === user.id ? {...u, location: newLoc, online: true} : u)
+                         }));
+                    },
+                    (err) => {
+                        console.error("GPS Error", err);
+                        setGpsError(true); 
+                    },
+                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                );
+                return () => navigator.geolocation.clearWatch(watchId);
+            }, [user.id]); 
+
             const myDelivered = db.orders.filter(o => o.driver === user.username && o.status === 'delivered');
             const earnings = myDelivered.reduce((acc, o) => acc + (o.driverFee||0), 0);
             const myActiveOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivering');
-            const markers = [{ pos: STORE_COORDS, emoji: '🏪', popup: 'Base' }, ...myActiveOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', data: o }))];
+            
+            const markers = [
+                { pos: user.location || STORE_COORDS, emoji: '', isMyLoc: true, popup: 'Yo' },
+                { pos: STORE_COORDS, emoji: '🏪', popup: 'Base' }, 
+                ...myActiveOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', data: o }))
+            ];
 
-            useEffect(() => {
-                const interval = setInterval(() => {
-                    navigator.geolocation.getCurrentPosition(
-                        pos => {
-                             const newLoc = [pos.coords.latitude, pos.coords.longitude];
-                             updateDB({...db, users: db.users.map(u => u.id === user.id ? {...u, location: newLoc, online: true} : u)});
-                        },
-                        null, { enableHighAccuracy: true }
-                    );
-                }, 10000); 
-                return () => clearInterval(interval);
-            }, [db, user.id]);
-
-            // Camera Activation Logic
             useEffect(() => {
                 if (scanning && videoRef.current) {
                     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
@@ -1520,7 +1484,6 @@
             }, [scanning]);
 
             const scanOrder = (content) => {
-                 // Check if it's a URL or direct ID
                  let oid = content;
                  if(content.includes('take_order=')) {
                      const url = new URL(content);
@@ -1539,17 +1502,48 @@
                      showToast("QR Inválido");
                  }
             };
+            
+            const navigateToOrder = (o) => {
+                if(o.clientLoc) {
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${o.clientLoc[0]},${o.clientLoc[1]}`);
+                } else {
+                    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}`);
+                }
+            };
 
             return (
                 <div className="h-full flex flex-col bg-black pb-16 relative w-full overflow-hidden">
-                    {/* Share Button for Other Views */}
+                    {gpsError && <div className="fixed top-12 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-full z-50 font-bold shadow-lg animate-pulse text-xs text-center w-max max-w-[90%]">⚠️ ACTIVA TU GPS PARA FUNCIONAR</div>}
+
                     <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>
                     
                     <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-black/90 to-transparent flex justify-between pointer-events-none"><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] flex items-center gap-2"><div className={`w-2 h-2 rounded-full ${user.online?'bg-green-500':'bg-red-500'}`}></div><span className="text-xs text-white font-bold">{user.name}</span></div><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] text-right"><p className="text-[10px] text-gray-500">DEUDA ACTUAL</p><p className="text-[var(--gold)] font-bold">{formatCurrency(user.cashOnHand)}</p></div></div>
                     {view === 'map' && (
                         <div className="flex-1 relative w-full h-full">
-                            <LeafletMap center={STORE_COORDS} markers={markers} onMarkerClick={setSelectedOrder} />
-                            {selectedOrder && <div className="absolute bottom-4 left-4 right-4 bg-[#141414] p-5 rounded-2xl border border-[var(--gold)] shadow-[0_0_30px_rgba(0,0,0,0.8)] z-[1000] animate-in slide-in-from-bottom"><div className="flex justify-between items-start mb-4"><div><h3 className="text-white font-bold text-xl">#{selectedOrder.orderNum} - {selectedOrder.clientName}</h3><p className="text-gray-400 text-sm mt-1">{selectedOrder.address}</p></div><button onClick={()=>setSelectedOrder(null)} className="bg-[#222] p-2 rounded-full"><X className="text-white"/></button></div><div className="grid grid-cols-2 gap-3 mb-4"><a href={`https://wa.me/52${selectedOrder.clientPhone}?text=Hola`} target="_blank" className="bg-green-600 text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><MessageCircle/> WHATSAPP</a><a href={`tel:${selectedOrder.clientPhone}`} className="bg-[#333] text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><Phone/> LLAMAR</a></div><button onClick={()=>{let cash = user.cashOnHand || 0; if(selectedOrder.method==='cash') cash += selectedOrder.total; updateDB({...db, orders: db.orders.map(x=>x.id===selectedOrder.id?{...x,status:'delivered'}:x), users: db.users.map(u=>u.id===user.id?{...u, cashOnHand: cash}:u)}); setSelectedOrder(null);}} className="w-full btn-gold py-4 text-lg rounded-xl shadow-lg">FINALIZAR ENTREGA</button></div>}
+                            <LeafletMap center={user.location || STORE_COORDS} markers={markers} onMarkerClick={setSelectedOrder} />
+                            
+                            {selectedOrder && <div className="absolute bottom-4 left-4 right-4 bg-[#141414] p-5 rounded-2xl border border-[var(--gold)] shadow-[0_0_30px_rgba(0,0,0,0.8)] z-[1000] animate-in slide-in-from-bottom">
+                                <div className="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 className="text-[var(--gold)] font-bold text-xl">ORDEN #{selectedOrder.orderNum}</h3>
+                                        <p className="text-white font-bold text-lg">{selectedOrder.clientName}</p>
+                                    </div>
+                                    <button onClick={()=>setSelectedOrder(null)} className="bg-[#222] p-2 rounded-full"><X className="text-white"/></button>
+                                </div>
+                                <div className="text-gray-400 text-sm mb-4 space-y-1 border-t border-[#333] pt-2">
+                                    <p>📞 {selectedOrder.clientPhone}</p>
+                                    <p>📍 {selectedOrder.address}</p>
+                                    {selectedOrder.address.includes('(') && <p className="text-yellow-500 text-xs">Ref: {selectedOrder.address.split('(')[1].replace(')','')}</p>}
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-3 mb-3">
+                                    <button onClick={()=>navigateToOrder(selectedOrder)} className="bg-blue-600 text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2 shadow-lg border border-blue-400"><Navigation size={18}/> NAVEGAR</button>
+                                    <a href={`tel:${selectedOrder.clientPhone}`} className="bg-[#333] text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><Phone size={18}/> LLAMAR</a>
+                                </div>
+                                
+                                <button onClick={()=>{let cash = user.cashOnHand || 0; if(selectedOrder.method==='cash') cash += selectedOrder.total; updateDB({...db, orders: db.orders.map(x=>x.id===selectedOrder.id?{...x,status:'delivered'}:x), users: db.users.map(u=>u.id===user.id?{...u, cashOnHand: cash}:u)}); setSelectedOrder(null);}} className="w-full btn-gold py-4 text-lg rounded-xl shadow-lg">FINALIZAR ENTREGA</button>
+                            </div>}
+                            
                             <button className="absolute bottom-20 right-4 bg-[var(--gold)] p-4 rounded-full shadow-[0_0_20px_var(--gold)] z-10 animate-bounce" onClick={()=>setScanning(true)}><QRIcon size={32} className="text-black"/></button>
                         </div>
                     )}
@@ -1568,7 +1562,7 @@
                         </div>
                     )}
                     {view === 'list' && (
-                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                        <div className="flex-1 overflow-y-auto p-4 space-y-2 text-white">
                              <h2 className="text-white font-bold text-xl mb-4">HISTORIAL ENTREGAS</h2>
                              {myDelivered.map(o=>(
                                  <div key={o.id} className="bg-[#222] p-3 rounded border border-[#333] flex justify-between items-center">
@@ -1608,7 +1602,7 @@
             );
         };
 
-        // 7. CLIENT APP (Full V47)
+        // 7. CLIENT APP (FIXED PUNTO 1, 3, 4, 6, 7)
         const ClientApp = ({ db, updateDB }) => {
             const [view, setView] = useState('menu');
             const [cart, setCart] = useState([]);
@@ -1620,8 +1614,52 @@
             const [tempCashAmount, setTempCashAmount] = useState('');
             const [suggestions, setSuggestions] = useState([]);
             const [addressTimer, setAddressTimer] = useState(null);
+            
+            // PUNTO 1: PERSISTENCIA Y SEGUIMIENTO CLIENTE
+            useEffect(() => {
+                const storedOrderId = localStorage.getItem('client_active_order_id');
+                if (storedOrderId) {
+                    const existingOrder = db.orders.find(o => o.id === storedOrderId);
+                    if (existingOrder) {
+                        if (existingOrder.status === 'delivered') {
+                            localStorage.removeItem('client_active_order_id');
+                            showToast("¡Pedido Entregado! Gracias por su compra.");
+                        } else {
+                            setActiveOrder(existingOrder);
+                        }
+                    }
+                }
+            }, [db.orders]);
 
-            useEffect(() => { navigator.geolocation.getCurrentPosition((pos) => setClientCoords([pos.coords.latitude, pos.coords.longitude]), () => setClientCoords(STORE_COORDS)); }, []);
+            const [dbLoading, setDbLoading] = useState(false);
+            
+            // FIX PUNTO 4: GPS INICIAL NO FORZOSO
+            useEffect(() => { 
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const coords = [pos.coords.latitude, pos.coords.longitude];
+                    setClientCoords(coords);
+                    // Reverse Geocode for initial soft fill
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
+                        .then(r=>r.json()).then(d=>{
+                            const parts = d.display_name.split(',');
+                            setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')}));
+                        });
+                }, () => setClientCoords(STORE_COORDS)); 
+            }, []);
+
+            // Check if DB is actually loaded
+            if ((!db || !db.products || db.products.length === 0) && !dbLoading) {
+                return (
+                     <div className="h-screen flex flex-col items-center justify-center relative">
+                         {/* FIX PUNTO 2: FONDO BANNER */}
+                         <div className="absolute inset-0 z-0" style={{backgroundImage: `url(${BANNER_URL})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)'}}></div>
+                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--gold)] mb-4 z-10"></div>
+                         <h2 className="text-[var(--gold)] text-xl font-bold z-10">Cargando Menú...</h2>
+                         <p className="text-gray-400 text-sm mt-2 z-10">Sincronizando con el servidor</p>
+                         <button onClick={()=>window.location.reload()} className="mt-8 text-white underline z-10">Recargar Página</button>
+                     </div>
+                );
+            }
 
             const deliveryFee = useMemo(() => {
                 if(form.type==='delivery' && clientCoords) {
@@ -1636,7 +1674,6 @@
             const submit = () => {
                 if(form.type==='delivery' && !db.settings.deliveryEnabled!==false) return showToast("Servicio a domicilio no disponible");
                 
-                // Final Radius Check before Submit
                 if (form.type === 'delivery' && clientCoords) {
                      const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], clientCoords[0], clientCoords[1]);
                      if (dist > db.settings.deliveryRadius) {
@@ -1648,14 +1685,17 @@
                 if(form.pay === 'cash' && !form.payAmount) return showToast("Indica con cuánto vas a pagar");
                 
                 const order = { id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, items: cart, total, status: 'web_pending_payment', method: form.pay, payAmount: form.payAmount, createdAt: new Date().toISOString(), address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', clientName: form.name, clientPhone: form.phone, clientLoc: clientCoords, source: 'web' };
+                
+                // Save Order ID locally for tracking
+                localStorage.setItem('client_active_order_id', order.id);
+                
                 updateDB({...db, orders: [...db.orders, order]}); setActiveOrder(order); setView('track');
             };
 
+            // FIX PUNTO 3 & 8: AUTOCOMPLETADO
             const updateLocationFromAddress = (addr) => {
                 setForm(prev => ({...prev, address: addr}));
-                
                 if (addressTimer) clearTimeout(addressTimer);
-                
                 setAddressTimer(setTimeout(async () => {
                     if(addr.length > 3) {
                         setIsLocating(true);
@@ -1664,18 +1704,13 @@
                             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`);
                             const data = await res.json();
                             setSuggestions(data);
-                            
+                            // Soft update map if results found
                             if(data && data.length > 0) {
-                                // Auto-select best match coordinates for map preview
                                 setClientCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
                             }
-                        } catch(e) {
-                            console.error("Geocoding error", e);
-                        }
+                        } catch(e) { console.error("Geocoding error", e); }
                         setIsLocating(false);
-                    } else {
-                        setSuggestions([]);
-                    }
+                    } else { setSuggestions([]); }
                 }, 800)); 
             };
 
@@ -1732,7 +1767,6 @@
                 newCart[idx].qty += delta;
                 if(newCart[idx].qty <= 0) newCart.splice(idx, 1);
                 setCart(newCart);
-                // Return to menu if empty
                 if (newCart.length === 0) setView('menu');
             };
 
@@ -1742,12 +1776,26 @@
                 <div className="h-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] relative app-view-mobile">
                     <button className="install-btn" onClick={showInstallInstructions}><img src={LOGO_URL} className="w-8 h-8 rounded-full"/></button>
                     
-                    <div className="h-48 bg-cover bg-center relative" style={{backgroundImage:`url(${BANNER_URL})`}}></div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-48">
-                        {db.products.length === 0 ? <p className="text-center text-gray-500 mt-10">Menú vacío. Vuelve pronto.</p> : 
-                        db.products.map(p=>(<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)]"><img src={p.img} className="w-20 h-20 rounded object-cover"/><div className="flex-1"><p className="font-bold text-[var(--text-main)]">{p.name}</p><p className="text-gray-500 text-xs line-clamp-2">{p.desc}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)]">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart,{...p, qty: 1}])} className="bg-[var(--accent)] text-white w-8 h-8 rounded-full font-bold shadow">+</button></div></div></div>))}
+                    {/* PUNTO 1: Notificación flotante de Pedido Activo */}
+                    {activeOrder && (
+                        <div onClick={()=>setView('track')} className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg z-[100] font-bold animate-bounce cursor-pointer flex items-center gap-2">
+                            <span>🛵 PEDIDO EN CURSO</span>
+                        </div>
+                    )}
+
+                    {/* FIX PUNTO 3: Ajuste Banner Header */}
+                    <div className="h-48 relative overflow-hidden">
+                        <img src={BANNER_URL} className="w-full h-full object-cover" alt="Banner"/>
+                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-body)] to-transparent"></div>
                     </div>
-                    <div className="client-promo-video"><video src={VIDEO_URL} autoPlay loop muted playsInline></video></div>
+
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-48">
+                        {db.products.map(p=>(<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)]"><img src={p.img} className="w-20 h-20 rounded object-cover"/><div className="flex-1"><p className="font-bold text-[var(--text-main)]">{p.name}</p><p className="text-gray-500 text-xs line-clamp-2">{p.desc}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)]">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart,{...p, qty: 1}])} className="bg-[var(--accent)] text-white w-8 h-8 rounded-full font-bold shadow">+</button></div></div></div>))}
+                    </div>
+                    
+                    {/* FIX PUNTO 6: Video sube si hay botón de pago */}
+                    <div className={`client-promo-video ${cart.length>0 ? 'shifted' : ''}`}><video src={VIDEO_URL} autoPlay loop muted playsInline></video></div>
+                    
                     {cart.length>0 && <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile"><button onClick={()=>setView('checkout')} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button></div>}
                 </div>
             );
@@ -1757,7 +1805,6 @@
                     <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2"><ArrowLeft/> Volver</button>
                     <h2 className="font-bold text-xl mb-6 text-[var(--text-main)]">RESUMEN</h2>
                     
-                    {/* Cart List */}
                     <div className="mb-6 space-y-2">
                         {cart.map((item, idx) => (
                             <div key={idx} className="bg-[#222] p-3 rounded flex justify-between items-center">
@@ -1786,7 +1833,8 @@
                                 </datalist>
                                 <input className="input-std" placeholder="Referencias (Casa color, portón...)" value={form.references} onChange={e=>setForm({...form,references:e.target.value})}/>
                                 <p className="text-xs text-gray-500">Toca el mapa si la ubicación no es exacta:</p>
-                                <div className="h-40 rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'📍'}]} onClickMap={handleMapClick} zoom={15} /></div>
+                                {/* FIX PUNTO 7: Mapa más cuadrado */}
+                                <div className="aspect-square w-full rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'📍'}]} onClickMap={handleMapClick} zoom={15} /></div>
                                 <div className="text-right text-sm text-[var(--accent)] font-bold">Costo Envío: {formatCurrency(deliveryFee)}</div>
                             </div>
                         )}
@@ -1815,10 +1863,34 @@
                 </div>
             );
 
-            if(view === 'track') return <div className="h-full flex flex-col bg-white"><div className="flex-1 relative"><LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, emoji:'🏪'}, {pos:clientCoords, emoji:'🏠'}]} route={[STORE_COORDS, clientCoords]} zoom={13}/></div><div className="p-6 bg-white rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] z-10"><h2 className="text-xl font-bold mb-2">ESTADO: {activeOrder?.status}</h2><button onClick={()=>setView('menu')} className="mt-4 w-full bg-black text-white py-3 rounded-xl font-bold">VOLVER AL MENU</button></div></div>;
+            if(view === 'track') {
+                const assignedDriver = activeOrder.driver ? db.users.find(u => u.username === activeOrder.driver) : null;
+                const driverLoc = assignedDriver && assignedDriver.location ? assignedDriver.location : STORE_COORDS;
+                
+                const trackMarkers = [
+                    { pos: STORE_COORDS, emoji: '🏪' },
+                    { pos: clientCoords, emoji: '🏠' }
+                ];
+                
+                if (assignedDriver) {
+                    trackMarkers.push({ pos: driverLoc, emoji: '🏍️', type: 'driver', label: 'Repartidor' });
+                }
+
+                return (
+                    <div className="h-full flex flex-col bg-white">
+                        <div className="flex-1 relative">
+                            <LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, clientCoords] : [STORE_COORDS, clientCoords]} zoom={13}/>
+                        </div>
+                        <div className="p-6 bg-white rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] z-10">
+                            <h2 className="text-xl font-bold mb-2">ESTADO: {activeOrder?.status === 'web_pending_payment' ? 'CONFIRMANDO PAGO' : activeOrder?.status === 'pending' ? 'PREPARANDO' : activeOrder?.status === 'delivering' ? 'EN CAMINO 🏍️' : 'PROCESANDO'}</h2>
+                            {activeOrder?.driver && <p className="text-green-600 font-bold mb-2">Repartidor asignado!</p>}
+                            <button onClick={()=>setView('menu')} className="mt-4 w-full bg-black text-white py-3 rounded-xl font-bold">VOLVER AL MENU</button>
+                        </div>
+                    </div>
+                );
+            }
         };
 
-        // --- KITCHEN COMPONENT (Restored) ---
         const Kitchen = ({ db, updateDB }) => {
             const [detailOrder, setDetailOrder] = useState(null);
             const move = (o, s) => updateDB({...db, orders: db.orders.map(x=>x.id===o.id?{...x, status:s}:x)});
@@ -1848,7 +1920,14 @@
                                 {db.orders.filter(o=>o.status===status).map(o=>(
                                     <div key={o.id} onClick={()=>setDetailOrder(o)} className="card p-4 border-l-8 cursor-pointer hover:bg-[#222]">
                                         <div className="flex justify-between mb-2"><span className="font-black text-2xl text-white">#{o.orderNum}</span><span className="text-sm text-gray-500 flex items-center gap-1"><Clock size={14}/> 12m</span></div>
-                                        <div className="space-y-1 mb-3">{o.items.map((i,x)=><div key={x} className="text-gray-300 font-bold text-lg">{i.qty} {i.name}</div>)}</div>
+                                        <div className="space-y-1 mb-3">
+                                            {o.items.map((i,x)=>(
+                                                <div key={x} className="mb-2">
+                                                    <div className="text-gray-300 font-bold text-lg">{i.qty} {i.name}</div>
+                                                    {i.ingredients && <p className="text-gray-500 text-sm">({i.ingredients})</p>}
+                                                </div>
+                                            ))}
+                                        </div>
                                         {status!=='ready' && <button onClick={(e)=>{e.stopPropagation(); move(o, status==='pending'?'preparing':'ready');}} className="w-full bg-[#333] mt-2 py-3 rounded text-white font-bold text-lg hover:bg-gray-700">AVANZAR</button>}
                                     </div>
                                 ))}
@@ -1859,7 +1938,6 @@
             );
         };
 
-        // --- APP ROOT ---
         const App = () => {
             const [theme, setTheme] = useState('dark');
             const [db, setDB] = useState(initialDB);
@@ -1868,7 +1946,6 @@
             const [godMenuOpen, setGodMenuOpen] = useState(false);
             const [syncing, setSyncing] = useState(false);
 
-            // CLOUD SYNC LOGIC
             useEffect(() => { 
                 const init = async () => {
                     setSyncing(true);
@@ -1876,7 +1953,6 @@
                     if(cloudData && cloudData.data) {
                         setDB(cloudData.data);
                     } else {
-                        // If no cloud data, try local storage fallback or keep initial
                         try {
                             const s = localStorage.getItem('emi_v76_db'); 
                             if(s) setDB(JSON.parse(s)); 
@@ -1886,16 +1962,10 @@
                 };
                 init();
                 
-                // Polling every 4 seconds
                 const interval = setInterval(async () => {
                      setSyncing(true);
                      const cloudData = await fetchCloudDB();
                      if(cloudData && cloudData.data) {
-                         // Simple merge strategy: Cloud wins. In a real app, use complex merge.
-                         // For this lightweight ERP, replacing state ensures everyone sees the same.
-                         // WARNING: This overwrites local unsaved inputs if typing during poll.
-                         // To fix, we only update if data is different and we aren't editing.
-                         // For now, let's trust the cloud.
                          setDB(cloudData.data);
                      }
                      setSyncing(false);
@@ -1905,14 +1975,12 @@
             }, []);
 
             const updateDB = (newDataOrFn) => { 
-                // Handle functional updates for state
                 let newData;
                 if (typeof newDataOrFn === 'function') {
                     newData = newDataOrFn(db);
                 } else {
                     newData = newDataOrFn;
                 }
-                
                 setDB(newData); 
                 localStorage.setItem('emi_v76_db', JSON.stringify(newData));
                 saveCloudDB(newData);
@@ -1920,14 +1988,12 @@
             
             useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
             
-            // MAGIC LINK CHECK
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
-                if (params.get('menu') === 'true') {
-                     requestPermissions();
-                     setUser({role:'cliente', name:'Invitado Web'});
-                     // Clean URL
-                     window.history.replaceState({}, document.title, "/");
+                if (params.get('menu') === 'true' || params.get('take_order')) {
+                      requestPermissions();
+                      setUser({role:'cliente', name:'Invitado Web'});
+                      window.history.replaceState({}, document.title, "/");
                 }
             }, []);
 
@@ -1948,19 +2014,19 @@
                 if(found) setUser(found); else showToast("Credenciales incorrectas");
             };
 
-            const resetApp = () => {
-                if(confirm("¿RESET DE FÁBRICA? Se borrarán todos los datos.")) {
+            const resetApp = async () => {
+                if(confirm("¿RESET DE FÁBRICA TOTAL? Se borrarán todos los datos de la nube y locales.")) {
                     localStorage.removeItem('emi_v76_db');
-                    // Reset cloud DB too
-                    saveCloudDB(initialDB);
+                    await saveCloudDB(initialDB);
                     window.location.reload();
                 }
             };
 
             if(!user) return (
                 <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
-                    <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
-                    <div className="card p-8 w-full max-w-sm text-center bg-[var(--bg-card)]">
+                    <div className="absolute inset-0 z-0" style={{backgroundImage: `url(${BANNER_URL})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.4)'}}></div>
+                    <button onClick={toggleTheme} className="theme-toggle z-10">{theme==='dark'?'☀️':'🌛'}</button>
+                    <div className="card p-8 w-full max-w-sm text-center bg-[var(--bg-card)] z-10 shadow-2xl">
                         <img src={LOGO_URL} className="w-32 mx-auto mb-6" onError={(e) => e.target.style.display='none'} />
                         <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI Burgers</h1>
                         <input className="input-std text-center mb-2" placeholder="Usuario" value={loginData.u} onChange={e=>setLoginData({...loginData, u:e.target.value})}/>
@@ -1972,18 +2038,13 @@
 
             return (
                 <div className={`h-screen w-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] ${theme}`}>
-                    
-                    {/* Sync Indicator */}
                     <div className={`sync-icon ${syncing ? 'syncing' : ''}`}><Cloud size={16}/></div>
-
-                    {/* Invisible Logout Trigger */}
                     <div className="logout-ghost">
                         <button onClick={()=>setUser(null)} className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold shadow-lg">SALIR</button>
                     </div>
 
                     <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
                     
-                    {/* Share Button for Admin/POS Global (Hidden for Clients) */}
                     {user.role!=='cajero' && user.role!=='cliente' && <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>}
 
                     {user.role==='admin' && <AdminPanel db={db} updateDB={updateDB}/>}
