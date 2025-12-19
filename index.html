@@ -1848,7 +1848,7 @@
 
             const resetApp = () => {
                 if(confirm("¿RESET DE FÁBRICA? Se borrarán todos los datos.")) {
-                    localStorage.removeItem('emi_v71_db');
+                    localStorage.removeItem('main_config');
                     // Reset cloud DB too
                     saveCloudDB(initialDB);
                     window.location.reload();
