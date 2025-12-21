@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMI BURGERS - ERP V77 REALTIME</title>
+    <title>EMI BURGERS - ERP V77 FINAL</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
@@ -77,13 +77,17 @@
         }
         @keyframes gps-pulse { 0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; } 100% { transform: translate(-50%, -50%) scale(3); opacity: 0; } }
 
+        /* Client Burger Pulse */
+        .client-burger-pin { font-size: 24px; text-align: center; animation: client-pulse 2s infinite; cursor: pointer; }
+        @keyframes client-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
         .theme-toggle { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: var(--bg-card); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; }
         .gods-eye { position: fixed; bottom: 150px; left: 20px; z-index: 9999; transition: all 0.3s; opacity: 0.4; transform: scale(0.8); }
         .gods-eye:hover, .gods-eye.active { opacity: 1; transform: scale(1); }
-        .gods-menu { position: absolute; bottom: 70px; left: 0; width: 200px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
+        .gods-menu { position: absolute; bottom: 70px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .bill-btn { width: 100%; height: 70px; background-size: 100% 100%; background-repeat: no-repeat; background-position: center; border-radius: 8px; border: 1px solid #444; cursor: pointer; transition: transform 0.1s; background-color: #333; }
+        .bill-btn { width: 100%; height: 70px; background-size: 100% 100%; background-repeat: no-repeat; background-position: center; border-radius: 8px; border: 1px solid #444; cursor: pointer; transition: transform 0.1s; background-color: var(--input-bg); }
         .bill-btn:active { transform: scale(0.95); filter: brightness(1.2); }
         
         .grid-cockpit { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 1.5rem; height: 100%; }
@@ -97,18 +101,18 @@
         .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
         
         .client-promo-video {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 120px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: auto; max-height: 120px;
             z-index: 50; pointer-events: none; overflow: hidden;
             mask-image: linear-gradient(to top, black 60%, transparent 100%);
             transition: bottom 0.3s ease;
+            display: flex; justify-content: center;
         }
         .client-promo-video.shifted { bottom: 90px; }
-        .client-promo-video video { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+        .client-promo-video video { width: 100%; height: 100%; object-fit: contain; opacity: 0.8; }
 
         .share-btn { position: fixed; top: 30%; right: 0; transform: translateY(-50%); background: var(--gold); border-radius: 20px 0 0 20px; padding: 12px; z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3); transition: all 0.3s; opacity: 0.5; }
         .share-btn:hover, .share-btn:active { opacity: 1; transform: translateY(-50%) scale(1.1); }
         
-        /* Floating Map Button for Dashboard (Punto 1) */
         .dash-map-btn { position: fixed; top: 15%; right: 0; transform: translateY(-50%); background: #2563eb; border-radius: 20px 0 0 20px; padding: 12px; z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3); transition: all 0.3s; opacity: 0.8; color: white; font-weight: bold; display: flex; align-items: center; gap: 5px; }
         .dash-map-btn:hover { opacity: 1; padding-right: 20px; }
 
@@ -120,7 +124,7 @@
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 
         .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-track { background: #111; }
+        .custom-scroll::-webkit-scrollbar-track { background: var(--bg-card); }
         .custom-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
         .logout-ghost { position: fixed; top: 0; right: 0; padding: 20px; z-index: 9999; opacity: 0; transition: opacity 0.2s; }
         .logout-ghost:hover, .logout-ghost:active { opacity: 1; }
@@ -140,6 +144,40 @@
         .sync-icon { position: fixed; bottom: 20px; left: 80px; z-index: 9999; color: var(--text-main); font-size: 10px; opacity: 0.5; }
         .syncing { animation: spin 1s infinite linear; opacity: 1; color: var(--gold); }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .pulse-input { border-color: var(--accent) !important; animation: border-pulse 2s infinite; }
+        @keyframes border-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 69, 0, 0.4); } 70% { box-shadow: 0 0 0 5px rgba(255, 69, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 69, 0, 0); } }
+        
+        .wa-float-btn {
+            position: fixed; bottom: 100px; right: 20px; z-index: 2000;
+            background-color: #25D366; color: white;
+            border-radius: 50%; padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            animation: bounceIn 0.5s;
+        }
+        @keyframes bounceIn { from { transform: scale(0); } to { transform: scale(1); } }
+        
+        /* Stepper Styles for Client Track */
+        .stepper-container { display: flex; justify-content: space-between; position: relative; margin-top: 20px; margin-bottom: 20px; }
+        .stepper-line { position: absolute; top: 15px; left: 0; width: 100%; height: 4px; background: #333; z-index: 0; }
+        .stepper-line-fill { position: absolute; top: 15px; left: 0; height: 4px; background: var(--gold); z-index: 0; transition: width 0.5s ease; }
+        .step-item { z-index: 1; display: flex; flex-direction: column; align-items: center; width: 25%; text-align: center; }
+        .step-circle { width: 34px; height: 34px; border-radius: 50%; background: #333; border: 2px solid #555; display: flex; align-items: center; justify-content: center; color: #777; transition: all 0.3s; font-size: 14px; }
+        .step-item.active .step-circle { background: var(--gold); border-color: var(--gold); color: black; box-shadow: 0 0 10px var(--gold); transform: scale(1.1); }
+        .step-item.completed .step-circle { background: var(--gold); border-color: var(--gold); color: black; }
+        .step-label { margin-top: 8px; font-size: 10px; font-weight: bold; color: #777; transition: color 0.3s; }
+        .step-item.active .step-label, .step-item.completed .step-label { color: white; }
+        
+        /* Driver Bottom Nav */
+        .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
+        .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #777; background: none; border: none; font-size: 10px; font-weight: bold; }
+        .driver-nav-btn.active { color: var(--gold); }
+        .driver-nav-btn svg { margin-bottom: 5px; }
+
+        /* Animation for Waiting Confirmation */
+        @keyframes pulse-logo { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .pulse-logo-anim { animation: pulse-logo 2s infinite; }
     </style>
 </head>
 <body class="dark">
@@ -151,7 +189,8 @@
             Smartphone, User, QrCode, Clock, CheckCircle, AlertTriangle, FileText, Settings, Menu as MenuIcon, X, 
             Save, Trash2, ShoppingBag, Camera, Users, BarChart3, Bell, Ticket, TrendingUp, Lock, Eye, Send, Map, Navigation, 
             Wallet, Receipt, ArrowRight, Banknote, Power, Wifi, WifiOff, RefreshCw, Crosshair, Home, UserCheck, Calendar, Globe, QrCode as QRIcon,
-            Package, Percent, Edit, Phone, Table, ArrowLeft, MessageCircle, Sun, Moon, Video, Copy, ClipboardList, PieChart, Link as LinkIcon, PenTool, Share2, MoreVertical, Download, Cloud, Info
+            Package, Percent, Edit, Phone, Table, ArrowLeft, MessageCircle, Sun, Moon, Video, Copy, ClipboardList, PieChart, Link as LinkIcon, PenTool, Share2, MoreVertical, Download, Cloud, Info, Image, Ban, EyeOff,
+            ChefHat, Bike, History
         } from 'https://esm.sh/lucide-react@0.344.0';
 
         const React = window.React;
@@ -161,6 +200,7 @@
         const STORE_COORDS = [27.446895, -109.943874]; 
         const CITY_SUFFIX = ", Ciudad Obregón, Sonora, Mexico";
         const SUPER_USER_PASS = "OBR1995@";
+        const STORE_PHONE = "526442345678"; // Placeholder for WhatsApp
         
         const LOGO_URL = "./LOGO_1.png";
         const BANNER_URL = "./BANNER_MENU.jpg"; 
@@ -206,9 +246,13 @@
         const fetchCloudDB = async () => {
             try {
                 const res = await fetch(`${API_URL}?action=read&id=${DB_ID}`);
+                if (!res.ok) throw new Error("Network response was not ok");
                 const json = await res.json();
                 return json && json.id ? json : null;
-            } catch (e) { console.error("Read Error", e); return null; }
+            } catch (e) { 
+                console.error("Read Error", e); 
+                return null; 
+            }
         };
 
         const saveCloudDB = async (db) => {
@@ -235,9 +279,7 @@
 
         const initialDB = {
             products: [], 
-            users: [
-                { id: 'u1', name: 'Admin', username: 'admin', password: '123', role: 'admin', salary: 0, schedule: {}, attendance: [] },
-            ],
+            users: [], 
             orders: [],
             coupons: [],
             supplies: [],
@@ -284,39 +326,55 @@
         const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route, radius, onMarkerClick }) => {
             const mapRef = useRef(null);
             const containerRef = useRef(null);
+            const mapInstance = useRef(null);
 
             useEffect(() => {
                 if (!containerRef.current) return;
                 
-                if (!mapRef.current) {
-                    mapRef.current = L.map(containerRef.current, { zoomControl: false }).setView(center, zoom);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapRef.current);
-                    if(onClickMap) mapRef.current.on('click', (e) => onClickMap([e.latlng.lat, e.latlng.lng]));
-                } else { 
-                    mapRef.current.setView(center, zoom); 
-                    setTimeout(() => mapRef.current.invalidateSize(), 100);
+                if (!mapInstance.current) {
+                    mapInstance.current = L.map(containerRef.current, { zoomControl: false }).setView(center, zoom);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapInstance.current);
+                    if(onClickMap) mapInstance.current.on('click', (e) => onClickMap([e.latlng.lat, e.latlng.lng]));
+                } else {
+                     const currentCenter = mapInstance.current.getCenter();
+                     const dist = Math.sqrt(Math.pow(currentCenter.lat - center[0], 2) + Math.pow(currentCenter.lng - center[1], 2));
+                     // Only re-center if distance is significant to avoid jitter
+                     if (dist > 0.001) { 
+                         mapInstance.current.setView(center, zoom); 
+                     }
+                     setTimeout(() => mapInstance.current.invalidateSize(), 100);
                 }
 
-                mapRef.current.eachLayer(layer => {
-                    if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline) mapRef.current.removeLayer(layer);
+                mapInstance.current.eachLayer(layer => {
+                    if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline) mapInstance.current.removeLayer(layer);
                 });
 
                 if (radius) {
-                    L.circle(STORE_COORDS, { color: 'red', fillColor: '#f03', fillOpacity: 0.1, radius: radius * 1000 }).addTo(mapRef.current);
+                    L.circle(STORE_COORDS, { color: 'red', fillColor: '#f03', fillOpacity: 0.1, radius: radius * 1000 }).addTo(mapInstance.current);
                 }
 
                 if(showHeatmap) {
-                       markers.forEach((m) => {
-                           L.circle(m.pos, { color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 300, stroke: false }).addTo(mapRef.current);
+                        markers.forEach((m) => {
+                           if (!m.isStore) {
+                               L.circle(m.pos, { color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 300, stroke: false }).addTo(mapInstance.current);
+                           }
                        });
                 } else {
                     markers.forEach((m) => {
                         const el = document.createElement('div');
                         if (m.isMyLoc) {
                             el.className = 'gps-pulse-marker';
+                        } else if(m.isClient) { 
+                            el.className = 'client-burger-pin';
+                            el.innerHTML = '🍔';
                         } else {
                             el.className = m.type === 'driver' ? 'driver-pin' : 'custom-pin';
-                            el.innerHTML = m.emoji || '📍';
+                            if(m.isLogo || m.isStore) { 
+                                el.className = 'custom-pin';
+                                el.innerHTML = `<img src="${LOGO_URL}" style="width:40px;height:40px;border-radius:50%;border:2px solid gold;">`;
+                            } else {
+                                el.innerHTML = m.emoji || '📍';
+                            }
                         }
                         if(m.label && !m.isMyLoc) {
                              const lbl = document.createElement('div');
@@ -325,7 +383,7 @@
                              el.appendChild(lbl);
                         }
                         const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: m.isMyLoc ? [20,20] : (m.type==='driver'?[36,36]:[40,40]), iconAnchor: m.isMyLoc ? [10,10] : [20,20] });
-                        const marker = L.marker(m.pos, { icon }).addTo(mapRef.current);
+                        const marker = L.marker(m.pos, { icon }).addTo(mapInstance.current);
                         if(m.popup) marker.bindPopup(m.popup);
                         if(m.data) {
                             marker.on('click', () => { if(typeof onMarkerClick === 'function') onMarkerClick(m.data) });
@@ -334,9 +392,9 @@
                 }
 
                 if(route && route.length === 2) {
-                    L.polyline(route, {color: 'blue', weight: 4, dashArray: '10, 10'}).addTo(mapRef.current);
+                    L.polyline(route, {color: 'blue', weight: 4, dashArray: '10, 10'}).addTo(mapInstance.current);
                 }
-            }, [center, markers, showHeatmap, zoom, radius]); 
+            }, [center, markers, showHeatmap, radius]); 
 
             return <div ref={containerRef} className="h-full w-full rounded-lg bg-gray-200 border border-gray-300 z-0"></div>;
         };
@@ -355,7 +413,7 @@
             const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
             
             const liveMarkers = [
-                { pos: STORE_COORDS, emoji: '🏪' },
+                { pos: STORE_COORDS, emoji: '🏪', isStore: true },
                 ...activeOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', popup: `Pedido #${o.orderNum}` })),
                 ...drivers.map(d => ({ pos: d.location || STORE_COORDS, emoji: '🏍️', label: d.name, type: 'driver' }))
             ];
@@ -400,17 +458,22 @@
             const topProducts = actualTopProducts.length > 0 ? actualTopProducts : [['Producto 1', 0], ['Producto 2', 0], ['Producto 3', 0]];
             const maxProdVal = actualTopProducts.length > 0 ? actualTopProducts[0][1] : 1;
 
-            const handleMapClick = () => {
-                if (actualTopProducts.length > 0) {
-                    setSelectedZone({ name: "Zona Centro", topItem: actualTopProducts[0][0] });
-                    setTimeout(() => setSelectedZone(null), 3000);
+            const handleMapClick = (markerData) => {
+                 if (markerData && markerData.isStore) {
+                      // Do nothing for store
+                 } else if (actualTopProducts.length > 0) {
+                    const topItem = actualTopProducts[0][0];
+                    const topQty = actualTopProducts[0][1];
+                    showToast(`Zona Caliente: ${topItem} (${topQty} ventas)`);
+                    setSelectedZone({ name: "Zona Centro", topItem: topItem, summary: `${topItem} lidera con ${topQty} unidades` });
+                    setTimeout(() => setSelectedZone(null), 5000);
                 } else {
                     showToast("Sin datos de ventas para mostrar zonas.");
                 }
             };
             
             const hotZoneMarkers = [
-                { pos: STORE_COORDS, emoji: '🏪', popup: 'Tienda' },
+                { pos: STORE_COORDS, emoji: '🏪', popup: 'Tienda', isStore: true, data: {isStore: true} }, 
                 ...db.orders.filter(o=>o.clientLoc).map(o=>({pos:o.clientLoc}))
             ];
 
@@ -434,7 +497,6 @@
 
             return (
                 <div className="space-y-6 animate-in fade-in pb-20 overflow-y-auto h-full">
-                    {/* Punto 1: Botón Flotante para Rastreo */}
                     <button className="dash-map-btn" onClick={()=>setViewMap(true)}><Map size={24}/> RASTREO</button>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -464,9 +526,12 @@
                         </div>
                         <div className="card p-6 relative h-96 md:h-auto min-h-[300px]">
                             <h3 className="font-bold text-[var(--text-main)] mb-4 flex items-center gap-2"><Map size={20}/> Zonas Calientes</h3>
-                            <div className="h-full rounded border border-[var(--border)] relative overflow-hidden mb-2 cursor-pointer" onClick={handleMapClick}>
-                                <LeafletMap center={STORE_COORDS} markers={hotZoneMarkers} showHeatmap={true} zoom={12}/>
-                                {selectedZone && <div className="absolute bottom-4 left-4 bg-black/80 text-white p-2 rounded z-[500] animate-bounce">🔥 {selectedZone.name}: Más vendido -> {selectedZone.topItem}</div>}
+                            <div className="h-full rounded border border-[var(--border)] relative overflow-hidden mb-2 cursor-pointer">
+                                <LeafletMap center={STORE_COORDS} markers={hotZoneMarkers} showHeatmap={true} zoom={12} onMarkerClick={handleMapClick}/>
+                                {selectedZone && <div className="absolute bottom-4 left-4 right-4 bg-black/90 text-white p-4 rounded z-[500] animate-in slide-in-from-bottom border border-[var(--gold)] text-center shadow-2xl">
+                                    <h4 className="font-bold text-[var(--gold)] text-lg mb-1">🔥 RESUMEN DE ZONA</h4>
+                                    <p className="text-sm">{selectedZone.summary}</p>
+                                </div>}
                             </div>
                         </div>
                     </div>
@@ -487,11 +552,11 @@
                                 <h3 className="font-bold text-[var(--text-main)] mb-4">Ventas por Canal</h3>
                                 {Object.keys(platformStats).length === 0 ? <p className="text-gray-500 text-sm">Sin datos</p> : Object.entries(platformStats).map(([key, val]) => (
                                      <div key={key} className="flex justify-between items-center py-2 border-b border-[var(--border)]">
-                                          <span className="text-[var(--text-main)]">{key}</span><span className="bg-[#222] px-2 rounded text-white text-xs">{val}</span>
+                                          <span className="text-[var(--text-main)]">{key}</span><span className="bg-[var(--input-bg)] px-2 rounded text-[var(--text-main)] text-xs">{val}</span>
                                      </div>
                                 ))}
                             </div>
-                            <div className="card p-6 border-l-4 border-red-500 cursor-pointer hover:bg-[#222]" onClick={()=>setShowMermas(true)}>
+                            <div className="card p-6 border-l-4 border-red-500 cursor-pointer hover:bg-[var(--input-bg)]" onClick={()=>setShowMermas(true)}>
                                 <h3 className="font-bold text-red-500 mb-2 flex items-center gap-2"><AlertTriangle size={16}/> Pérdidas / Caducados</h3>
                                 <div className="text-4xl font-black text-[var(--text-main)] mb-2">{expired.length}</div>
                             </div>
@@ -524,10 +589,9 @@
             );
         };
 
-        // --- ADMIN MANAGERS (Product, Inventory, Staff, etc) ---
         const ProductManager = ({ db, updateDB }) => {
             const [modal, setModal] = useState(null);
-            const [form, setForm] = useState({ name:'', price:'', cat:'', img:'', desc:'', ingredients:'' });
+            const [form, setForm] = useState({ name:'', price:0, cat:'', img:'', desc:'', ingredients:'', isComplement: false, active: true });
             
             const handleCSV = (e) => {
                 const f = e.target.files[0];
@@ -544,41 +608,85 @@
                     r.readAsText(f);
                 }
             };
+
+            const handleImageUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setForm({...form, img: reader.result});
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
             
             const save = () => {
                 let products = [...db.products];
                 if(form.id) products = products.map(p => p.id === form.id ? form : p);
-                else products.push({ ...form, id: generateId(), active: true });
+                else products.push({ ...form, id: generateId() });
                 updateDB({...db, products}); setModal(null);
             };
             
             const remove = (id) => { if(confirm("¿Eliminar?")) updateDB({...db, products: db.products.filter(p=>p.id!==id)}); };
-            
+            const toggleActive = (p) => { updateDB({...db, products: db.products.map(x=>x.id===p.id?{...x, active:!x.active}:x)}); };
+
+            const groupedProducts = useMemo(() => {
+                const groups = {};
+                db.products.forEach(p => {
+                    const cat = p.cat || 'Otros';
+                    if (!groups[cat]) groups[cat] = [];
+                    groups[cat].push(p);
+                });
+                return groups;
+            }, [db.products]);
+
             return (
-                <div className="space-y-4 overflow-y-auto h-full pb-20">
-                    <div className="flex gap-2">
-                        <button onClick={()=>{setForm({}); setModal(true);}} className="btn-gold z-10">NUEVO PRODUCTO</button>
+                <div className="space-y-6 overflow-y-auto h-full pb-20">
+                    <div className="flex gap-2 sticky top-0 bg-[var(--bg-body)] z-20 pb-2">
+                        <button onClick={()=>{setForm({name:'', price:0, cat:'', img:'', desc:'', ingredients:'', isComplement:false, active:true}); setModal(true);}} className="btn-gold z-10">NUEVO PRODUCTO</button>
                         <label className="btn-gold cursor-pointer bg-blue-600 text-white z-10">CARGAR CSV <input type="file" hidden onChange={handleCSV}/></label>
                         <button onClick={()=>{
                              const csv = "Nombre,Precio,Categoria,Descripcion,Imagen\nHamburguesa,100,Burgers,Rica,url";
                              const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv); a.download='plantilla.csv'; a.click();
                         }} className="btn-gold bg-green-600 text-white z-10">PLANTILLA</button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {db.products.map(p => (
-                            <div key={p.id} className="card p-3 flex gap-3 items-center group">
-                                <img src={p.img} className="w-16 h-16 rounded object-cover"/>
-                                <div className="flex-1">
-                                    <p className="font-bold text-[var(--text-main)]">{p.name}</p>
-                                    <p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p>
-                                </div>
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition z-10">
-                                    <button onClick={()=>{setForm(p); setModal(true);}} className="bg-blue-600 text-white p-2 rounded"><Edit size={16}/></button>
-                                    <button onClick={()=>remove(p.id)} className="bg-red-600 text-white p-2 rounded"><Trash2 size={16}/></button>
-                                </div>
+                    
+                    {Object.entries(groupedProducts).map(([cat, prods]) => (
+                        <div key={cat} className="mb-6">
+                            <h3 className="text-2xl font-bold text-[var(--gold)] mb-3 border-b border-[var(--border)]">{cat}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {prods.map(p => (
+                                    <div key={p.id} className={`card p-3 flex gap-3 items-center group ${!p.active ? 'opacity-50' : ''}`}>
+                                            <img src={p.img} className="w-16 h-16 rounded object-cover"/>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-[var(--text-main)]">{p.name}</p>
+                                                <p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p>
+                                                {p.isComplement && <span className="text-[10px] bg-blue-900 text-blue-200 px-1 rounded">Complemento</span>}
+                                            </div>
+                                            <div className="flex gap-2 z-10">
+                                                <button onClick={()=>toggleActive(p)} className={`p-2 rounded ${p.active?'text-green-500':'text-red-500'}`}>{p.active?<Eye size={16}/>:<EyeOff size={16}/>}</button>
+                                                <button onClick={()=>{
+                                                    setForm({
+                                                        id: p.id,
+                                                        name: p.name || '', 
+                                                        price: p.price || 0,
+                                                        cat: p.cat || '',
+                                                        img: p.img || '',
+                                                        desc: p.desc || '',
+                                                        ingredients: p.ingredients || '',
+                                                        isComplement: p.isComplement || false,
+                                                        active: p.active !== undefined ? p.active : true
+                                                    }); 
+                                                    setModal(true);
+                                                }} className="text-blue-500 p-2 rounded"><Edit size={16}/></button>
+                                                <button onClick={()=>remove(p.id)} className="text-red-600 p-2 rounded"><Trash2 size={16}/></button>
+                                            </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
+
                     {modal && (
                         <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
                             <div className="card w-full max-w-lg bg-[var(--bg-card)] p-6">
@@ -587,7 +695,14 @@
                                     <input className="input-std" placeholder="Nombre" value={form.name||''} onChange={e=>setForm({...form,name:e.target.value})}/>
                                     <input className="input-std" type="number" placeholder="Precio" value={form.price||''} onChange={e=>setForm({...form,price:parseFloat(e.target.value)})}/>
                                     <input className="input-std" placeholder="Categoría" value={form.cat||''} onChange={e=>setForm({...form,cat:e.target.value})}/>
-                                    <input className="input-std" placeholder="URL Imagen" value={form.img||''} onChange={e=>setForm({...form,img:e.target.value})}/>
+                                    <div className="flex gap-1">
+                                        <input className="input-std" placeholder="URL Imagen" value={form.img||''} onChange={e=>setForm({...form,img:e.target.value})}/>
+                                        <label className="btn-gold cursor-pointer flex items-center justify-center"><Image size={16}/><input type="file" hidden accept="image/*" onChange={handleImageUpload}/></label>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <input type="checkbox" checked={form.isComplement} onChange={e=>setForm({...form, isComplement:e.target.checked})}/>
+                                    <span className="text-[var(--text-main)] text-sm">¿Es un complemento? (Aparecerá al pagar)</span>
                                 </div>
                                 <input className="input-std mb-2" placeholder="Ingredientes (Separa por comas)" value={form.ingredients||''} onChange={e=>setForm({...form,ingredients:e.target.value})}/>
                                 <textarea className="input-std mb-4" placeholder="Descripción" value={form.desc||''} onChange={e=>setForm({...form,desc:e.target.value})}/>
@@ -756,16 +871,16 @@
                                   <div className="mb-4 bg-[#222] p-2 rounded">
                                       <p className="text-xs font-bold mb-1 text-white">Editar Último Registro (Admin)</p>
                                       <div className="flex gap-2">
-                                           <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 ? new Date(editing.attendance[editing.attendance.length-1].in).toISOString().slice(0,16) : ''} onChange={(e)=>{
-                                               const newAtt = [...(editing.attendance || [])];
-                                               if(newAtt.length > 0) newAtt[newAtt.length-1].in = new Date(e.target.value).toISOString();
-                                               setEditing({...editing, attendance: newAtt});
-                                           }}/>
-                                           <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 && editing.attendance[editing.attendance.length-1].out ? new Date(editing.attendance[editing.attendance.length-1].out).toISOString().slice(0,16) : ''} onChange={(e)=>{
-                                               const newAtt = [...(editing.attendance || [])];
-                                               if(newAtt.length > 0) newAtt[newAtt.length-1].out = new Date(e.target.value).toISOString();
-                                               setEditing({...editing, attendance: newAtt});
-                                           }}/>
+                                            <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 ? new Date(editing.attendance[editing.attendance.length-1].in).toISOString().slice(0,16) : ''} onChange={(e)=>{
+                                                const newAtt = [...(editing.attendance || [])];
+                                                if(newAtt.length > 0) newAtt[newAtt.length-1].in = new Date(e.target.value).toISOString();
+                                                setEditing({...editing, attendance: newAtt});
+                                            }}/>
+                                            <input type="datetime-local" className="input-std text-xs" value={(editing.attendance || []).length > 0 && editing.attendance[editing.attendance.length-1].out ? new Date(editing.attendance[editing.attendance.length-1].out).toISOString().slice(0,16) : ''} onChange={(e)=>{
+                                                const newAtt = [...(editing.attendance || [])];
+                                                if(newAtt.length > 0) newAtt[newAtt.length-1].out = new Date(e.target.value).toISOString();
+                                                setEditing({...editing, attendance: newAtt});
+                                            }}/>
                                       </div>
                                   </div>
 
@@ -866,8 +981,8 @@
                                 <span className="text-white text-sm">Radio: {db.settings.deliveryRadius} KM</span>
                                 <input type="range" min="1" max="50" value={db.settings.deliveryRadius} onChange={(e)=>updateRadius(e.target.value)} className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-[var(--gold)]"/>
                             </div>
-                            <div className="h-40 rounded border border-gray-600 overflow-hidden">
-                                <LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, emoji:'🏪'}]} zoom={11} radius={db.settings.deliveryRadius} />
+                            <div className="h-40 rounded border border-gray-600 overflow-hidden h-80">
+                                <LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, emoji:'🏪', isStore:true}]} zoom={11} radius={db.settings.deliveryRadius} />
                             </div>
                         </div>
                     </div>
@@ -906,7 +1021,7 @@
             const saveConfig = () => { updateDB({...db, settings: {...db.settings, ticketConfig: { header, footer }}}); showToast("Guardado"); };
             
             const generateHTML = (type) => {
-                 const base = `<div class="center bold">${header.replace(/\n/g, '<br>')}</div><hr>`;
+                 const base = `<div class="center bold"><img src="${LOGO_URL}" style="width:50px;display:block;margin:0 auto 10px;">${header.replace(/\n/g, '<br>')}</div><hr>`;
                 const end = `<hr><div class="center">${footer.replace(/\n/g, '<br>')}</div>`;
                 const date = new Date().toLocaleString();
                 if(type === 'sale') return `${base}<div class="center">VENTA #1234</div><div class="center">${date}</div><hr><div>1x Burger Clásica ... $95</div><div>1x Papas ........... $55</div><hr><div class="bold right">TOTAL: $150</div>${end}`;
@@ -967,7 +1082,7 @@
         const POS = ({ db, updateDB, user }) => {
             const [cart, setCart] = useState([]);
             const [modal, setModal] = useState(null); 
-            const [catFilter, setCatFilter] = useState('All');
+            const [catFilter, setCatFilter] = useState('Todos');
             const [orderType, setOrderType] = useState('takeaway'); 
             const [orderDetails, setOrderDetails] = useState({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
             const [payMethod, setPayMethod] = useState('cash');
@@ -981,20 +1096,30 @@
             const [bottomMenuOpen, setBottomMenuOpen] = useState(false);
             const [liquidationModal, setLiquidationModal] = useState(false);
             const [corteModal, setCorteModal] = useState(false);
+            const [retiroModal, setRetiroModal] = useState(false);
             const [driverToLiq, setDriverToLiq] = useState(null);
             const [liqSummary, setLiqSummary] = useState(null);
             const [newExpense, setNewExpense] = useState({desc:'', amount:''});
             const [suggestions, setSuggestions] = useState([]);
             const [manualDriverId, setManualDriverId] = useState('');
             const [viewMap, setViewMap] = useState(false); 
+            const [viewReadyOrders, setViewReadyOrders] = useState(false); 
+            const [ingredientsProduct, setIngredientsProduct] = useState(null);
+            
+            // Blind Cut States
+            const [countedCash, setCountedCash] = useState('');
+            const [countedCard, setCountedCard] = useState('');
+            const [cutResult, setCutResult] = useState(null);
 
-            // FIX PUNTO 3: Ingredientes Toggle
             const showIngredients = (p) => {
-                alert(p.ingredients || "Sin ingredientes especificados.");
+                setIngredientsProduct(p);
             };
+            
+            const uniqueCategories = ['Todos', ...new Set(db.products.filter(p=>p.active).map(p => p.cat).filter(Boolean))];
 
             const webOrders = db.orders.filter(o => o.source === 'web' && o.status === 'web_pending_payment');
-            
+            const readyOrders = db.orders.filter(o => o.status === 'ready' && o.address !== 'RECOGER');
+
             const activeOrders = db.orders.filter(o => o.status === 'delivering' || o.status === 'pending');
             const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
             const liveMarkers = [
@@ -1005,11 +1130,32 @@
 
             const handleWebOrder = (order) => {
                 setCart(order.items);
-                setOrderDetails({name: order.clientName, phone: '', address: order.address, references: '', refs: ''});
+                setOrderDetails({
+                    name: order.clientName, 
+                    phone: order.clientPhone || '', 
+                    address: order.address.split('(')[0].trim(), 
+                    references: order.address.split('(')[1]?.replace(')', '') || '', 
+                    table: '', platform: '', platformOrderId: '', refs: ''
+                });
                 setOrderType(order.address === 'RECOGER' ? 'takeaway' : 'delivery');
                 setDeliveryCoords(order.clientLoc);
                 setModal('cockpit');
-                updateDB({...db, orders: db.orders.filter(o=>o.id!==order.id)});
+                updateDB({...db, orders: db.orders.filter(o=>o.id!==order.id)}); 
+            };
+            
+            const cancelWebOrder = (id) => { 
+                const order = db.orders.find(o => o.id === id);
+                if (!order) return;
+                
+                if (user.role !== 'admin' && user.role !== 'superadmin' && !user.superUser) {
+                    if (order.status !== 'pending' && order.status !== 'web_pending_payment') {
+                        showToast("Solo Admin puede cancelar pedidos en proceso");
+                        return;
+                    }
+                }
+
+                updateDB({...db, orders: db.orders.map(o => o.id === id ? {...o, status: 'cancelled'} : o)});
+                showToast("Pedido Cancelado");
             };
 
             const deliveryFee = useMemo(() => {
@@ -1109,14 +1255,19 @@
             
             const confirmLiquidation = () => {
                 if(!driverToLiq || !liqSummary) return;
+                
+                const paymentToDrawer = liqSummary.netToPay;
+
                 updateDB({
                     ...db,
                     users: db.users.map(u => u.id === driverToLiq.id ? {...u, cashOnHand: 0} : u),
-                    orders: db.orders.map(o => liqSummary.deliveredOrders.find(do_ => do_.id === o.id) ? {...o, settled: true} : o)
+                    orders: db.orders.map(o => liqSummary.deliveredOrders.find(do_ => do_.id === o.id) ? {...o, settled: true} : o),
+                    cashDrawer: {...db.cashDrawer, current: db.cashDrawer.current + paymentToDrawer}
                 });
-                const ticket = `<div class="center bold">LIQUIDACIÓN REPARTIDOR</div><div class="center">${driverToLiq.name}</div><hr><div>Entregas: ${liqSummary.deliveredOrders.length}</div><div>Total Cobrado: ${formatCurrency(liqSummary.totalCash)}</div><div>Ganancia Envíos: -${formatCurrency(liqSummary.totalEarnings)}</div><hr><div class="bold right">ENTREGÓ: ${formatCurrency(liqSummary.netToPay)}</div><br><br><div class="center">_______________________<br>Firma</div>`;
+                
+                const ticket = `<div class="center bold"><img src="${LOGO_URL}" style="width:50px;display:block;margin:0 auto;">LIQUIDACIÓN REPARTIDOR</div><div class="center">${driverToLiq.name}</div><hr><div>Entregas: ${liqSummary.deliveredOrders.length}</div><div>Total Cobrado: ${formatCurrency(liqSummary.totalCash)}</div><div>Ganancia Envíos: -${formatCurrency(liqSummary.totalEarnings)}</div><hr><div class="bold right">ENTREGÓ: ${formatCurrency(liqSummary.netToPay)}</div><br><br><div class="center">_______________________<br>Firma</div>`;
                 printTicket(ticket);
-                showToast("Liquidación Exitosa.");
+                showToast("Liquidación Exitosa. Efectivo añadido a caja.");
                 setLiquidationModal(false); setDriverToLiq(null);
             };
 
@@ -1130,19 +1281,43 @@
                 });
                 setNewExpense({desc:'', amount:''});
                 showToast("Retiro Registrado");
+                setRetiroModal(false);
             };
             
-            const printCut = () => {
-                const initial = db.cashDrawer.initial || 0;
-                const salesCash = db.orders.filter(o => o.method === 'cash').reduce((a,b) => a + b.total, 0);
-                const withdrawals = db.expenses.reduce((a,b) => a + b.amount, 0);
-                const final = initial + salesCash - withdrawals;
+            const performBlindCut = () => {
+                const cCash = parseFloat(countedCash) || 0;
+                const cCard = parseFloat(countedCard) || 0;
                 
-                const ticket = `<div class="center bold">CORTE DE CAJA (Z)</div><div class="center">${new Date().toLocaleString()}</div><hr>
-                <div>Fondo Inicial: ${formatCurrency(initial)}</div>
-                <div>+ Ventas Efectivo: ${formatCurrency(salesCash)}</div>
-                <div>- Retiros/Gastos: -${formatCurrency(withdrawals)}</div>
-                <hr><div class="bold right">TOTAL EN CAJA: ${formatCurrency(final)}</div>
+                const systemCash = db.cashDrawer.current;
+                const systemCard = db.orders.filter(o => o.method === 'card' && o.status !== 'cancelled').reduce((a,b)=>a+b.total,0);
+                
+                const diffCash = systemCash - cCash; 
+                const diffCard = systemCard - cCard;
+                
+                let missingOrder = null;
+                const diffAbs = Math.abs(diffCash);
+                if (diffAbs > 0) {
+                    missingOrder = db.orders.find(o => Math.abs(o.total - diffAbs) < 1); 
+                }
+
+                setCutResult({
+                    systemCash, systemCard,
+                    cCash, cCard,
+                    diffCash, diffCard,
+                    missingOrder
+                });
+            };
+
+            const printBlindCut = () => {
+                 const ticket = `<div class="center bold"><img src="${LOGO_URL}" style="width:50px;display:block;margin:0 auto;">CORTE DE CAJA (Z)</div><div class="center">${new Date().toLocaleString()}</div><hr>
+                <div>EFECTIVO REPORTADO: ${formatCurrency(parseFloat(countedCash)||0)}</div>
+                <div>TARJETA REPORTADO: ${formatCurrency(parseFloat(countedCard)||0)}</div>
+                <hr>
+                <div>SISTEMA EFECTIVO: ${formatCurrency(cutResult.systemCash)}</div>
+                <div>SISTEMA TARJETA: ${formatCurrency(cutResult.systemCard)}</div>
+                <hr>
+                <div class="bold right">DIFERENCIA: ${formatCurrency((parseFloat(countedCash)||0) - cutResult.systemCash)}</div>
+                ${cutResult.missingOrder ? `<br><div class="center bold">POSIBLE FALTANTE:</div><div class="center">Orden #${cutResult.missingOrder.orderNum} - ${formatCurrency(cutResult.missingOrder.total)}</div>` : ''}
                 <br><br><div class="center">_______________________<br>Firma Cajera</div>`;
                 printTicket(ticket);
             };
@@ -1192,22 +1367,6 @@
                 }
 
                 updateDB({ ...db, orders: [...db.orders, order], cashDrawer: {...db.cashDrawer, current: newCashDrawer} });
-
-                const qrUrl = orderType === 'delivery' ? `${window.location.href}?take_order=${order.id}` : `ORDER:${order.id}`;
-                const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrUrl)}`;
-                const ticketBase = `<div class="center bold">${db.settings.ticketConfig.header.replace(/\n/g, '<br>')}</div><div class="center">Orden #${order.orderNum}</div><div class="center">${new Date().toLocaleString()}</div><hr>`;
-                const itemsList = order.items.map(i => `<div>${i.qty}x ${i.name} ... ${formatCurrency(i.price * i.qty)}</div>${i.note ? `<div class="italic text-xs">(${i.note})</div>` : ''}`).join('');
-                const ticketEnd = `<hr><div class="center">${db.settings.ticketConfig.footer.replace(/\n/g, '<br>')}</div><div class="center"><img src="${qrImg}" width="80"/></div>`;
-                
-                if(orderType === 'platform') {
-                    const driverTicket = `${ticketBase}<div class="center bold">COPIA RESTAURANTE</div><hr>${itemsList}<hr><div class="bold right">TOTAL: ${formatCurrency(total)}</div>${ticketEnd}`;
-                    const clientTicket = `${ticketBase}<div class="center">COPIA CLIENTE/DRIVER</div><hr>${order.items.map(i=>`<div>${i.qty}x ${i.name} ... $0.00</div>`).join('')}<hr><div class="bold right">TOTAL: $0.00</div><div class="center">PROPINAS NO INCLUIDAS</div>${ticketEnd}`;
-                    const combinedHTML = `${driverTicket}<br><br><div class="center">✂️ --- CORTE AQUÍ --- ✂️</div><br><br>${clientTicket}`;
-                    printTicket(combinedHTML);
-                } else {
-                    printTicket(`${ticketBase}${itemsList}<hr><div class="bold right">Envío: ${formatCurrency(deliveryFee)}</div><div class="bold right">TOTAL: ${formatCurrency(total)}</div>${ticketEnd}`);
-                }
-
                 setCart([]); setModal(null); setCashReceived(0); setVoucher(''); 
                 setOrderDetails({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
             };
@@ -1218,14 +1377,16 @@
                        setModal(null);
                        setLiquidationModal(false);
                        setCorteModal(false);
+                       setRetiroModal(false);
                        setViewMap(false);
                        setBottomMenuOpen(false);
+                       setViewReadyOrders(false);
                    }
                 };
                 window.addEventListener('keydown', handleEsc);
                 return () => window.removeEventListener('keydown', handleEsc);
             }, []);
-
+            
             if (viewMap) {
                 return (
                     <div className="h-full flex flex-col p-4 bg-[var(--bg-body)]">
@@ -1236,26 +1397,84 @@
                          <div className="flex-1 rounded border border-[var(--gold)] overflow-hidden">
                              <LeafletMap center={STORE_COORDS} markers={liveMarkers} zoom={13}/>
                          </div>
-                         <div className="mt-2 flex gap-4 text-sm text-gray-400">
-                             <span className="flex items-center gap-1">🍔 Pedidos Activos</span>
-                             <span className="flex items-center gap-1">🏍️ Repartidores</span>
-                         </div>
                     </div>
                 );
             }
 
-            return (
+            if (viewReadyOrders) {
+                return (
+                    <div className="h-full flex flex-col bg-[var(--bg-body)] p-4">
+                         <div className="flex justify-between items-center mb-4 border-b border-[#333] pb-2">
+                             <h2 className="text-2xl font-bold text-[var(--gold)]">GESTIÓN / ENTREGA</h2>
+                             <button onClick={()=>setViewReadyOrders(false)} className="text-gray-500">Volver a Caja</button>
+                         </div>
+                         <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {readyOrders.length === 0 ? <p className="text-gray-500 text-center col-span-full mt-10">No hay pedidos listos para entrega.</p> :
+                                readyOrders.map(o => (
+                                    <div key={o.id} className="card p-4 border-l-4 border-green-500 bg-[#222]">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div>
+                                                <h3 className="font-black text-xl text-white">#{o.orderNum}</h3>
+                                                <p className="text-sm text-gray-300 font-bold">{o.clientName}</p>
+                                            </div>
+                                            <span className="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">LISTO</span>
+                                        </div>
+                                        <div className="bg-white p-2 rounded mb-2 w-fit mx-auto">
+                                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`ORDER:${o.id}`)}`} className="w-32 h-32"/>
+                                        </div>
+                                        <div className="text-xs text-gray-400 mb-2">
+                                            <p>{o.address}</p>
+                                            <p>{o.clientPhone}</p>
+                                        </div>
+                                        <div className="text-right font-bold text-[var(--gold)] text-lg">{formatCurrency(o.total)}</div>
+                                        {o.source === 'web' && (
+                                            <div className="mt-2 pt-2 border-t border-[#444] text-xs text-gray-300">
+                                                <p className="font-bold">Detalles Web:</p>
+                                                {o.items.map((i, idx) => <p key={idx}>- {i.qty}x {i.name} {i.note ? `(${i.note})` : ''}</p>)}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            }
+                            {webOrders.length > 0 && <div className="col-span-full mt-4"><h3 className="text-white font-bold mb-2 text-xl border-b border-blue-500 pb-1">SOLICITUDES WEB PENDIENTES</h3></div>}
+                             {webOrders.map(o => (
+                                <div key={o.id} className="card p-4 border-l-4 border-blue-500 bg-[#1a1a2e]">
+                                     <div className="flex justify-between">
+                                         <div>
+                                              <p className="font-bold text-white">WEB #{o.orderNum}</p>
+                                              <p className="text-sm text-gray-400">{o.clientName}</p>
+                                         </div>
+                                         <p className="text-[var(--gold)] font-bold">{formatCurrency(o.total)}</p>
+                                     </div>
+                                     <div className="mt-2 text-xs text-gray-400 max-h-24 overflow-y-auto mb-2 bg-black/20 p-2 rounded">
+                                         {o.items.map((i,idx) => <div key={idx}>{i.qty}x {i.name}</div>)}
+                                         <div className="mt-1 text-[10px] text-yellow-500">📍 {o.address}</div>
+                                     </div>
+                                     <div className="flex gap-2 mt-2">
+                                         <button onClick={()=>cancelWebOrder(o.id)} className="flex-1 bg-red-900/50 text-red-500 border border-red-900 py-2 rounded text-xs font-bold">CANCELAR</button>
+                                         <button onClick={()=>{ handleWebOrder(o); setViewReadyOrders(false);}} className="flex-1 bg-blue-600 text-white py-2 rounded text-xs font-bold">PROCESAR</button>
+                                     </div>
+                                </div>
+                             ))}
+                         </div>
+                    </div>
+                );
+            }
+            
+             return (
                 <div className="h-full flex flex-col bg-[var(--bg-body)]">
                     <div className="flex bg-[var(--bg-card)] border-b border-[var(--border)]">
                         <button className="flex-1 p-3 font-bold bg-[var(--gold)] text-black">PUNTO DE VENTA</button>
-                        <button className={`flex-1 p-3 font-bold ${webOrders.length>0?'bg-blue-600 text-white animate-pulse':'text-gray-500'}`}>WEB ({webOrders.length})</button>
+                        <button onClick={()=>setViewReadyOrders(true)} className={`flex-1 p-3 font-bold ${readyOrders.length>0 || webOrders.length>0 ? 'bg-green-600 text-white animate-pulse' : 'text-gray-500'}`}>GESTIÓN / ENTREGA ({readyOrders.length}) {webOrders.length>0?`+ ${webOrders.length} WEB`:''}</button>
                     </div>
                     
                     <div className="flex-1 flex overflow-hidden">
                         <div className="flex-1 flex flex-col">
-                            <div className="p-2 border-b border-[var(--border)] flex gap-2">{['All', 'Burgers'].map(c=><button key={c} onClick={()=>setCatFilter(c)} className="px-4 py-1 rounded-full text-xs font-bold bg-[#222] text-white hover:bg-[var(--gold)] hover:text-black">{c}</button>)}</div>
+                            <div className="p-2 border-b border-[var(--border)] flex gap-2 overflow-x-auto">
+                                {uniqueCategories.map(c=><button key={c} onClick={()=>setCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${catFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-[#222] text-white'}`}>{c}</button>)}
+                            </div>
                             <div className="flex-1 p-4 grid grid-cols-5 gap-3 overflow-y-auto content-start">
-                                {db.products.map(p=>(
+                                {db.products.filter(p=>p.active && (catFilter==='Todos' || p.cat===catFilter)).map(p=>(
                                     <div key={p.id} onClick={()=>addToCart(p)} className="card h-28 relative overflow-hidden cursor-pointer group border-0 hover:ring-2 ring-[var(--gold)]">
                                         <img src={p.img} className="absolute inset-0 w-full h-full object-cover opacity-60"/>
                                         <div className="absolute top-1 right-1 z-20 bg-black/50 rounded-full p-1 hover:bg-[var(--gold)] hover:text-black text-white" onClick={(e)=>{e.stopPropagation(); showIngredients(p);}}><Info size={16}/></div>
@@ -1268,18 +1487,6 @@
                             </div>
                         </div>
                         <div className="w-96 bg-[var(--bg-card)] border-l border-[var(--border)] flex flex-col z-10 shadow-2xl relative">
-                            {webOrders.length > 0 && (
-                                <div className="absolute top-0 right-full mr-2 bg-blue-900 text-white p-4 rounded z-50 w-64 shadow-xl">
-                                    <h4 className="font-bold mb-2">Pedidos Web Pendientes</h4>
-                                    {webOrders.map(o=>(
-                                        <div key={o.id} className="bg-black/50 p-2 rounded mb-2 text-sm cursor-pointer hover:bg-black/80" onClick={()=>handleWebOrder(o)}>
-                                            <p className="font-bold">#{o.orderNum} - {o.clientName}</p>
-                                            <p className="text-xs">{o.address}</p>
-                                            <p className="text-[var(--gold)]">{formatCurrency(o.total)}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
                             <div className="flex-1 p-3 overflow-y-auto space-y-2">
                                 {cart.map((item,idx)=>(
                                     <div key={idx} className="bg-[#222] p-2 rounded border border-[#333] relative group">
@@ -1304,12 +1511,24 @@
                             <div className="admin-fab-menu">
                                 <button onClick={()=>setViewMap(true)} className="bg-blue-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">RASTREO GPS <MapPin size={16}/></button>
                                 <button onClick={()=>copyToClipboard(window.location.href)} className="bg-purple-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">COPIAR MENU <Share2 size={16}/></button>
-                                <button onClick={()=>setCorteModal(true)} className="bg-red-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">CORTE / RETIRO <DollarSign size={16}/></button>
+                                <button onClick={()=>{setCorteModal(true); setCutResult(null); setCountedCash(''); setCountedCard('');}} className="bg-red-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">CORTE DE CAJA <DollarSign size={16}/></button>
+                                <button onClick={()=>{setRetiroModal(true); setNewExpense({desc:'', amount:''});}} className="bg-orange-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">RETIRO DE EFECTIVO <Minus size={16}/></button>
                                 <button onClick={()=>setLiquidationModal(true)} className="bg-green-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">LIQUIDAR DRIVER <UserCheck size={16}/></button>
                             </div>
                         )}
                         <button className="bg-[var(--gold)] text-black p-4 rounded-full shadow-[0_0_15px_var(--gold)]" onClick={()=>setBottomMenuOpen(!bottomMenuOpen)}><Plus size={24} className={`transition ${bottomMenuOpen?'rotate-45':''}`}/></button>
                     </div>
+                    
+                    {/* INGREDIENTS MODAL */}
+                    {ingredientsProduct && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4" onClick={()=>setIngredientsProduct(null)}>
+                            <div className="bg-[var(--bg-card)] p-6 rounded-xl max-w-sm w-full text-center border border-[var(--gold)]" onClick={e=>e.stopPropagation()}>
+                                <h3 className="text-xl font-bold text-[var(--gold)] mb-4">{ingredientsProduct.name}</h3>
+                                <p className="text-[var(--text-main)] mb-6">{ingredientsProduct.ingredients || "No se especificaron ingredientes."}</p>
+                                <button onClick={()=>setIngredientsProduct(null)} className="btn-gold w-full">CERRAR</button>
+                            </div>
+                        </div>
+                    )}
 
                     {modal === 'cockpit' && (
                         <div className="fixed inset-0 bg-black/95 z-50 p-4 animate-in fade-in zoom-in duration-200 text-white">
@@ -1336,7 +1555,6 @@
                                         <>
                                             <div className="flex gap-2 mb-2 relative">
                                                 <input className={`input-std h-10 text-lg flex-1 ${isLocating?'locating':''}`} placeholder={isLocating?"📍 Localizando...":"Calle y Número *"} value={orderDetails.address} onChange={e=>updateLocationFromAddress(e.target.value)} list="pos-address-list"/>
-                                                {/* FIX PUNTO 8: AUTOCOMPLETADO VISIBLE */}
                                                 <datalist id="pos-address-list">
                                                     {suggestions.map((s,i) => <option key={i} value={s.display_name} />)}
                                                 </datalist>
@@ -1356,7 +1574,7 @@
                                     <h3 className="text-[var(--gold)] font-bold text-xl uppercase mb-4 text-center">3. PAGO: {formatCurrency(total)}</h3>
                                     <div className="flex gap-2 mb-4"><button onClick={()=>switchPayMethod('cash')} className={`flex-1 py-4 rounded font-bold text-lg ${payMethod==='cash'?'bg-green-600 text-white':'bg-[#222] text-gray-500'}`}>EFECTIVO</button><button onClick={()=>switchPayMethod('card')} className={`flex-1 py-4 rounded font-bold text-lg ${payMethod==='card'?'bg-blue-600 text-white':'bg-[#222] text-gray-500'}`}>{orderType==='platform'?'APP':'TARJETA'}</button></div>
                                     {payMethod === 'cash' && <div className="flex-1 flex flex-col gap-2">
-                                        <div className="grid grid-cols-3 gap-2">{[20,50,100,200,500].map(v=><button key={v} className="bill-btn" style={{backgroundImage:`url(${v}.png)`}} onClick={()=>setCashReceived(v)}></button>)}<button onClick={()=>setCashReceived(total)} className="bg-[var(--gold)] text-black font-black rounded text-sm h-[70px]">EXACTO</button></div>
+                                        <div className="grid grid-cols-3 gap-2">{[20,50,100,200,500].map(v=><button key={v} className="bill-btn" style={{backgroundImage:`url(./${v}.png)`}} onClick={()=>setCashReceived(v)}></button>)}<button onClick={()=>setCashReceived(total)} className="bg-[var(--gold)] text-black font-black rounded text-sm h-[70px]">EXACTO</button></div>
                                         <div className="mt-4 p-4 bg-black rounded border border-[#333]">
                                             <div className="flex justify-between text-gray-400 items-center">
                                                 <span>Recibido:</span>
@@ -1406,203 +1624,70 @@
 
                     {corteModal && (
                         <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
-                            <div className="card w-full max-w-md bg-[var(--bg-card)] p-6">
-                                <h3 className="text-2xl font-bold text-red-500 mb-4">CORTE DE CAJA / RETIROS</h3>
+                            <div className="card w-full max-w-md bg-[var(--bg-card)] p-6 max-h-screen overflow-y-auto">
+                                <h3 className="text-2xl font-bold text-red-500 mb-4">CORTE DE CAJA (CIEGO)</h3>
                                 
                                 <div className="bg-[#111] p-4 rounded mb-6 border border-[#333]">
-                                    <div className="flex justify-between text-gray-400 text-sm"><span>Fondo Inicial:</span><span>{formatCurrency(db.cashDrawer.initial || 0)}</span></div>
-                                    <div className="flex justify-between text-green-500 text-sm"><span>+ Ventas Efectivo:</span><span>{formatCurrency(db.orders.filter(o => o.method === 'cash').reduce((a,b) => a + b.total, 0))}</span></div>
-                                    <div className="flex justify-between text-red-500 text-sm border-b border-[#333] pb-2 mb-2"><span>- Retiros/Gastos:</span><span>-{formatCurrency(db.expenses.reduce((a,b)=>a+b.amount,0))}</span></div>
-                                    <div className="flex justify-between text-xl font-black text-white"><span>TOTAL EN CAJA:</span><span>{formatCurrency(db.cashDrawer.current)}</span></div>
-                                </div>
-                                <button onClick={printCut} className="w-full bg-[var(--gold)] text-black font-bold py-3 mb-4 rounded shadow-lg flex items-center justify-center gap-2"><Printer/> IMPRIMIR CORTE Z</button>
-
-                                <div className="bg-[#222] p-4 rounded mb-4">
-                                    <p className="text-xs text-white font-bold mb-2">NUEVO RETIRO (Pago Proveedor/Gastos)</p>
-                                    <input className="input-std mb-2" placeholder="Descripción" value={newExpense.desc} onChange={e=>setNewExpense({...newExpense, desc:e.target.value})}/>
-                                    <input className="input-std mb-2" type="number" placeholder="Monto" value={newExpense.amount} onChange={e=>setNewExpense({...newExpense, amount:e.target.value})}/>
-                                    <button onClick={addExpense} className="w-full bg-red-600 text-white font-bold py-2 rounded">REGISTRAR RETIRO</button>
+                                    {!cutResult ? (
+                                        <div className="space-y-4">
+                                            <p className="text-white font-bold mb-2">INGRESE TOTALES CONTADOS:</p>
+                                            <div>
+                                                <label className="text-gray-400 text-xs">Total Efectivo en Caja</label>
+                                                <input type="number" className="input-std text-xl" value={countedCash} onChange={e=>setCountedCash(e.target.value)} placeholder="$0.00"/>
+                                            </div>
+                                            <div>
+                                                <label className="text-gray-400 text-xs">Suma Tickets Tarjeta</label>
+                                                <input type="number" className="input-std text-xl" value={countedCard} onChange={e=>setCountedCard(e.target.value)} placeholder="$0.00"/>
+                                            </div>
+                                            <button onClick={performBlindCut} className="btn-gold w-full mt-2">CALCULAR DIFERENCIA</button>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2 animate-in fade-in">
+                                            <div className="flex justify-between text-gray-400 text-sm"><span>Efectivo Declarado:</span><span>{formatCurrency(cutResult.cCash)}</span></div>
+                                            <div className="flex justify-between text-gray-400 text-sm"><span>Sistema (Calculado):</span><span>{formatCurrency(cutResult.systemCash)}</span></div>
+                                            <div className={`flex justify-between font-bold border-t border-[#333] pt-2 ${cutResult.diffCash < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                                <span>Diferencia Efectivo:</span><span>{formatCurrency(cutResult.cCash - cutResult.systemCash)}</span>
+                                            </div>
+                                            
+                                            <div className="flex justify-between text-gray-400 text-sm mt-4"><span>Tarjeta Declarada:</span><span>{formatCurrency(cutResult.cCard)}</span></div>
+                                            <div className="flex justify-between text-gray-400 text-sm"><span>Sistema Tarjeta:</span><span>{formatCurrency(cutResult.systemCard)}</span></div>
+                                            
+                                            {cutResult.missingOrder && (
+                                                <div className="bg-red-900/30 border border-red-500 p-2 rounded mt-2 text-xs text-red-300">
+                                                    <p className="font-bold">⚠️ POSIBLE VENTA FALTANTE DETECTADA</p>
+                                                    <p>La diferencia coincide con la Orden #{cutResult.missingOrder.orderNum}</p>
+                                                    <p>Total: {formatCurrency(cutResult.missingOrder.total)}</p>
+                                                </div>
+                                            )}
+                                            
+                                            <button onClick={printBlindCut} className="w-full bg-[var(--gold)] text-black font-bold py-3 mt-4 rounded shadow-lg flex items-center justify-center gap-2"><Printer/> IMPRIMIR CORTE Z</button>
+                                            <button onClick={()=>setCutResult(null)} className="text-gray-500 text-xs mt-2 w-full">RECALCULAR</button>
+                                        </div>
+                                    )}
                                 </div>
                                 <button onClick={()=>setCorteModal(false)} className="text-gray-500 w-full">CERRAR (ESC)</button>
                             </div>
                         </div>
                     )}
+
+                    {retiroModal && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
+                            <div className="card w-full max-w-md bg-[var(--bg-card)] p-6">
+                                <h3 className="text-2xl font-bold text-orange-500 mb-4">RETIRO DE EFECTIVO</h3>
+                                <div className="bg-[#222] p-4 rounded mb-4">
+                                    <p className="text-xs text-white font-bold mb-2">Registrar gasto o pago a proveedor</p>
+                                    <input className="input-std mb-2" placeholder="Descripción (ej. Pago Coca-Cola)" value={newExpense.desc} onChange={e=>setNewExpense({...newExpense, desc:e.target.value})}/>
+                                    <input className="input-std mb-2" type="number" placeholder="Monto a Retirar" value={newExpense.amount} onChange={e=>setNewExpense({...newExpense, amount:e.target.value})}/>
+                                    <button onClick={addExpense} className="w-full bg-orange-600 text-white font-bold py-2 rounded">CONFIRMAR RETIRO</button>
+                                </div>
+                                <button onClick={()=>setRetiroModal(false)} className="text-gray-500 w-full">CANCELAR (ESC)</button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
         };
-
-        // 6. DRIVER APP (FIXED PUNTO 1, 3, 4, 5)
-        const DriverApp = ({ db, updateDB, user }) => {
-            const [view, setView] = useState('map');
-            const [selectedOrder, setSelectedOrder] = useState(null);
-            const [scanning, setScanning] = useState(false);
-            const [manualId, setManualId] = useState('');
-            const [gpsError, setGpsError] = useState(false); 
-            const videoRef = useRef(null);
-            
-            // --- PUNTO 5: FORZAR UBICACIÓN TIEMPO REAL ---
-            useEffect(() => {
-                const watchId = navigator.geolocation.watchPosition(
-                    (pos) => {
-                         const newLoc = [pos.coords.latitude, pos.coords.longitude];
-                         setGpsError(false); 
-                         updateDB(prev => ({
-                             ...prev, 
-                             users: prev.users.map(u => u.id === user.id ? {...u, location: newLoc, online: true} : u)
-                         }));
-                    },
-                    (err) => {
-                        console.error("GPS Error", err);
-                        setGpsError(true); 
-                    },
-                    { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
-                );
-                return () => navigator.geolocation.clearWatch(watchId);
-            }, [user.id]); 
-
-            const myDelivered = db.orders.filter(o => o.driver === user.username && o.status === 'delivered');
-            const earnings = myDelivered.reduce((acc, o) => acc + (o.driverFee||0), 0);
-            const myActiveOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivering');
-            
-            const markers = [
-                { pos: user.location || STORE_COORDS, emoji: '', isMyLoc: true, popup: 'Yo' },
-                { pos: STORE_COORDS, emoji: '🏪', popup: 'Base' }, 
-                ...myActiveOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', data: o }))
-            ];
-
-            useEffect(() => {
-                if (scanning && videoRef.current) {
-                    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                        .then(stream => { videoRef.current.srcObject = stream; videoRef.current.play(); })
-                        .catch(err => { console.error("Camera error:", err); showToast("Error al acceder a la cámara"); setScanning(false); });
-                }
-                return () => {
-                    if (videoRef.current && videoRef.current.srcObject) {
-                        videoRef.current.srcObject.getTracks().forEach(track => track.stop());
-                    }
-                }
-            }, [scanning]);
-
-            const scanOrder = (content) => {
-                 let oid = content;
-                 if(content.includes('take_order=')) {
-                     const url = new URL(content);
-                     oid = url.searchParams.get('take_order');
-                 } else if(content.startsWith("ORDER:")) {
-                     oid = content.split(':')[1];
-                 }
-
-                 if(oid) {
-                     const order = db.orders.find(o => o.id === oid);
-                     if(order && order.status === 'ready') {
-                         updateDB({...db, orders: db.orders.map(o => o.id === oid ? {...o, status: 'delivering', driver: user.username} : o)});
-                         showToast("Orden Asignada!"); setScanning(false); setManualId('');
-                     } else { showToast("Orden no válida o no lista"); }
-                 } else {
-                     showToast("QR Inválido");
-                 }
-            };
-            
-            const navigateToOrder = (o) => {
-                if(o.clientLoc) {
-                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${o.clientLoc[0]},${o.clientLoc[1]}`);
-                } else {
-                    window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.address)}`);
-                }
-            };
-
-            return (
-                <div className="h-full flex flex-col bg-black pb-16 relative w-full overflow-hidden">
-                    {gpsError && <div className="fixed top-12 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded-full z-50 font-bold shadow-lg animate-pulse text-xs text-center w-max max-w-[90%]">⚠️ ACTIVA TU GPS PARA FUNCIONAR</div>}
-
-                    <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>
-                    
-                    <div className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-black/90 to-transparent flex justify-between pointer-events-none"><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] flex items-center gap-2"><div className={`w-2 h-2 rounded-full ${user.online?'bg-green-500':'bg-red-500'}`}></div><span className="text-xs text-white font-bold">{user.name}</span></div><div className="pointer-events-auto bg-[#111] px-3 py-1 rounded-full border border-[#333] text-right"><p className="text-[10px] text-gray-500">DEUDA ACTUAL</p><p className="text-[var(--gold)] font-bold">{formatCurrency(user.cashOnHand)}</p></div></div>
-                    {view === 'map' && (
-                        <div className="flex-1 relative w-full h-full">
-                            <LeafletMap center={user.location || STORE_COORDS} markers={markers} onMarkerClick={setSelectedOrder} />
-                            
-                            {selectedOrder && <div className="absolute bottom-4 left-4 right-4 bg-[#141414] p-5 rounded-2xl border border-[var(--gold)] shadow-[0_0_30px_rgba(0,0,0,0.8)] z-[1000] animate-in slide-in-from-bottom">
-                                <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h3 className="text-[var(--gold)] font-bold text-xl">ORDEN #{selectedOrder.orderNum}</h3>
-                                        <p className="text-white font-bold text-lg">{selectedOrder.clientName}</p>
-                                    </div>
-                                    <button onClick={()=>setSelectedOrder(null)} className="bg-[#222] p-2 rounded-full"><X className="text-white"/></button>
-                                </div>
-                                <div className="text-gray-400 text-sm mb-4 space-y-1 border-t border-[#333] pt-2">
-                                    <p>📞 {selectedOrder.clientPhone}</p>
-                                    <p>📍 {selectedOrder.address}</p>
-                                    {selectedOrder.address.includes('(') && <p className="text-yellow-500 text-xs">Ref: {selectedOrder.address.split('(')[1].replace(')','')}</p>}
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-3 mb-3">
-                                    <button onClick={()=>navigateToOrder(selectedOrder)} className="bg-blue-600 text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2 shadow-lg border border-blue-400"><Navigation size={18}/> NAVEGAR</button>
-                                    <a href={`tel:${selectedOrder.clientPhone}`} className="bg-[#333] text-white py-3 rounded-xl text-center font-bold flex items-center justify-center gap-2"><Phone size={18}/> LLAMAR</a>
-                                </div>
-                                
-                                <button onClick={()=>{let cash = user.cashOnHand || 0; if(selectedOrder.method==='cash') cash += selectedOrder.total; updateDB({...db, orders: db.orders.map(x=>x.id===selectedOrder.id?{...x,status:'delivered'}:x), users: db.users.map(u=>u.id===user.id?{...u, cashOnHand: cash}:u)}); setSelectedOrder(null);}} className="w-full btn-gold py-4 text-lg rounded-xl shadow-lg">FINALIZAR ENTREGA</button>
-                            </div>}
-                            
-                            <button className="absolute bottom-20 right-4 bg-[var(--gold)] p-4 rounded-full shadow-[0_0_20px_var(--gold)] z-10 animate-bounce" onClick={()=>setScanning(true)}><QRIcon size={32} className="text-black"/></button>
-                        </div>
-                    )}
-                    {scanning && (
-                        <div className="fixed inset-0 bg-black z-[2000] flex flex-col items-center justify-center p-6">
-                            <h2 className="text-[var(--gold)] text-2xl font-bold mb-4">ESCANEAR TICKET</h2>
-                            <div className="w-full max-w-sm aspect-square border-4 border-[var(--gold)] rounded-lg relative overflow-hidden mb-4">
-                                <video ref={videoRef} className="w-full h-full object-cover"></video>
-                                <div className="scanner-overlay"><div className="scanner-line"></div></div>
-                            </div>
-                            <div className="flex gap-2 w-full max-w-xs mb-4">
-                                <input className="input-std" placeholder="ID Manual si QR dañado" value={manualId} onChange={e=>setManualId(e.target.value)}/>
-                                <button onClick={()=>scanOrder(`ORDER:${manualId}`)} className="btn-gold"><PenTool/></button>
-                            </div>
-                            <button onClick={()=>setScanning(false)} className="mt-4 text-gray-500">Cancelar</button>
-                        </div>
-                    )}
-                    {view === 'list' && (
-                        <div className="flex-1 overflow-y-auto p-4 space-y-2 text-white">
-                             <h2 className="text-white font-bold text-xl mb-4">HISTORIAL ENTREGAS</h2>
-                             {myDelivered.map(o=>(
-                                 <div key={o.id} className="bg-[#222] p-3 rounded border border-[#333] flex justify-between items-center">
-                                     <div>
-                                         <p className="text-white font-bold">#{o.orderNum} - {o.clientName}</p>
-                                         <p className="text-xs text-gray-500">{new Date(o.createdAt).toLocaleTimeString()}</p>
-                                     </div>
-                                     <div className="text-right">
-                                         <p className="text-green-500 font-bold">+{formatCurrency(o.driverFee||0)}</p>
-                                         <p className="text-[10px] text-gray-400">{o.settled ? 'LIQUIDADO' : 'PENDIENTE'}</p>
-                                     </div>
-                                 </div>
-                             ))}
-                        </div>
-                    )}
-                    {view === 'wallet' && (
-                        <div className="flex-1 p-6 flex flex-col items-center justify-center text-center">
-                            <h2 className="text-2xl font-bold text-white mb-2">MI BILLETERA</h2>
-                            <p className="text-gray-400 text-sm mb-6">Muestra este QR en caja para liquidar</p>
-                            <div className="bg-white p-4 rounded-xl mb-8">
-                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=LIQ:${user.id}`} className="w-64 h-64"/>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 w-full">
-                                <div className="bg-[#222] p-4 rounded border border-[#333]">
-                                    <p className="text-gray-500 text-xs">GANANCIAS HOY</p>
-                                    <p className="text-2xl font-bold text-green-500">{formatCurrency(earnings)}</p>
-                                </div>
-                                <div className="bg-[#222] p-4 rounded border border-[#333]">
-                                    <p className="text-gray-500 text-xs">DEUDA EFECTIVO</p>
-                                    <p className="text-2xl font-bold text-red-500">{formatCurrency(user.cashOnHand)}</p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    <nav className="fixed bottom-0 left-0 right-0 bg-[#111] border-t border-[#333] flex justify-around p-4 z-50"><button onClick={()=>setView('map')} className={`flex flex-col items-center ${view==='map'?'text-[var(--gold)]':'text-gray-500'}`}><Map/><span className="text-[10px] mt-1">MAPA</span></button><button onClick={()=>setView('list')} className={`flex flex-col items-center ${view==='list'?'text-[var(--gold)]':'text-gray-500'}`}><ClipboardList/><span className="text-[10px] mt-1">HISTORIAL</span></button><button onClick={()=>setView('wallet')} className={`flex flex-col items-center ${view==='wallet'?'text-[var(--gold)]':'text-gray-500'}`}><Wallet/><span className="text-[10px] mt-1">BILLETERA</span></button></nav>
-                </div>
-            );
-        };
-
-        // 7. CLIENT APP (FIXED PUNTO 1, 3, 4, 6, 7)
+        
         const ClientApp = ({ db, updateDB }) => {
             const [view, setView] = useState('menu');
             const [cart, setCart] = useState([]);
@@ -1611,55 +1696,55 @@
             const [clientCoords, setClientCoords] = useState(null);
             const [isLocating, setIsLocating] = useState(false);
             const [showCashModal, setShowCashModal] = useState(false);
+            const [showComplements, setShowComplements] = useState(false); 
             const [tempCashAmount, setTempCashAmount] = useState('');
             const [suggestions, setSuggestions] = useState([]);
             const [addressTimer, setAddressTimer] = useState(null);
+            const [clientCatFilter, setClientCatFilter] = useState('Todos'); 
             
-            // PUNTO 1: PERSISTENCIA Y SEGUIMIENTO CLIENTE
             useEffect(() => {
                 const storedOrderId = localStorage.getItem('client_active_order_id');
                 if (storedOrderId) {
                     const existingOrder = db.orders.find(o => o.id === storedOrderId);
                     if (existingOrder) {
-                        if (existingOrder.status === 'delivered') {
+                        if (existingOrder.status === 'delivered' || existingOrder.status === 'cancelled') {
                             localStorage.removeItem('client_active_order_id');
-                            showToast("¡Pedido Entregado! Gracias por su compra.");
+                            if(existingOrder.status === 'delivered') showToast("¡Pedido Entregado! Gracias por su compra.");
                         } else {
                             setActiveOrder(existingOrder);
+                            setView('track');
                         }
                     }
                 }
-            }, [db.orders]);
-
-            const [dbLoading, setDbLoading] = useState(false);
-            
-            // FIX PUNTO 4: GPS INICIAL NO FORZOSO
-            useEffect(() => { 
+                
                 navigator.geolocation.getCurrentPosition((pos) => {
                     const coords = [pos.coords.latitude, pos.coords.longitude];
                     setClientCoords(coords);
-                    // Reverse Geocode for initial soft fill
                     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
                         .then(r=>r.json()).then(d=>{
-                            const parts = d.display_name.split(',');
-                            setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')}));
-                        });
+                            if(d && d.display_name){
+                                const parts = d.display_name.split(',');
+                                setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')}));
+                            }
+                        }).catch(e=>{});
                 }, () => setClientCoords(STORE_COORDS)); 
-            }, []);
+            }, [db.orders]);
 
-            // Check if DB is actually loaded
-            if ((!db || !db.products || db.products.length === 0) && !dbLoading) {
-                return (
-                     <div className="h-screen flex flex-col items-center justify-center relative">
-                         {/* FIX PUNTO 2: FONDO BANNER */}
-                         <div className="absolute inset-0 z-0" style={{backgroundImage: `url(${BANNER_URL})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.3)'}}></div>
-                         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[var(--gold)] mb-4 z-10"></div>
-                         <h2 className="text-[var(--gold)] text-xl font-bold z-10">Cargando Menú...</h2>
-                         <p className="text-gray-400 text-sm mt-2 z-10">Sincronizando con el servidor</p>
-                         <button onClick={()=>window.location.reload()} className="mt-8 text-white underline z-10">Recargar Página</button>
-                     </div>
-                );
+            const [dbLoading, setDbLoading] = useState(false);
+            useEffect(() => {
+                const timer = setTimeout(() => {
+                     if (!db || !db.products || db.products.length === 0) {
+                         setDbLoading(true);
+                     }
+                }, 5000);
+                return () => clearTimeout(timer);
+            }, [db]);
+
+            if ((!db || !db.products) && dbLoading) {
+                 return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
             }
+            
+            if(!db.settings.storeOpen) return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
 
             const deliveryFee = useMemo(() => {
                 if(form.type==='delivery' && clientCoords) {
@@ -1669,30 +1754,59 @@
                 return 0;
             }, [clientCoords, form.type, db.settings.deliveryTable]);
 
-            const total = cart.reduce((a,b)=>a+b.price,0) + deliveryFee;
+            const total = cart.reduce((a,b)=>a+b.price*b.qty,0) + deliveryFee;
+
+            const preSubmit = () => {
+                 const hasComplements = db.products.some(p => p.isComplement && p.active);
+                 if (hasComplements && !showComplements) {
+                     setShowComplements(true);
+                 } else {
+                     setView('checkout');
+                     setShowComplements(false);
+                 }
+            };
 
             const submit = () => {
-                if(form.type==='delivery' && !db.settings.deliveryEnabled!==false) return showToast("Servicio a domicilio no disponible");
+                if(activeOrder) return showToast("Ya tienes un pedido en curso");
                 
-                if (form.type === 'delivery' && clientCoords) {
-                     const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], clientCoords[0], clientCoords[1]);
-                     if (dist > db.settings.deliveryRadius) {
-                         return showToast("Upss! Dirección fuera de zona de cobertura.");
-                     }
+                // VALIDATIONS
+                if(!form.name) return showToast("Falta Nombre");
+                if(!form.phone || form.phone.length !== 10) return showToast("Teléfono inválido (10 dígitos)");
+                
+                if (form.type === 'delivery') {
+                    if (!db.settings.deliveryEnabled) return showToast("Servicio a domicilio no disponible");
+                    if (!form.address) return showToast("Falta Dirección");
+                    if (!form.references) return showToast("Faltan Referencias");
+                    if (clientCoords) {
+                         const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], clientCoords[0], clientCoords[1]);
+                         if (dist > db.settings.deliveryRadius) {
+                             return showToast("Upss! Dirección fuera de zona de cobertura.");
+                         }
+                    }
                 }
-
-                if(form.type==='delivery' && (!form.phone || form.phone.length !== 10)) return showToast("Teléfono inválido (10 dígitos)");
-                if(form.pay === 'cash' && !form.payAmount) return showToast("Indica con cuánto vas a pagar");
                 
-                const order = { id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, items: cart, total, status: 'web_pending_payment', method: form.pay, payAmount: form.payAmount, createdAt: new Date().toISOString(), address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', clientName: form.name, clientPhone: form.phone, clientLoc: clientCoords, source: 'web' };
+                if(form.pay === 'cash' && (!form.payAmount || form.payAmount < total)) return showToast("Monto de pago inválido");
                 
-                // Save Order ID locally for tracking
+                const order = { 
+                    id: generateId(), 
+                    orderNum: Math.floor(Math.random()*9000)+1000, 
+                    items: cart, 
+                    total, 
+                    status: 'web_pending_payment', 
+                    method: form.pay, 
+                    payAmount: form.payAmount, 
+                    createdAt: new Date().toISOString(), 
+                    address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', 
+                    clientName: form.name, 
+                    clientPhone: form.phone,
+                    clientLoc: clientCoords, 
+                    source: 'web' 
+                };
+                
                 localStorage.setItem('client_active_order_id', order.id);
-                
                 updateDB({...db, orders: [...db.orders, order]}); setActiveOrder(order); setView('track');
             };
 
-            // FIX PUNTO 3 & 8: AUTOCOMPLETADO
             const updateLocationFromAddress = (addr) => {
                 setForm(prev => ({...prev, address: addr}));
                 if (addressTimer) clearTimeout(addressTimer);
@@ -1704,7 +1818,6 @@
                             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`);
                             const data = await res.json();
                             setSuggestions(data);
-                            // Soft update map if results found
                             if(data && data.length > 0) {
                                 setClientCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
                             }
@@ -1721,9 +1834,11 @@
                      setClientCoords(coords);
                      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
                         .then(r=>r.json()).then(d=>{
-                            const parts = d.display_name.split(',');
-                            setForm({...form, address: parts[0] + (parts[1]||'')});
-                        });
+                            if(d && d.display_name){
+                                const parts = d.display_name.split(',');
+                                setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')}));
+                            }
+                        }).catch(e=>{});
                      setIsLocating(false);
                  }, () => setIsLocating(false));
             };
@@ -1769,82 +1884,173 @@
                 setCart(newCart);
                 if (newCart.length === 0) setView('menu');
             };
+            
+            const updateItemNote = (idx, note) => { 
+                const newCart = [...cart];
+                newCart[idx].note = note;
+                setCart(newCart);
+            };
 
-            if(!db.settings.storeOpen) return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
+            const groupedProducts = useMemo(() => {
+                const groups = {};
+                if(db && db.products) {
+                    db.products.filter(p => p.active && !p.isComplement).forEach(p => {
+                        const cat = p.cat || 'Otros';
+                        if (!groups[cat]) groups[cat] = [];
+                        groups[cat].push(p);
+                    });
+                }
+                return groups;
+            }, [db.products]);
+
+            const uniqueClientCategories = ['Todos', ...Object.keys(groupedProducts)];
 
             if(view === 'menu') return (
                 <div className="h-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] relative app-view-mobile">
                     <button className="install-btn" onClick={showInstallInstructions}><img src={LOGO_URL} className="w-8 h-8 rounded-full"/></button>
                     
-                    {/* PUNTO 1: Notificación flotante de Pedido Activo */}
                     {activeOrder && (
-                        <div onClick={()=>setView('track')} className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-4 py-2 rounded-full shadow-lg z-[100] font-bold animate-bounce cursor-pointer flex items-center gap-2">
-                            <span>🛵 PEDIDO EN CURSO</span>
+                        <div onClick={()=>setView('track')} className="fixed top-20 left-4 right-4 bg-red-600 text-white p-6 rounded-2xl shadow-2xl z-[100] animate-pulse cursor-pointer border-4 border-[var(--gold)] text-center">
+                            <h2 className="text-3xl font-brand">🛵 PEDIDO EN CURSO</h2>
+                            <p className="font-bold text-sm mt-2">TOCA PARA VER EL MAPA</p>
                         </div>
                     )}
 
-                    {/* FIX PUNTO 3: Ajuste Banner Header */}
-                    <div className="h-48 relative overflow-hidden">
-                        <img src={BANNER_URL} className="w-full h-full object-cover" alt="Banner"/>
-                        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-body)] to-transparent"></div>
+                    <div className="w-full bg-black">
+                         <img src={BANNER_URL} className="w-full h-48 object-cover mx-auto" alt="Banner"/>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-48">
-                        {db.products.map(p=>(<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)]"><img src={p.img} className="w-20 h-20 rounded object-cover"/><div className="flex-1"><p className="font-bold text-[var(--text-main)]">{p.name}</p><p className="text-gray-500 text-xs line-clamp-2">{p.desc}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)]">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart,{...p, qty: 1}])} className="bg-[var(--accent)] text-white w-8 h-8 rounded-full font-bold shadow">+</button></div></div></div>))}
+                    <div className="p-2 flex gap-2 overflow-x-auto bg-[var(--bg-card)] border-b border-[var(--border)]">
+                        {uniqueClientCategories.map(c=><button key={c} onClick={()=>setClientCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${clientCatFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-[#222] text-white'}`}>{c}</button>)}
                     </div>
-                    
-                    {/* FIX PUNTO 6: Video sube si hay botón de pago */}
-                    <div className={`client-promo-video ${cart.length>0 ? 'shifted' : ''}`}><video src={VIDEO_URL} autoPlay loop muted playsInline></video></div>
-                    
-                    {cart.length>0 && <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile"><button onClick={()=>setView('checkout')} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button></div>}
-                </div>
-            );
 
-            if(view === 'checkout') return (
-                <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto app-view-mobile relative">
-                    <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2"><ArrowLeft/> Volver</button>
-                    <h2 className="font-bold text-xl mb-6 text-[var(--text-main)]">RESUMEN</h2>
-                    
-                    <div className="mb-6 space-y-2">
-                        {cart.map((item, idx) => (
-                            <div key={idx} className="bg-[#222] p-3 rounded flex justify-between items-center">
-                                <div>
-                                    <p className="font-bold text-white">{item.name}</p>
-                                    <p className="text-xs text-[var(--gold)]">{formatCurrency(item.price)}</p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <button onClick={()=>adjustQty(idx, -1)} className="w-8 h-8 bg-gray-700 text-white rounded-full flex items-center justify-center font-bold">-</button>
-                                    <span className="font-bold text-white">{item.qty}</span>
-                                    <button onClick={()=>adjustQty(idx, 1)} className="w-8 h-8 bg-[var(--gold)] text-black rounded-full flex items-center justify-center font-bold">+</button>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-48">
+                        {Object.entries(groupedProducts).filter(([cat]) => clientCatFilter === 'Todos' || cat === clientCatFilter).map(([cat, prods]) => (
+                            <div key={cat}>
+                                <h3 className="text-2xl font-brand text-[var(--accent)] mb-2 border-b border-[var(--border)]">{cat}</h3>
+                                <div className="space-y-4">
+                                    {prods.map(p=>(
+                                        <div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)] relative">
+                                            <img src={p.img} className="w-20 h-20 rounded object-cover"/>
+                                            <div className="flex-1">
+                                                <p className="font-bold text-[var(--text-main)] text-lg">{p.name}</p>
+                                                <p className="text-gray-500 text-xs italic mb-1">{p.ingredients}</p> 
+                                                <div className="flex justify-between items-center mt-2">
+                                                    <span className="font-bold text-[var(--accent)] text-xl">{formatCurrency(p.price)}</span>
+                                                    <button onClick={()=>setCart([...cart,{...p, qty: 1}])} className="bg-[var(--accent)] text-white w-8 h-8 rounded-full font-bold shadow text-lg">+</button>
+                                                </div>
+                                            </div>
+                                            <div className="absolute top-2 right-2 max-w-[40%] text-[10px] text-gray-400 text-right leading-tight">{p.desc}</div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         ))}
                     </div>
-
-                    <div className="space-y-4 mb-8">
-                        <input className="input-std" placeholder="Nombre" onChange={e=>setForm({...form,name:e.target.value})}/>
-                        <input className="input-std" type="number" placeholder="Teléfono (10 dígitos)" onChange={e=>setForm({...form,phone:e.target.value})}/>
-                        <div className="flex gap-2"><button onClick={()=>setForm({...form, type:'delivery'})} className={`flex-1 p-3 rounded font-bold border ${form.type==='delivery'?'border-[var(--accent)] text-[var(--accent)]':'border-gray-500 text-gray-500'}`}>DOMICILIO</button>{db.settings.pickupEnabled && <button onClick={()=>setForm({...form, type:'pickup'})} className={`flex-1 p-3 rounded font-bold border ${form.type==='pickup'?'border-[var(--accent)] text-[var(--accent)]':'border-gray-500 text-gray-500'}`}>RECOGER</button>}</div>
-                        {form.type==='delivery' && (
-                            <div className="space-y-2">
-                                <div className="flex gap-2 relative"><input className={`input-std h-10 flex-1 ${isLocating?'locating':''}`} placeholder={isLocating?"📍 Localizando...":"Calle y Número"} value={form.address} onChange={e=>updateLocationFromAddress(e.target.value)} list="client-address-list"/><button onClick={useGPS} className="bg-blue-600 text-white rounded p-2 gps-btn"><MapPin/></button></div>
-                                <datalist id="client-address-list">
-                                    {suggestions.map((s,i) => <option key={i} value={s.display_name} />)}
-                                </datalist>
-                                <input className="input-std" placeholder="Referencias (Casa color, portón...)" value={form.references} onChange={e=>setForm({...form,references:e.target.value})}/>
-                                <p className="text-xs text-gray-500">Toca el mapa si la ubicación no es exacta:</p>
-                                {/* FIX PUNTO 7: Mapa más cuadrado */}
-                                <div className="aspect-square w-full rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'📍'}]} onClickMap={handleMapClick} zoom={15} /></div>
-                                <div className="text-right text-sm text-[var(--accent)] font-bold">Costo Envío: {formatCurrency(deliveryFee)}</div>
-                            </div>
+                    
+                    <div className={`client-promo-video ${cart.length>0 ? 'shifted' : ''}`}><video src={VIDEO_URL} autoPlay loop muted playsInline></video></div>
+                    
+                    {/* Bottom Bar: Go to Pay OR Order in Progress */}
+                    <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile">
+                        {activeOrder ? (
+                            <button onClick={()=>setView('track')} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg animate-pulse flex items-center justify-center gap-2">
+                                🛵 PEDIDO EN CURSO
+                            </button>
+                        ) : (
+                            cart.length > 0 && <button onClick={preSubmit} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button>
                         )}
-                        <p className="font-bold text-[var(--text-main)]">Método de Pago</p>
-                        <div className="flex gap-2">
-                            <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='cash'?'border-green-500 text-green-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='cash'} onChange={handleCashSelect}/> Efectivo</label>
-                            <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='card'?'border-blue-500 text-blue-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='card'} onChange={()=>setForm({...form,pay:'card'})}/> Tarjeta</label>
-                        </div>
-                        {form.pay==='cash' && <p className="text-green-500 text-center font-bold text-sm">Pagarás con: {formatCurrency(form.payAmount)}</p>}
                     </div>
+                    
+                    {showComplements && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end p-4 animate-in slide-in-from-bottom">
+                            <div className="bg-[var(--bg-card)] rounded-t-2xl p-6 border-t border-[var(--gold)]">
+                                <h3 className="text-xl font-bold text-[var(--gold)] mb-4 text-center">¿SE TE ANTOJA ALGO MÁS? 🍟🥤</h3>
+                                <div className="flex gap-4 overflow-x-auto pb-4">
+                                    {db.products.filter(p => p.isComplement && p.active).map(p => (
+                                        <div key={p.id} className="min-w-[120px] bg-[#222] p-2 rounded-lg text-center cursor-pointer border border-transparent hover:border-[var(--gold)]" onClick={()=>{
+                                            const existing = cart.find(i => i.id === p.id);
+                                            if (existing) {
+                                                setCart(cart.map(i => i.id === p.id ? {...i, qty: i.qty + 1} : i));
+                                            } else {
+                                                setCart([...cart,{...p, qty: 1}]);
+                                            }
+                                            showToast("Agregado!");
+                                        }}>
+                                            <img src={p.img} className="w-20 h-20 mx-auto rounded mb-2 object-cover"/>
+                                            <p className="text-xs font-bold text-white line-clamp-1">{p.name}</p>
+                                            <p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p>
+                                            <button className="mt-1 bg-[var(--gold)] text-black text-xs px-2 py-1 rounded-full font-bold">+</button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button onClick={()=>{setView('checkout'); setShowComplements(false);}} className="w-full bg-white text-black font-bold py-3 rounded-xl">LISTO, CONTINUAR</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+
+            if(view === 'checkout') return (
+                <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto app-view-mobile relative flex flex-col">
+                    <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2"><ArrowLeft/> Volver</button>
+                    <h2 className="font-bold text-xl mb-6 text-[var(--text-main)]">RESUMEN</h2>
+
+                    <div className="mb-6 space-y-4 flex-1">
+                        {cart.map((item, idx) => (
+                            <div key={idx} className="bg-[#222] p-3 rounded">
+                                <div className="flex justify-between items-center mb-2">
+                                    <div>
+                                        <p className="font-bold text-white">{item.name}</p>
+                                        <p className="text-xs text-[var(--gold)]">{formatCurrency(item.price)}</p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <button onClick={()=>adjustQty(idx, -1)} className="w-8 h-8 bg-gray-700 text-white rounded-full flex items-center justify-center font-bold">-</button>
+                                        <span className="font-bold text-white">{item.qty}</span>
+                                        <button onClick={()=>adjustQty(idx, 1)} className="w-8 h-8 bg-[var(--gold)] text-black rounded-full flex items-center justify-center font-bold">+</button>
+                                    </div>
+                                </div>
+                                {!item.isComplement && (
+                                    <input className="w-full bg-transparent border-b border-[#444] text-xs text-gray-300 p-1 outline-none pulse-input placeholder-gray-600" placeholder="Escribe aquí (sin cebolla, extra salsa...)" value={item.note || ''} onChange={(e)=>updateItemNote(idx, e.target.value)}/>
+                                )}
+                            </div>
+                        ))}
+
+                        <div className="space-y-4 mb-8">
+                            
+                            <input className="input-std" placeholder="Nombre" onChange={e=>setForm({...form,name:e.target.value})}/>
+                            <input className="input-std" type="number" placeholder="Teléfono (10 dígitos)" onChange={e=>setForm({...form,phone:e.target.value})}/>
+                            <div className="flex gap-2"><button onClick={()=>setForm({...form, type:'delivery'})} className={`flex-1 p-3 rounded font-bold border ${form.type==='delivery'?'border-[var(--accent)] text-[var(--accent)]':'border-gray-500 text-gray-500'}`}>DOMICILIO</button>{db.settings.pickupEnabled && <button onClick={()=>setForm({...form, type:'pickup'})} className={`flex-1 p-3 rounded font-bold border ${form.type==='pickup'?'border-[var(--accent)] text-[var(--accent)]':'border-gray-500 text-gray-500'}`}>RECOGER</button>}</div>
+                            {form.type==='delivery' && (
+                                <div className="space-y-2">
+                                    <div className="flex gap-2 relative"><input className={`input-std h-10 flex-1 ${isLocating?'locating':''}`} placeholder={isLocating?"📍 Localizando...":"Calle y Número"} value={form.address} onChange={e=>updateLocationFromAddress(e.target.value)} list="client-address-list"/><button onClick={useGPS} className="bg-blue-600 text-white rounded p-2 gps-btn"><MapPin/></button></div>
+                                    <datalist id="client-address-list">
+                                        {suggestions.map((s,i) => <option key={i} value={s.display_name} />)}
+                                    </datalist>
+                                    <input className="input-std" placeholder="Referencias (Casa color, portón...)" value={form.references} onChange={e=>setForm({...form,references:e.target.value})}/>
+                                    <p className="text-xs text-gray-500">Toca el mapa si la ubicación no es exacta:</p>
+                                    
+                                    <div className="h-32 w-full rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'', isClient:true}, {pos:STORE_COORDS, emoji:'', isStore:true}]} onClickMap={handleMapClick} zoom={15} /></div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="bg-[#222] p-4 rounded mb-2 space-y-2 border border-[#333]">
+                         <div className="flex justify-between text-white"><span>Subtotal:</span><span>{formatCurrency(cart.reduce((a,b)=>a+b.price*b.qty,0))}</span></div>
+                         <div className="flex justify-between text-[var(--gold)]"><span>Envío Estimado:</span><span>{formatCurrency(deliveryFee)}</span></div>
+                         <div className="border-t border-[#444] pt-2 flex justify-between text-xl font-bold text-white"><span>TOTAL:</span><span>{formatCurrency(total)}</span></div>
+                         <p className="text-[10px] text-gray-500 italic mt-2 text-center">El costo de envío puede variar ligeramente según la hora de entrega.</p>
+                    </div>
+
+                    <div className="mb-4">
+                            <p className="font-bold text-[var(--text-main)] mb-2">Método de Pago</p>
+                            <div className="flex gap-2">
+                                <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='cash'?'border-green-500 text-green-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='cash'} onChange={handleCashSelect}/> Efectivo</label>
+                                <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='card'?'border-blue-500 text-blue-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='card'} onChange={()=>setForm({...form,pay:'card'})}/> Tarjeta</label>
+                            </div>
+                            {form.pay==='cash' && form.payAmount > 0 && <div className="flex justify-between text-green-500 text-sm mt-2 font-bold px-2"><span>Pagas con: {formatCurrency(form.payAmount)}</span><span>Cambio: {formatCurrency(form.payAmount - total)}</span></div>}
+                    </div>
+
                     <button onClick={submit} className="w-full bg-[var(--accent)] text-white py-4 rounded-lg font-bold shadow-lg">ENVIAR A CAJA</button>
 
                     {showCashModal && (
@@ -1868,27 +2074,292 @@
                 const driverLoc = assignedDriver && assignedDriver.location ? assignedDriver.location : STORE_COORDS;
                 
                 const trackMarkers = [
-                    { pos: STORE_COORDS, emoji: '🏪' },
-                    { pos: clientCoords, emoji: '🏠' }
+                    { pos: clientCoords, emoji: '', isClient: true },
+                    { pos: STORE_COORDS, emoji: '', isStore: true }
                 ];
-                
                 if (assignedDriver) {
                     trackMarkers.push({ pos: driverLoc, emoji: '🏍️', type: 'driver', label: 'Repartidor' });
                 }
 
+                // Determine Status and UI
+                const isWaitingAccept = activeOrder.status === 'web_pending_payment';
+                const isInProgress = activeOrder.status === 'pending' || activeOrder.status === 'preparing';
+                const isDelivering = activeOrder.status === 'ready' || activeOrder.status === 'delivering';
+                const isCancelled = activeOrder.status === 'cancelled';
+
+                // WhatsApp Cancel Message Detailed
+                const waMessage = `Hola, soy ${activeOrder.clientName}.%0AOrden #${activeOrder.orderNum}.%0AArtículos: ${activeOrder.items.map(i=>i.name + " (" + i.qty + ")").join(', ')}.%0ADestino: ${activeOrder.address}.%0ATotal: ${formatCurrency(activeOrder.total)}.%0AQUIERO CANCELAR MI PEDIDO.`;
+
+                // --- UI 1: WAITING ACCEPTANCE (KFC Bucket Style) ---
+                if (isWaitingAccept) {
+                    return (
+                        <div className="h-full flex flex-col items-center justify-center bg-white p-6 text-center">
+                            <div className="mb-6 pulse-logo-anim"> {/* Added pulse class */}
+                                <img src={LOGO_URL} className="w-32 h-32 rounded-full border-4 border-[var(--gold)] shadow-xl"/>
+                            </div>
+                            <h2 className="text-3xl font-brand text-black mb-2">¡ESPERA!</h2>
+                            <p className="text-xl font-bold text-black mb-4 uppercase">No actualices la página, estoy enviando tu pedido al restaurante</p>
+                            <p className="text-gray-500 text-sm">Esto puede tardar unos minutos.</p>
+                            <div className="mt-8 animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-black"></div>
+                        </div>
+                    );
+                }
+
+                // --- UI 2: IN PROGRESS (Stepper) ---
+                if (isInProgress) {
+                     return (
+                        <div className="h-full flex flex-col bg-white">
+                            {/* Static Map Image / Placeholder */}
+                            <div className="h-1/2 w-full bg-gray-200 flex items-center justify-center relative">
+                                <div className="absolute inset-0 opacity-50 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover"></div>
+                                <div className="z-10 bg-red-600 text-white px-6 py-2 rounded-full font-bold shadow-lg animate-pulse">ORDEN EN PROCESO</div>
+                            </div>
+
+                            <div className="h-1/2 bg-[var(--bg-body)] rounded-t-3xl -mt-6 relative z-10 flex flex-col p-6 shadow-[0_-5px_25px_rgba(0,0,0,0.5)]">
+                                <div className="w-16 h-1 bg-gray-600 rounded-full mx-auto mb-4 opacity-50"></div>
+                                <h2 className="text-3xl font-brand text-[var(--gold)] text-center mb-1">COCINANDO TU PEDIDO 🔥</h2>
+                                <p className="text-center text-gray-400 text-sm mb-6">Orden #{activeOrder.orderNum}</p>
+                                
+                                <div className="stepper-container">
+                                     <div className="stepper-line">
+                                         <div className="stepper-line-fill" style={{width: '33%'}}></div>
+                                     </div>
+                                     <div className="step-item completed">
+                                         <div className="step-circle">✔</div>
+                                         <div className="step-label">Recibido</div>
+                                     </div>
+                                     <div className="step-item active">
+                                         <div className="step-circle"><ChefHat size={16}/></div>
+                                         <div className="step-label">Cocina</div>
+                                     </div>
+                                     <div className="step-item">
+                                         <div className="step-circle"><ShoppingBag size={16}/></div>
+                                         <div className="step-label">Listo</div>
+                                     </div>
+                                     <div className="step-item">
+                                         <div className="step-circle"><Bike size={16}/></div>
+                                         <div className="step-label">Camino</div>
+                                     </div>
+                                 </div>
+                                 
+                                 <div className="mt-auto space-y-3">
+                                     <a href={`https://wa.me/${STORE_PHONE}?text=${waMessage}`} target="_blank" className="w-full bg-[#25D366] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg">
+                                         <MessageCircle size={20}/> CANCELAR / AYUDA
+                                     </a>
+                                 </div>
+                            </div>
+                        </div>
+                     );
+                }
+
+                // --- UI 3: DELIVERING (Real Map) ---
                 return (
                     <div className="h-full flex flex-col bg-white">
-                        <div className="flex-1 relative">
-                            <LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, clientCoords] : [STORE_COORDS, clientCoords]} zoom={13}/>
+                        <div className="h-1/2 relative w-full border-b-4 border-[var(--gold)]">
+                            <LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, clientCoords] : null} zoom={13}/>
                         </div>
-                        <div className="p-6 bg-white rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] z-10">
-                            <h2 className="text-xl font-bold mb-2">ESTADO: {activeOrder?.status === 'web_pending_payment' ? 'CONFIRMANDO PAGO' : activeOrder?.status === 'pending' ? 'PREPARANDO' : activeOrder?.status === 'delivering' ? 'EN CAMINO 🏍️' : 'PROCESANDO'}</h2>
-                            {activeOrder?.driver && <p className="text-green-600 font-bold mb-2">Repartidor asignado!</p>}
-                            <button onClick={()=>setView('menu')} className="mt-4 w-full bg-black text-white py-3 rounded-xl font-bold">VOLVER AL MENU</button>
+
+                        <div className="h-1/2 bg-[var(--bg-body)] rounded-t-3xl -mt-6 relative z-10 flex flex-col p-6 shadow-[0_-5px_25px_rgba(0,0,0,0.5)]">
+                             <div className="w-16 h-1 bg-gray-600 rounded-full mx-auto mb-4 opacity-50"></div>
+                             
+                             <div className="flex-1 flex flex-col">
+                                 <h2 className="text-3xl font-brand text-[var(--gold)] text-center mb-1">
+                                     {activeOrder.status === 'ready' ? 'LISTO PARA ENTREGA' : 'EN CAMINO 🏍️'}
+                                 </h2>
+                                 <p className="text-center text-gray-400 text-sm mb-6">Orden #{activeOrder.orderNum}</p>
+
+                                 <div className="stepper-container">
+                                     <div className="stepper-line">
+                                         <div className="stepper-line-fill" style={{width: activeOrder.status === 'ready' ? '66%' : '100%'}}></div>
+                                     </div>
+                                     <div className="step-item completed"><div className="step-circle">✔</div></div>
+                                     <div className="step-item completed"><div className="step-circle">✔</div></div>
+                                     <div className={`step-item ${activeOrder.status === 'ready' ? 'active' : 'completed'}`}>
+                                         <div className="step-circle"><ShoppingBag size={16}/></div>
+                                         <div className="step-label">Listo</div>
+                                     </div>
+                                     <div className={`step-item ${activeOrder.status === 'delivering' ? 'active' : ''}`}>
+                                         <div className="step-circle"><Bike size={16}/></div>
+                                         <div className="step-label">Camino</div>
+                                     </div>
+                                 </div>
+                                 
+                                 {activeOrder.driver && (
+                                     <div className="bg-[#222] p-3 rounded-lg flex items-center gap-3 mb-4 border border-[#333]">
+                                         <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center text-xl">🏍️</div>
+                                         <div>
+                                             <p className="font-bold text-white text-sm">Repartidor Asignado</p>
+                                             <p className="text-xs text-gray-400">Tu pedido llega pronto.</p>
+                                         </div>
+                                     </div>
+                                 )}
+                             </div>
+
+                             <div className="mt-auto space-y-3">
+                                 <a href={`https://wa.me/${STORE_PHONE}?text=${waMessage}`} target="_blank" className="w-full bg-[#25D366] text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg">
+                                     <MessageCircle size={20}/> AYUDA / SOPORTE
+                                 </a>
+                                 <button onClick={()=>setView('menu')} className="w-full bg-[#333] text-white py-3 rounded-xl font-bold border border-[#444]">VOLVER AL MENÚ</button>
+                             </div>
                         </div>
                     </div>
                 );
             }
+        };
+
+        const DriverApp = ({ db, updateDB, user }) => {
+            const [view, setView] = useState('map');
+            const myOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivering');
+            const deliveredOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivered');
+            const totalCash = user.cashOnHand || 0;
+            const pendingEarnings = deliveredOrders.filter(o => !o.settled).reduce((acc, o) => acc + (o.driverFee || 0), 0);
+
+            // DRIVER LOCATION TRACKING
+            useEffect(() => {
+                const watchId = navigator.geolocation.watchPosition(
+                    (pos) => {
+                        const newLoc = [pos.coords.latitude, pos.coords.longitude];
+                        // In a real app, we would update this to the DB. Simulating local state update for now or just map center
+                        // Ideally: updateDB with new user location
+                    },
+                    (err) => {
+                         console.warn("GPS Error", err);
+                         showToast("⚠️ GPS DESACTIVADO. Actívalo para trabajar.");
+                    },
+                    { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+                );
+                return () => navigator.geolocation.clearWatch(watchId);
+            }, []);
+
+            const markDelivered = (o) => {
+                if(confirm("¿Confirmar entrega?")) {
+                    updateDB({...db, orders: db.orders.map(x=>x.id===o.id?{...x, status:'delivered', driverFee: db.settings.deliveryTable[db.settings.deliveryTable.length-1].price}:x)});
+                    showToast("Entrega Registrada");
+                }
+            };
+
+            const scanQR = () => { showToast("Función de cámara simulada"); };
+
+            return (
+                <div className="h-full flex flex-col bg-gray-900 pb-16 relative">
+                    {/* TOP HEADER */}
+                    <div className="absolute top-0 left-0 w-full bg-black/80 backdrop-blur p-4 z-50 flex justify-between items-center border-b border-[#333]">
+                         <div className="flex items-center gap-2">
+                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                             <span className="font-bold text-white">{user.name}</span>
+                         </div>
+                         <div className="bg-[#222] px-3 py-1 rounded-full text-xs font-bold text-[var(--gold)]">
+                             {formatCurrency(totalCash)}
+                         </div>
+                    </div>
+
+                    {/* MAIN CONTENT AREA */}
+                    <div className="flex-1 overflow-hidden relative pt-16">
+                        {view === 'map' && (
+                            <div className="w-full h-full relative">
+                                <LeafletMap center={STORE_COORDS} 
+                                    markers={[
+                                        {pos:STORE_COORDS, emoji:'🏪', isStore:true},
+                                        ...myOrders.map(o => ({
+                                            pos: o.clientLoc || STORE_COORDS, 
+                                            emoji: '🍔', 
+                                            popup: `Orden #${o.orderNum} - ${o.clientName}`
+                                        }))
+                                    ]} 
+                                    zoom={13} 
+                                />
+                                {/* Overlay Cards for Active Orders on Map */}
+                                <div className="absolute bottom-4 left-4 right-4 space-y-2 z-[400]">
+                                    {myOrders.map(o => (
+                                        <div key={o.id} className="bg-[#1a1a1a] p-4 rounded-xl border-l-4 border-blue-500 shadow-xl flex flex-col gap-2">
+                                            <div className="flex justify-between items-center">
+                                                <div>
+                                                    <p className="font-bold text-white">#{o.orderNum} • {o.clientName}</p>
+                                                    <p className="text-xs text-gray-400 truncate w-48">{o.address}</p>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <a href={`https://www.google.com/maps/dir/?api=1&destination=${o.clientLoc ? `${o.clientLoc[0]},${o.clientLoc[1]}` : encodeURIComponent(o.address)}`} target="_blank" className="bg-blue-600 p-2 rounded-full text-white"><Navigation size={18}/></a>
+                                                    <button onClick={()=>markDelivered(o)} className="bg-green-600 p-2 rounded-full text-white"><CheckCircle size={18}/></button>
+                                                </div>
+                                            </div>
+                                            <a href={`https://wa.me/52${o.clientPhone}?text=Hola, ${o.clientName}, tengo una entrega para usted de EMI BURGERS pero no localizo el domicilio/no me atienden para recibir. ¿Podria apoyarme?`} target="_blank" className="bg-[#25D366] text-white text-xs font-bold py-2 rounded text-center flex items-center justify-center gap-1"><MessageCircle size={14}/> CONTACTAR CLIENTE</a>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {view === 'history' && (
+                            <div className="p-4 space-y-4 overflow-y-auto h-full">
+                                <h2 className="text-xl font-bold text-white mb-2">POR LIQUIDAR</h2>
+                                {deliveredOrders.filter(o=>!o.settled).map(o => (
+                                    <div key={o.id} className="bg-[#222] p-3 rounded border-l-4 border-yellow-500 flex justify-between items-center">
+                                        <div>
+                                            <p className="text-white font-bold">Orden #{o.orderNum}</p>
+                                            <p className="text-xs text-gray-500">{new Date(o.createdAt).toLocaleTimeString()}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-green-500 font-bold">+{formatCurrency(o.driverFee)}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                                {deliveredOrders.filter(o=>!o.settled).length === 0 && <p className="text-gray-500 text-xs italic">Nada pendiente.</p>}
+
+                                <h2 className="text-xl font-bold text-white mb-2 mt-6">LIQUIDADAS</h2>
+                                {deliveredOrders.filter(o=>o.settled).map(o => (
+                                    <div key={o.id} className="bg-[#111] p-3 rounded border border-[#333] flex justify-between items-center opacity-50">
+                                        <div>
+                                            <p className="text-white font-bold">Orden #{o.orderNum}</p>
+                                            <p className="text-xs text-gray-500">Pagado</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-gray-500 font-bold">+{formatCurrency(o.driverFee)}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {view === 'wallet' && (
+                            <div className="p-6 flex flex-col items-center justify-center h-full text-center">
+                                <h2 className="text-2xl font-black text-white mb-4">MI BILLETERA</h2>
+                                <p className="text-gray-400 text-xs mb-4">Muestra este QR en caja para liquidar</p>
+                                
+                                <div className="bg-white p-4 rounded-xl mb-6">
+                                     <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=LIQ:${user.id}`} className="w-48 h-48"/>
+                                </div>
+                                
+                                <div className="grid grid-cols-2 gap-4 w-full">
+                                    <div className="bg-[#222] p-4 rounded border border-[#333]">
+                                        <p className="text-[10px] text-gray-500 uppercase font-bold">Ganancias Hoy</p>
+                                        <p className="text-green-500 text-xl font-black">{formatCurrency(pendingEarnings)}</p>
+                                    </div>
+                                    <div className="bg-[#222] p-4 rounded border border-[#333]">
+                                        <p className="text-[10px] text-gray-500 uppercase font-bold">Deuda Efectivo</p>
+                                        <p className="text-red-500 text-xl font-black">{formatCurrency(totalCash)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* QR SCAN FAB (Simulated for picking up orders) */}
+                    {view === 'map' && <button onClick={scanQR} className="absolute bottom-20 right-4 bg-[var(--gold)] text-black p-4 rounded-full shadow-[0_0_15px_rgba(255,215,0,0.5)] z-50"><QrCode size={28}/></button>}
+
+                    {/* BOTTOM NAV */}
+                    <div className="driver-nav">
+                        <button onClick={()=>setView('map')} className={`driver-nav-btn ${view==='map'?'active':''}`}>
+                            <Map size={20}/> MAPA
+                        </button>
+                        <button onClick={()=>setView('history')} className={`driver-nav-btn ${view==='history'?'active':''}`}>
+                            <History size={20}/> HISTORIAL
+                        </button>
+                        <button onClick={()=>setView('wallet')} className={`driver-nav-btn ${view==='wallet'?'active':''}`}>
+                            <Wallet size={20}/> BILLETERA
+                        </button>
+                    </div>
+                </div>
+            );
         };
 
         const Kitchen = ({ db, updateDB }) => {
@@ -1905,7 +2376,7 @@
                                     {detailOrder.items.map((i,x)=>(
                                         <div key={x} className="flex justify-between items-center border-b border-[#333] pb-2">
                                             <span className="text-2xl font-bold text-white">{i.qty}x {i.name}</span>
-                                            {i.notes && <span className="bg-yellow-900 text-[var(--gold)] text-lg px-2 rounded font-bold">{i.notes}</span>}
+                                            {i.note && <span className="bg-yellow-900 text-[var(--gold)] text-lg px-2 rounded font-bold">{i.note}</span>}
                                         </div>
                                     ))}
                                 </div>
@@ -1966,7 +2437,9 @@
                      setSyncing(true);
                      const cloudData = await fetchCloudDB();
                      if(cloudData && cloudData.data) {
-                         setDB(cloudData.data);
+                         if(JSON.stringify(cloudData.data) !== JSON.stringify(db)) {
+                              setDB(cloudData.data);
+                         }
                      }
                      setSyncing(false);
                 }, 4000);
@@ -1982,7 +2455,13 @@
                     newData = newDataOrFn;
                 }
                 setDB(newData); 
-                localStorage.setItem('emi_v76_db', JSON.stringify(newData));
+                try {
+                    localStorage.setItem('emi_v76_db', JSON.stringify(newData));
+                } catch (e) {
+                    if (e.name === 'QuotaExceededError') {
+                        showToast("Memoria local llena. Sincronizando con nube...");
+                    }
+                }
                 saveCloudDB(newData);
             };
             
@@ -1991,24 +2470,13 @@
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('menu') === 'true' || params.get('take_order')) {
-                      requestPermissions();
-                      setUser({role:'cliente', name:'Invitado Web'});
-                      window.history.replaceState({}, document.title, "/");
+                       setUser({role:'cliente', name:'Invitado Web'});
                 }
             }, []);
 
             const toggleTheme = () => { const newT = theme==='dark'?'light':'dark'; setTheme(newT); document.body.className = newT; };
             
-            const requestPermissions = async () => {
-                try {
-                    await navigator.mediaDevices.getUserMedia({ video: true });
-                    await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject));
-                    if ('Notification' in window) await Notification.requestPermission();
-                } catch (e) { console.log("Permisos limitados"); }
-            };
-
             const handleLogin = async () => { 
-                await requestPermissions();
                 if(loginData.p === SUPER_USER_PASS) return setUser({role:'admin', name:'Super Admin', superUser:true});
                 const found = db.users.find(u => u.username === loginData.u && u.password === loginData.p);
                 if(found) setUser(found); else showToast("Credenciales incorrectas");
@@ -2039,9 +2507,12 @@
             return (
                 <div className={`h-screen w-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] ${theme}`}>
                     <div className={`sync-icon ${syncing ? 'syncing' : ''}`}><Cloud size={16}/></div>
-                    <div className="logout-ghost">
-                        <button onClick={()=>setUser(null)} className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold shadow-lg">SALIR</button>
-                    </div>
+                    
+                    {user.role !== 'cliente' && (
+                        <div className="logout-ghost">
+                            <button onClick={()=>setUser(null)} className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold shadow-lg">SALIR</button>
+                        </div>
+                    )}
 
                     <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
                     
@@ -2055,11 +2526,24 @@
                     
                     {user.name==='Super Admin' && (
                         <div className={`gods-eye group ${godMenuOpen ? 'active' : ''}`}>
-                            <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(255,193,7,0.6)] border-2 border-white transition z-50" onClick={()=>setGodMenuOpen(!godMenuOpen)}><Eye size={28} className="text-black"/></button>
+                            <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_15px_var(--gold)] z-50 relative" onClick={()=>setGodMenuOpen(!godMenuOpen)}>
+                                <Eye size={30} className="text-black"/>
+                            </button>
                             {godMenuOpen && (
                                 <div className="gods-menu">
-                                    {['admin','cajero','cliente','repartidor','cocina'].map(r=><button key={r} onClick={()=>{setUser({...user, role:r}); setGodMenuOpen(false);}} className="text-left p-2 rounded text-sm text-white hover:bg-[#333] capitalize">{r}</button>)}
-                                    <button onClick={resetApp} className="text-left p-2 rounded text-sm text-red-500 hover:bg-[#333] font-bold border-t border-[#333] mt-2">RESET APP</button>
+                                    <p className="text-[var(--gold)] text-[10px] font-bold text-center mb-2 uppercase">CAMBIAR VISTA</p>
+                                    <div className="grid grid-cols-2 gap-2 mb-3">
+                                        <button onClick={()=>setUser({...user, role:'admin'})} className="bg-blue-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">ADMIN</button>
+                                        <button onClick={()=>setUser({...user, role:'cajero'})} className="bg-green-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">CAJA</button>
+                                        <button onClick={()=>setUser({...user, role:'cocina'})} className="bg-orange-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">COCINA</button>
+                                        <button onClick={()=>setUser({...user, role:'repartidor'})} className="bg-purple-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">DRIVER</button>
+                                        <button onClick={()=>setUser({...user, role:'cliente'})} className="bg-yellow-500 text-black text-[10px] font-bold p-2 rounded col-span-2 hover:scale-105 transition">VISTA CLIENTE</button>
+                                    </div>
+                                    
+                                    <hr className="border-[#333] mb-2"/>
+                                    
+                                    <button onClick={resetApp} className="text-red-500 font-bold text-xs bg-black/50 p-2 rounded w-full hover:bg-red-900/20 mb-1">🔥 RESET FÁBRICA</button>
+                                    <button className="text-gray-400 text-[10px] text-center w-full">{db.orders.length} Pedidos en DB</button>
                                 </div>
                             )}
                         </div>
