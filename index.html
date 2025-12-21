@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMI BURGERS - ERP V77 FINAL</title>
+    <title>EMI BURGERS - EL SABOR QUE MANDA!</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
@@ -101,14 +101,14 @@
         .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
         
         .client-promo-video {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: auto; max-height: 120px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: auto; max-height: 160px;
             z-index: 50; pointer-events: none; overflow: hidden;
-            mask-image: linear-gradient(to top, black 60%, transparent 100%);
+            mask-image: linear-gradient(to top, black 80%, transparent 100%);
             transition: bottom 0.3s ease;
             display: flex; justify-content: center;
         }
         .client-promo-video.shifted { bottom: 90px; }
-        .client-promo-video video { width: 100%; height: 100%; object-fit: contain; opacity: 0.8; }
+        .client-promo-video video { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
 
         .share-btn { position: fixed; top: 30%; right: 0; transform: translateY(-50%); background: var(--gold); border-radius: 20px 0 0 20px; padding: 12px; z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3); transition: all 0.3s; opacity: 0.5; }
         .share-btn:hover, .share-btn:active { opacity: 1; transform: translateY(-50%) scale(1.1); }
@@ -202,10 +202,10 @@
         const SUPER_USER_PASS = "OBR1995@";
         const STORE_PHONE = "526442345678"; // Placeholder for WhatsApp
         
-        const LOGO_URL = 'LOGO_1.png';
-        const BANNER_URL = 'BANNER_MENU.jpg'; 
-        const VIDEO_URL = 'WEB_PROMOCIONES.mp4';
-        const CLOSED_IMG = 'CERRADO_OFF.png'; 
+        const LOGO_URL = "./LOGO_1.png";
+        const BANNER_URL = "./BANNER_MENU.jpg"; 
+        const VIDEO_URL = "./WEB_PROMOCIONES.mp4";
+        const CLOSED_IMG = "./CERRADO_OFF.png"; 
 
         const API_URL = "https://script.google.com/macros/s/AKfycbzQC10H2zUg1yWa_mjqvTafiYUpG50-TpCPDGEFHhFURs1UpJTDovyW8cEMdEP6kxKoxg/exec";
         const DB_ID = "emi_db_v76";
@@ -322,6 +322,24 @@
                 win.document.close(); setTimeout(() => { win.print(); win.close(); }, 500);
             } else { showToast("Permite popups para imprimir"); }
         };
+        
+        // Helper to generate circle points for polygon hole
+        const getCirclePoints = (center, radiusKm) => {
+            const points = [];
+            const earthRadius = 6371;
+            for (let i = 0; i < 360; i += 5) {
+                const lat1 = center[0] * Math.PI / 180;
+                const lon1 = center[1] * Math.PI / 180;
+                const brng = i * Math.PI / 180;
+                const dist = radiusKm / earthRadius;
+                
+                const lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist) + Math.cos(lat1) * Math.sin(dist) * Math.cos(brng));
+                const lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) * Math.cos(lat1), Math.cos(dist) - Math.sin(lat1) * Math.sin(lat2));
+                
+                points.push([lat2 * 180 / Math.PI, lon2 * 180 / Math.PI]);
+            }
+            return points;
+        };
 
         const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route, radius, onMarkerClick }) => {
             const mapRef = useRef(null);
@@ -338,6 +356,7 @@
                 } else {
                      const currentCenter = mapInstance.current.getCenter();
                      const dist = Math.sqrt(Math.pow(currentCenter.lat - center[0], 2) + Math.pow(currentCenter.lng - center[1], 2));
+                     // Only re-center if distance is significant to avoid jitter
                      if (dist > 0.001) { 
                          mapInstance.current.setView(center, zoom); 
                      }
@@ -345,11 +364,17 @@
                 }
 
                 mapInstance.current.eachLayer(layer => {
-                    if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline) mapInstance.current.removeLayer(layer);
+                    if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline || layer instanceof L.Polygon) mapInstance.current.removeLayer(layer);
                 });
 
                 if (radius) {
-                    L.circle(STORE_COORDS, { color: 'red', fillColor: '#f03', fillOpacity: 0.1, radius: radius * 1000 }).addTo(mapInstance.current);
+                    // Draw Gray Overlay with Hole (Donut)
+                    const outerBounds = [[90, -180], [90, 180], [-90, 180], [-90, -180]];
+                    const hole = getCirclePoints(STORE_COORDS, radius);
+                    L.polygon([outerBounds, hole], { color: 'transparent', fillColor: '#333', fillOpacity: 0.6 }).addTo(mapInstance.current);
+                    
+                    // Draw the green circle boundary
+                    L.circle(STORE_COORDS, { color: '#00e676', fillColor: 'transparent', weight: 2, radius: radius * 1000 }).addTo(mapInstance.current);
                 }
 
                 if(showHeatmap) {
@@ -1700,7 +1725,8 @@
             const [suggestions, setSuggestions] = useState([]);
             const [addressTimer, setAddressTimer] = useState(null);
             const [clientCatFilter, setClientCatFilter] = useState('Todos'); 
-            
+            const [showOutOfRangeModal, setShowOutOfRangeModal] = useState(false); // New state for modal
+
             useEffect(() => {
                 const storedOrderId = localStorage.getItem('client_active_order_id');
                 if (storedOrderId) {
@@ -1739,11 +1765,10 @@
                 return () => clearTimeout(timer);
             }, [db]);
 
-            if ((!db || !db.products) && dbLoading) {
-                 return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
+            // Ensure store closed logic is robust
+            if (!db.settings.storeOpen || (!db.products || db.products.length === 0)) {
+                 return <div className="h-screen bg-cover bg-center fixed inset-0 z-[9999]" style={{backgroundImage:`url(${CLOSED_IMG})`, backgroundColor: 'black'}}></div>;
             }
-            
-            if(!db.settings.storeOpen) return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
 
             const deliveryFee = useMemo(() => {
                 if(form.type==='delivery' && clientCoords) {
@@ -1756,6 +1781,15 @@
             const total = cart.reduce((a,b)=>a+b.price*b.qty,0) + deliveryFee;
 
             const preSubmit = () => {
+                 // Check range here before going to checkout
+                 if (clientCoords) {
+                     const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], clientCoords[0], clientCoords[1]);
+                     if (dist > db.settings.deliveryRadius) {
+                         setShowOutOfRangeModal(true);
+                         return;
+                     }
+                 }
+
                  const hasComplements = db.products.some(p => p.isComplement && p.active);
                  if (hasComplements && !showComplements) {
                      setShowComplements(true);
@@ -1960,6 +1994,17 @@
                         )}
                     </div>
                     
+                    {/* OUT OF RANGE MODAL */}
+                    {showOutOfRangeModal && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
+                            <div className="bg-[var(--bg-card)] p-6 rounded-xl w-full max-w-sm text-center border border-red-500 shadow-2xl animate-bounce">
+                                <h3 className="text-xl font-bold text-red-500 mb-2">🚫 FUERA DE ZONA</h3>
+                                <p className="text-white mb-4">Lo sentimos, tu ubicación parece estar fuera de nuestro rango de reparto.</p>
+                                <button onClick={() => { setShowOutOfRangeModal(false); setView('checkout'); }} className="w-full bg-[var(--gold)] text-black font-bold py-3 rounded-lg">INDICAR DIRECCIÓN DIFERENTE</button>
+                            </div>
+                        </div>
+                    )}
+                    
                     {showComplements && (
                         <div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end p-4 animate-in slide-in-from-bottom">
                             <div className="bg-[var(--bg-card)] rounded-t-2xl p-6 border-t border-[var(--gold)]">
@@ -2028,7 +2073,7 @@
                                     <input className="input-std" placeholder="Referencias (Casa color, portón...)" value={form.references} onChange={e=>setForm({...form,references:e.target.value})}/>
                                     <p className="text-xs text-gray-500">Toca el mapa si la ubicación no es exacta:</p>
                                     
-                                    <div className="h-32 w-full rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'', isClient:true}, {pos:STORE_COORDS, emoji:'', isStore:true}]} onClickMap={handleMapClick} zoom={15} /></div>
+                                    <div className="h-64 w-full rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'', isClient:true}, {pos:STORE_COORDS, emoji:'', isStore:true}]} onClickMap={handleMapClick} zoom={14} radius={db.settings.deliveryRadius} /></div>
                                 </div>
                             )}
                         </div>
