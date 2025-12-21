@@ -3,45 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMI BURGERS - ERP V77 FINAL</title>
-    <!-- ... (Head content same as before) ... -->
+    <title>EMI BURGERS - EL SABOR QUE MANDA!</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- React & Dependencies -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        :root { --gold: #FFD700; --accent: #FF4500; --success: #00e676; --danger: #ff3333; --warning: #ff9800; --blue-maps: #4285F4; }
+        :root {
+            --gold: #FFD700;
+            --accent: #FF4500;
+            --success: #00e676;
+            --danger: #ff3333;
+            --warning: #ff9800;
+            --blue-maps: #4285F4;
+        }
+        
         body.dark { --bg-body: #050505; --bg-card: #141414; --text-main: #f0f0f0; --input-bg: #222; --border: #333; }
         body.light { --bg-body: #f3f4f6; --bg-card: #ffffff; --text-main: #111827; --input-bg: #e5e7eb; --border: #d1d5db; }
-        body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; transition: background-color 0.3s, color 0.3s; height: 100vh; width: 100vw; }
+
+        body { 
+            background-color: var(--bg-body); color: var(--text-main); 
+            font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; 
+            user-select: none; -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s, color 0.3s;
+            height: 100vh; width: 100vw;
+        }
+        
         #root { height: 100%; width: 100%; overflow: hidden; }
+
         .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
         .font-mono { font-family: 'Courier Prime', monospace; }
+        
         .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .input-std { background-color: var(--input-bg) !important; border: 1px solid var(--border) !important; color: var(--text-main) !important; outline: none; width: 100%; border-radius: 0.5rem; padding: 0.75rem; transition: border 0.2s; }
+        
+        .input-std { 
+            background-color: var(--input-bg) !important; 
+            border: 1px solid var(--border) !important; 
+            color: var(--text-main) !important; 
+            outline: none; width: 100%; border-radius: 0.5rem; padding: 0.75rem; transition: border 0.2s; 
+        }
         .input-std:focus { border-color: var(--gold) !important; }
+        
         .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; text-transform: uppercase; border-radius: 0.75rem; padding: 0.8rem; border: none; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); transition: transform 0.1s; display: flex; justify-content: center; items-center; gap: 0.5rem; cursor: pointer; }
         .btn-gold:active { transform: scale(0.96); }
+        
         .leaflet-container { height: 100%; width: 100%; z-index: 0; background: #eee; }
         .custom-pin { background: none; border: none; font-size: 32px; text-align: center; filter: drop-shadow(0 2px 3px black); cursor: pointer; transition: transform 0.2s; }
         .driver-pin { font-size: 20px; background: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 3px solid var(--gold); box-shadow: 0 0 15px var(--gold); z-index: 1000; }
-        .gps-pulse-marker { width: 20px; height: 20px; background-color: var(--blue-maps); border: 3px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.3); position: relative; }
-        .gps-pulse-marker::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; border-radius: 50%; background-color: rgba(66, 133, 244, 0.4); animation: gps-pulse 2s infinite; }
+        
+        .gps-pulse-marker {
+            width: 20px; height: 20px;
+            background-color: var(--blue-maps);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .gps-pulse-marker::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); width: 100%; height: 100%;
+            border-radius: 50%; background-color: rgba(66, 133, 244, 0.4);
+            animation: gps-pulse 2s infinite;
+        }
         @keyframes gps-pulse { 0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; } 100% { transform: translate(-50%, -50%) scale(3); opacity: 0; } }
+
+        /* Client Burger Pulse */
         .client-burger-pin { font-size: 24px; text-align: center; animation: client-pulse 2s infinite; cursor: pointer; }
         @keyframes client-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
         .theme-toggle { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: var(--bg-card); padding: 5px 10px; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; }
         .gods-eye { position: fixed; bottom: 150px; left: 20px; z-index: 9999; transition: all 0.3s; opacity: 0.4; transform: scale(0.8); }
         .gods-eye:hover, .gods-eye.active { opacity: 1; transform: scale(1); }
         .gods-menu { position: absolute; bottom: 70px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
         .bill-btn { width: 100%; height: 70px; background-size: 100% 100%; background-repeat: no-repeat; background-position: center; border-radius: 8px; border: 1px solid #444; cursor: pointer; transition: transform 0.1s; background-color: var(--input-bg); }
         .bill-btn:active { transform: scale(0.95); filter: brightness(1.2); }
+        
         .grid-cockpit { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 1.5rem; height: 100%; }
         .cockpit-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; position: relative; }
         .mode-btn { padding: 1.5rem; border: 2px solid var(--border); border-radius: 0.75rem; text-align: left; font-weight: bold; font-size: 1.1rem; color: #888; transition: all 0.2s; cursor: pointer; }
@@ -51,29 +99,44 @@
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .progress-bar { height: 8px; border-radius: 4px; background: #333; overflow: hidden; }
         .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-        .client-promo-video { position: fixed; bottom: 0; left: 0; width: 100%; height: auto; max-height: 160px; z-index: 50; pointer-events: none; overflow: hidden; mask-image: linear-gradient(to top, black 80%, transparent 100%); transition: bottom 0.3s ease; display: flex; justify-content: center; }
+        
+        .client-promo-video {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: auto; max-height: 160px;
+            z-index: 50; pointer-events: none; overflow: hidden;
+            mask-image: linear-gradient(to top, black 80%, transparent 100%);
+            transition: bottom 0.3s ease;
+            display: flex; justify-content: center;
+        }
         .client-promo-video.shifted { bottom: 90px; }
         .client-promo-video video { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+
         .share-btn { position: fixed; top: 30%; right: 0; transform: translateY(-50%); background: var(--gold); border-radius: 20px 0 0 20px; padding: 12px; z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3); transition: all 0.3s; opacity: 0.5; }
         .share-btn:hover, .share-btn:active { opacity: 1; transform: translateY(-50%) scale(1.1); }
+        
         .dash-map-btn { position: fixed; top: 15%; right: 0; transform: translateY(-50%); background: #2563eb; border-radius: 20px 0 0 20px; padding: 12px; z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3); transition: all 0.3s; opacity: 0.8; color: white; font-weight: bold; display: flex; align-items: center; gap: 5px; }
         .dash-map-btn:hover { opacity: 1; padding-right: 20px; }
+
         .admin-fab { position: fixed; bottom: 80px; left: 20px; z-index: 9000; }
         .admin-fab-menu { position: absolute; bottom: 70px; left: 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; animation: slideUp 0.2s ease-out; }
+        
         .install-btn { position: fixed; bottom: 80px; left: 20px; z-index: 9999; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: bounce 2s infinite; }
         .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: var(--bg-card); }
         .custom-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
         .logout-ghost { position: fixed; top: 0; right: 0; padding: 20px; z-index: 9999; opacity: 0; transition: opacity 0.2s; }
         .logout-ghost:hover, .logout-ghost:active { opacity: 1; }
+
         .gps-btn { position: relative; overflow: hidden; }
         .gps-btn::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; border-radius: 50%; background: rgba(255, 255, 255, 0.3); animation: ripple 1.5s infinite; }
         @keyframes ripple { 0% { width: 0; height: 0; opacity: 0.5; } 100% { width: 200%; height: 200%; opacity: 0; } }
+
         .scanner-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.5) inset; pointer-events: none; }
         .scanner-line { position: absolute; width: 100%; height: 2px; background: red; box-shadow: 0 0 10px red; animation: scan 2s infinite linear; }
         @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+
         @keyframes pulse-bg { 0% { background-color: var(--input-bg); } 50% { background-color: #332b00; } 100% { background-color: var(--input-bg); } }
         .locating { animation: pulse-bg 1.5s infinite; }
         .ticket-view { font-family: 'Courier Prime', monospace; background: white; color: black; padding: 10px; width: 100%; border: 1px solid #ccc; font-size: 10px; white-space: pre-wrap; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -81,10 +144,21 @@
         .sync-icon { position: fixed; bottom: 20px; left: 80px; z-index: 9999; color: var(--text-main); font-size: 10px; opacity: 0.5; }
         .syncing { animation: spin 1s infinite linear; opacity: 1; color: var(--gold); }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        
         .pulse-input { border-color: var(--accent) !important; animation: border-pulse 2s infinite; }
         @keyframes border-pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 69, 0, 0.4); } 70% { box-shadow: 0 0 0 5px rgba(255, 69, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 69, 0, 0); } }
-        .wa-float-btn { position: fixed; bottom: 100px; right: 20px; z-index: 2000; background-color: #25D366; color: white; border-radius: 50%; padding: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; animation: bounceIn 0.5s; }
+        
+        .wa-float-btn {
+            position: fixed; bottom: 100px; right: 20px; z-index: 2000;
+            background-color: #25D366; color: white;
+            border-radius: 50%; padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            animation: bounceIn 0.5s;
+        }
         @keyframes bounceIn { from { transform: scale(0); } to { transform: scale(1); } }
+        
+        /* Stepper Styles for Client Track */
         .stepper-container { display: flex; justify-content: space-between; position: relative; margin-top: 20px; margin-bottom: 20px; }
         .stepper-line { position: absolute; top: 15px; left: 0; width: 100%; height: 4px; background: #333; z-index: 0; }
         .stepper-line-fill { position: absolute; top: 15px; left: 0; height: 4px; background: var(--gold); z-index: 0; transition: width 0.5s ease; }
@@ -94,18 +168,30 @@
         .step-item.completed .step-circle { background: var(--gold); border-color: var(--gold); color: black; }
         .step-label { margin-top: 8px; font-size: 10px; font-weight: bold; color: #777; transition: color 0.3s; }
         .step-item.active .step-label, .step-item.completed .step-label { color: white; }
+        
+        /* Driver Bottom Nav */
         .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a1a; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
         .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #777; background: none; border: none; font-size: 10px; font-weight: bold; }
         .driver-nav-btn.active { color: var(--gold); }
         .driver-nav-btn svg { margin-bottom: 5px; }
+
+        /* Animation for Waiting Confirmation */
         @keyframes pulse-logo { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .pulse-logo-anim { animation: pulse-logo 2s infinite; }
     </style>
 </head>
 <body class="dark">
     <div id="root"></div>
+
     <script type="text/babel" data-type="module">
-        import { Utensils, Truck, LayoutDashboard, LogOut, Plus, Minus, Search, MapPin, Printer, CreditCard, DollarSign, Smartphone, User, QrCode, Clock, CheckCircle, AlertTriangle, FileText, Settings, Menu as MenuIcon, X, Save, Trash2, ShoppingBag, Camera, Users, BarChart3, Bell, Ticket, TrendingUp, Lock, Eye, Send, Map, Navigation, Wallet, Receipt, ArrowRight, Banknote, Power, Wifi, WifiOff, RefreshCw, Crosshair, Home, UserCheck, Calendar, Globe, QrCode as QRIcon, Package, Percent, Edit, Phone, Table, ArrowLeft, MessageCircle, Sun, Moon, Video, Copy, ClipboardList, PieChart, Link as LinkIcon, PenTool, Share2, MoreVertical, Download, Cloud, Info, Image, Ban, EyeOff, ChefHat, Bike, History } from 'https://esm.sh/lucide-react@0.344.0';
+        import { 
+            Utensils, Truck, LayoutDashboard, LogOut, Plus, Minus, Search, MapPin, Printer, CreditCard, DollarSign, 
+            Smartphone, User, QrCode, Clock, CheckCircle, AlertTriangle, FileText, Settings, Menu as MenuIcon, X, 
+            Save, Trash2, ShoppingBag, Camera, Users, BarChart3, Bell, Ticket, TrendingUp, Lock, Eye, Send, Map, Navigation, 
+            Wallet, Receipt, ArrowRight, Banknote, Power, Wifi, WifiOff, RefreshCw, Crosshair, Home, UserCheck, Calendar, Globe, QrCode as QRIcon,
+            Package, Percent, Edit, Phone, Table, ArrowLeft, MessageCircle, Sun, Moon, Video, Copy, ClipboardList, PieChart, Link as LinkIcon, PenTool, Share2, MoreVertical, Download, Cloud, Info, Image, Ban, EyeOff,
+            ChefHat, Bike, History
+        } from 'https://esm.sh/lucide-react@0.344.0';
 
         const React = window.React;
         const ReactDOM = window.ReactDOM;
@@ -114,11 +200,13 @@
         const STORE_COORDS = [27.446895, -109.943874]; 
         const CITY_SUFFIX = ", Ciudad Obregón, Sonora, Mexico";
         const SUPER_USER_PASS = "OBR1995@";
-        const STORE_PHONE = "526442345678"; 
+        const STORE_PHONE = "526442345678"; // Placeholder for WhatsApp
+        
         const LOGO_URL = "./LOGO_1.png";
         const BANNER_URL = "./BANNER_MENU.jpg"; 
         const VIDEO_URL = "./WEB_PROMOCIONES.mp4";
         const CLOSED_IMG = "./CERRADO_OFF.png"; 
+
         const API_URL = "https://script.google.com/macros/s/AKfycbzQC10H2zUg1yWa_mjqvTafiYUpG50-TpCPDGEFHhFURs1UpJTDovyW8cEMdEP6kxKoxg/exec";
         const DB_ID = "emi_db_v76";
 
@@ -130,7 +218,10 @@
             toast.className = "custom-toast";
             toast.innerHTML = `<span class="font-bold">⚠️ ${message}</span>`;
             document.body.appendChild(toast);
-            setTimeout(() => { toast.style.animation = "slideIn 0.3s reverse"; setTimeout(() => document.body.removeChild(toast), 300); }, 3000);
+            setTimeout(() => {
+                toast.style.animation = "slideIn 0.3s reverse";
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
         };
 
         const copyToClipboard = (text) => {
@@ -143,7 +234,12 @@
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
-            try { document.execCommand('copy'); showToast('Enlace de menú copiado'); } catch (err) { showToast("Error al copiar."); }
+            try {
+                document.execCommand('copy');
+                showToast('Enlace de menú copiado');
+            } catch (err) {
+                showToast("Error al copiar.");
+            }
             document.body.removeChild(textArea);
         };
         
@@ -153,7 +249,10 @@
                 if (!res.ok) throw new Error("Network response was not ok");
                 const json = await res.json();
                 return json && json.id ? json : null;
-            } catch (e) { console.error("Read Error", e); return null; }
+            } catch (e) { 
+                console.error("Read Error", e); 
+                return null; 
+            }
         };
 
         const saveCloudDB = async (db) => {
@@ -172,19 +271,38 @@
                     });
                 }
                 return true;
-            } catch (e) { console.error("Save Error", e); return false; }
+            } catch (e) { 
+                console.error("Save Error", e); 
+                return false;
+            }
         };
 
         const initialDB = {
-            products: [], users: [], orders: [], coupons: [], supplies: [],
+            products: [], 
+            users: [], 
+            orders: [],
+            coupons: [],
+            supplies: [],
             settings: {
-                storeOpen: true, pickupEnabled: true, deliveryEnabled: true, paymentMethods: { cash: true, card: true },
-                deliveryRadius: 15, driverAssign: 'manual', supervisorKey: 'ADMIN123', cashLimit: 2000,
-                providers: [], platforms: ['Uber Eats', 'DiDi Food', 'Rappi'],
+                storeOpen: true,
+                pickupEnabled: true,
+                deliveryEnabled: true,
+                paymentMethods: { cash: true, card: true },
+                deliveryRadius: 15,
+                driverAssign: 'manual',
+                supervisorKey: 'ADMIN123',
+                cashLimit: 2000,
+                providers: [], 
+                platforms: ['Uber Eats', 'DiDi Food', 'Rappi'],
                 ticketConfig: { header: 'EMI BURGERS\nCD. OBREGON', footer: '¡GRACIAS POR SU COMPRA!' },
-                deliveryTable: [ { min: 0, max: 3, price: 30 }, { min: 3.1, max: 7, price: 50 }, { min: 7.1, max: 15, price: 80 } ]
+                deliveryTable: [
+                    { min: 0, max: 3, price: 30 },
+                    { min: 3.1, max: 7, price: 50 },
+                    { min: 7.1, max: 15, price: 80 }
+                ]
             },
-            cashDrawer: { current: 0, initial: 0 }, expenses: []
+            cashDrawer: { current: 0, initial: 0 },
+            expenses: []
         };
 
         const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -200,13 +318,12 @@
         const printTicket = (html) => {
             const win = window.open('', '', 'width=300,height=600');
             if(win){
-                const currentUrl = window.location.href;
-                const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
-                win.document.write(`<html><head><base href="${baseUrl}"><style>body{font-family:monospace;font-size:12px;width:280px;margin:0;padding:10px;} .center{text-align:center;} .bold{font-weight:bold;} hr{border-top:1px dashed #000;} img{display:block;margin:0 auto;}</style></head><body>${html}</body></html>`);
+                win.document.write(`<html><head><base href="${window.location.origin}${window.location.pathname}"><style>body{font-family:monospace;font-size:12px;width:280px;margin:0;padding:10px;} .center{text-align:center;} .bold{font-weight:bold;} hr{border-top:1px dashed #000;} img{display:block;margin:0 auto;}</style></head><body><img src="${LOGO_URL}" style="width:50px;margin-bottom:10px;">${html}</body></html>`);
                 win.document.close(); setTimeout(() => { win.print(); win.close(); }, 500);
             } else { showToast("Permite popups para imprimir"); }
         };
         
+        // Helper to generate circle points for polygon hole
         const getCirclePoints = (center, radiusKm) => {
             const points = [];
             const earthRadius = 6371;
@@ -215,8 +332,10 @@
                 const lon1 = center[1] * Math.PI / 180;
                 const brng = i * Math.PI / 180;
                 const dist = radiusKm / earthRadius;
+                
                 const lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist) + Math.cos(lat1) * Math.sin(dist) * Math.cos(brng));
                 const lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) * Math.cos(lat1), Math.cos(dist) - Math.sin(lat1) * Math.sin(lat2));
+                
                 points.push([lat2 * 180 / Math.PI, lon2 * 180 / Math.PI]);
             }
             return points;
@@ -237,7 +356,10 @@
                 } else {
                      const currentCenter = mapInstance.current.getCenter();
                      const dist = Math.sqrt(Math.pow(currentCenter.lat - center[0], 2) + Math.pow(currentCenter.lng - center[1], 2));
-                     if (dist > 0.001) { mapInstance.current.setView(center, zoom); }
+                     // Only re-center if distance is significant to avoid jitter
+                     if (dist > 0.001) { 
+                         mapInstance.current.setView(center, zoom); 
+                     }
                      setTimeout(() => mapInstance.current.invalidateSize(), 100);
                 }
 
@@ -246,9 +368,12 @@
                 });
 
                 if (radius) {
+                    // Draw Gray Overlay with Hole (Donut)
                     const outerBounds = [[90, -180], [90, 180], [-90, 180], [-90, -180]];
                     const hole = getCirclePoints(STORE_COORDS, radius);
                     L.polygon([outerBounds, hole], { color: 'transparent', fillColor: '#333', fillOpacity: 0.6 }).addTo(mapInstance.current);
+                    
+                    // Draw the green circle boundary
                     L.circle(STORE_COORDS, { color: '#00e676', fillColor: 'transparent', weight: 2, radius: radius * 1000 }).addTo(mapInstance.current);
                 }
 
@@ -256,12 +381,6 @@
                         markers.forEach((m) => {
                            if (!m.isStore) {
                                L.circle(m.pos, { color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 300, stroke: false }).addTo(mapInstance.current);
-                           } else {
-                               const el = document.createElement('div');
-                               el.className = 'custom-pin';
-                               el.innerHTML = `<img src="${LOGO_URL}" style="width:40px;height:40px;border-radius:50%;border:2px solid gold;">`;
-                               const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: [40,40], iconAnchor: [20,20] });
-                               L.marker(m.pos, { icon }).addTo(mapInstance.current).bindPopup('Tienda');
                            }
                        });
                 } else {
@@ -313,8 +432,10 @@
 
             const sales = db.orders.reduce((a,b)=>a+b.total,0);
             const expenses = db.expenses.reduce((a,b)=>a+b.amount,0);
+            
             const activeOrders = db.orders.filter(o => o.status === 'delivering' || o.status === 'pending');
             const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
+            
             const liveMarkers = [
                 { pos: STORE_COORDS, emoji: '🏪', isStore: true },
                 ...activeOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', popup: `Pedido #${o.orderNum}` })),
@@ -346,10 +467,18 @@
             }, [db.orders]);
 
             const platformStats = db.orders.reduce((acc, o) => { const key = o.source === 'web' ? 'WEB' : (o.source === 'platform' ? (o.platformName || 'APP') : 'TIENDA'); acc[key] = (acc[key] || 0) + 1; return acc; }, {});
-            const paymentStats = db.orders.reduce((acc, o) => { const method = o.method === 'cash' ? 'EFECTIVO' : 'TARJETA'; acc[method] = (acc[method] || 0) + 1; return acc; }, {});
+            const paymentStats = db.orders.reduce((acc, o) => {
+                const method = o.method === 'cash' ? 'EFECTIVO' : 'TARJETA';
+                acc[method] = (acc[method] || 0) + 1;
+                return acc;
+            }, {});
             const topPayment = Object.entries(paymentStats).sort((a,b)=>b[1]-a[1])[0] || ['Ninguno', 0];
+
             const expired = db.supplies.filter(s => new Date(s.expiry) < new Date());
-            const actualTopProducts = Object.entries(db.orders.reduce((acc, o) => { o.items.forEach(i => acc[i.name] = (acc[i.name] || 0) + i.qty); return acc; }, {})).sort((a,b)=>b[1]-a[1]).slice(0,5);
+            const actualTopProducts = Object.entries(db.orders.reduce((acc, o) => {
+                o.items.forEach(i => acc[i.name] = (acc[i.name] || 0) + i.qty);
+                return acc;
+            }, {})).sort((a,b)=>b[1]-a[1]).slice(0,5);
             const topProducts = actualTopProducts.length > 0 ? actualTopProducts : [['Producto 1', 0], ['Producto 2', 0], ['Producto 3', 0]];
             const maxProdVal = actualTopProducts.length > 0 ? actualTopProducts[0][1] : 1;
 
@@ -855,8 +984,8 @@
             };
 
             return (
-                <div className="h-full flex flex-col gap-4 overflow-y-auto custom-scroll pb-20">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-shrink-0">
+                <div className="h-full flex flex-col gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="card p-4 border-l-4 border-purple-500 bg-[var(--bg-card)]">
                             <h3 className="font-bold mb-2 flex gap-2 text-[var(--text-main)]"><Bell/> NOTIFICACIONES</h3>
                             <div className="flex gap-2">
@@ -882,8 +1011,8 @@
                         </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-[900px]">
-                        <div className="card p-4 border-t-4 border-blue-500 space-y-4">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 overflow-hidden pb-20">
+                        <div className="card p-4 border-t-4 border-blue-500 overflow-y-auto space-y-4">
                             <h3 className="font-bold flex gap-2 text-[var(--text-main)]"><Globe/> WEB & PAGOS</h3>
                             <div className="flex justify-between items-center bg-[#222] p-3 rounded"><div><p className="text-white text-sm font-bold">Estado Tienda</p></div><button onClick={()=>updateDB({...db, settings: {...db.settings, storeOpen: !db.settings.storeOpen}})} className={`px-4 py-1 rounded font-black text-xs uppercase ${db.settings.storeOpen?'bg-green-500 text-black':'bg-red-500 text-white'}`}>{db.settings.storeOpen?'ABIERTA':'CERRADA'}</button></div>
                             <div className="bg-[#222] p-3 rounded space-y-2">
@@ -894,13 +1023,13 @@
                                 <div className="flex justify-between items-center"><span className="text-gray-400 text-xs">Permitir Domicilio</span><button onClick={()=>updateDB({...db, settings: {...db.settings, deliveryEnabled: !db.settings.deliveryEnabled}})} className={`w-8 h-4 rounded-full relative ${db.settings.deliveryEnabled!==false?'bg-green-500':'bg-gray-600'}`}><div className={`w-2 h-2 bg-white rounded-full absolute top-1 ${db.settings.deliveryEnabled!==false?'right-1':'left-1'}`}></div></button></div>
                             </div>
                         </div>
-                        <div className="card p-4 border-t-4 border-[var(--gold)] space-y-4">
+                        <div className="card p-4 border-t-4 border-[var(--gold)] overflow-y-auto space-y-4">
                             <h3 className="font-bold mb-2 text-[var(--text-main)]"><Lock/> SEGURIDAD & LISTAS</h3>
                             <div><label className="text-xs text-gray-500">Clave Supervisor (QR)</label><div className="bg-white p-2 mt-2 w-fit rounded"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=SUPERVISOR:${db.settings.supervisorKey}`} className="w-24 h-24"/></div><input className="input-std text-sm mt-2" value={db.settings.supervisorKey} onChange={e=>updateDB({...db, settings:{...db.settings, supervisorKey:e.target.value}})}/></div>
                             <hr className="border-[#333]"/>
-                            <div><p className="text-[var(--text-main)] text-xs font-bold mb-1">PLATAFORMAS</p><div className="flex gap-1 mb-2"><input className="input-std text-xs" value={newItem.plat} onChange={e=>setNewItem({...newItem, plat:e.target.value})}/><button onClick={()=>addItem('platforms',newItem.plat)} className="btn-gold">+</button></div><div className="h-full overflow-y-auto bg-[#222] p-2 rounded custom-scroll" style={{maxHeight:'300px'}}>{db.settings.platforms.map((p,i)=><div key={i} className="flex justify-between text-gray-400 text-xs border-b border-[#333] py-1"><span>{p}</span><button onClick={()=>delItem('platforms',i)} className="text-red-500">x</button></div>)}</div></div>
+                            <div><p className="text-[var(--text-main)] text-xs font-bold mb-1">PLATAFORMAS</p><div className="flex gap-1 mb-2"><input className="input-std text-xs" value={newItem.plat} onChange={e=>setNewItem({...newItem, plat:e.target.value})}/><button onClick={()=>addItem('platforms',newItem.plat)} className="btn-gold">+</button></div><div className="h-24 overflow-y-auto bg-[#222] p-2 rounded custom-scroll">{db.settings.platforms.map((p,i)=><div key={i} className="flex justify-between text-gray-400 text-xs border-b border-[#333] py-1"><span>{p}</span><button onClick={()=>delItem('platforms',i)} className="text-red-500">x</button></div>)}</div></div>
                         </div>
-                        <div className="card p-4 border-t-4 border-green-500 flex flex-col">
+                        <div className="card p-4 border-t-4 border-green-500 overflow-y-auto flex flex-col">
                             <div className="flex justify-between items-center mb-2"><h3 className="text-white font-bold flex gap-2"><Table/> TABULADOR ENVÍOS</h3><label className="text-[10px] text-blue-400 cursor-pointer">Cargar CSV<input type="file" hidden onChange={handleCSV}/></label></div>
                             <div className="flex gap-1 mb-2 bg-[#222] p-1 rounded"><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="Min" type="number" value={tabItem.min} onChange={e=>setTabItem({...tabItem, min:e.target.value})}/><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="Max" type="number" value={tabItem.max} onChange={e=>setTabItem({...tabItem, max:e.target.value})}/><input className="bg-transparent text-white text-xs w-12 border-b border-[#444] text-center" placeholder="$" type="number" value={tabItem.price} onChange={e=>setTabItem({...tabItem, price:e.target.value})}/><button className="text-green-500 font-bold px-2" onClick={addRate}>+</button></div>
                             <div className="flex-1 bg-[#222] rounded overflow-y-auto p-2 space-y-1 custom-scroll">{db.settings.deliveryTable.map((r,i)=><div key={i} className="flex justify-between text-xs text-gray-300 border-b border-[#333] pb-1"><span>{r.min} - {r.max} KM</span><span className="text-[var(--gold)] font-bold">${r.price}</span></div>)}</div>
@@ -1005,9 +1134,6 @@
             const [countedCash, setCountedCash] = useState('');
             const [countedCard, setCountedCard] = useState('');
             const [cutResult, setCutResult] = useState(null);
-            
-            // New state for handling web order processing
-            const [processingWebOrderId, setProcessingWebOrderId] = useState(null);
 
             const showIngredients = (p) => {
                 setIngredientsProduct(p);
@@ -1027,7 +1153,6 @@
             ];
 
             const handleWebOrder = (order) => {
-                setProcessingWebOrderId(order.id); // Save ID, don't delete
                 setCart(order.items);
                 setOrderDetails({
                     name: order.clientName, 
@@ -1039,7 +1164,7 @@
                 setOrderType(order.address === 'RECOGER' ? 'takeaway' : 'delivery');
                 setDeliveryCoords(order.clientLoc);
                 setModal('cockpit');
-                // Removed updateDB delete call here
+                updateDB({...db, orders: db.orders.filter(o=>o.id!==order.id)}); 
             };
             
             const cancelWebOrder = (id) => { 
@@ -1247,52 +1372,17 @@
                      if(!orderDetails.phone || orderDetails.phone.length !== 10) return showToast("Teléfono debe ser de 10 dígitos");
                      if(!orderDetails.address) return showToast("Falta Dirección");
                 }
-                
-                // Logic to update existing Web Order OR create new order
-                let updatedOrders = [...db.orders];
-                let orderId = generateId();
-                let orderNum = Math.floor(Math.random()*9000)+1000;
-                
-                if (processingWebOrderId) {
-                     // Update existing order
-                     updatedOrders = updatedOrders.map(o => {
-                         if (o.id === processingWebOrderId) {
-                             orderId = o.id; // Keep same ID
-                             orderNum = o.orderNum; // Keep same Num
-                             return {
-                                 ...o,
-                                 items: cart,
-                                 total,
-                                 method: payMethod,
-                                 status: 'pending', // Move to kitchen
-                                 address: orderType === 'delivery' ? `${orderDetails.address} (Ref: ${orderDetails.references})` : orderType.toUpperCase(),
-                                 clientName: orderDetails.name || 'Cliente',
-                                 clientPhone: orderDetails.phone,
-                                 clientLoc: orderType === 'delivery' ? deliveryCoords : null,
-                                 driverAssignMode: db.settings.driverAssign,
-                                 deliveryFee: orderType === 'delivery' ? deliveryFee : 0,
-                                 driver: null,
-                                 settled: false
-                             };
-                         }
-                         return o;
-                     });
-                } else {
-                    // Create new order
-                    const newOrder = {
-                        id: orderId, 
-                        orderNum: orderNum,
-                        items: cart, total, method: payMethod, status: 'pending', createdAt: new Date().toISOString(),
-                        address: orderType === 'delivery' ? `${orderDetails.address} (Ref: ${orderDetails.references})` : orderType.toUpperCase(),
-                        clientName: orderDetails.name || 'Cliente', clientPhone: orderDetails.phone,
-                        clientLoc: orderType === 'delivery' ? deliveryCoords : null, 
-                        source: orderType === 'platform' ? 'platform' : 'store',
-                        platformName: orderDetails.platform, platformOrderId: orderDetails.platformOrderId,
-                        driverAssignMode: db.settings.driverAssign, deliveryFee: orderType === 'delivery' ? deliveryFee : 0,
-                        driver: null, settled: false
-                    };
-                    updatedOrders.push(newOrder);
-                }
+                const order = {
+                    id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000,
+                    items: cart, total, method: payMethod, status: 'pending', createdAt: new Date().toISOString(),
+                    address: orderType === 'delivery' ? `${orderDetails.address} (Ref: ${orderDetails.references})` : orderType.toUpperCase(),
+                    clientName: orderDetails.name || 'Cliente', clientPhone: orderDetails.phone,
+                    clientLoc: orderType === 'delivery' ? deliveryCoords : null, 
+                    source: orderType === 'platform' ? 'platform' : 'store',
+                    platformName: orderDetails.platform, platformOrderId: orderDetails.platformOrderId,
+                    driverAssignMode: db.settings.driverAssign, deliveryFee: orderType === 'delivery' ? deliveryFee : 0,
+                    driver: null, settled: false
+                };
 
                 let newCashDrawer = db.cashDrawer.current;
                 if(payMethod==='cash') {
@@ -1300,11 +1390,9 @@
                     setTimeout(() => checkCashLimit(total), 1000); 
                 }
 
-                updateDB({ ...db, orders: updatedOrders, cashDrawer: {...db.cashDrawer, current: newCashDrawer} });
-                
-                setCart([]); setModal(null); setCashReceived(0); setVoucher(''); setProcessingWebOrderId(null);
+                updateDB({ ...db, orders: [...db.orders, order], cashDrawer: {...db.cashDrawer, current: newCashDrawer} });
+                setCart([]); setModal(null); setCashReceived(0); setVoucher(''); 
                 setOrderDetails({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
-                showToast("Orden enviada a cocina");
             };
 
             useEffect(() => {
@@ -1637,7 +1725,8 @@
             const [suggestions, setSuggestions] = useState([]);
             const [addressTimer, setAddressTimer] = useState(null);
             const [clientCatFilter, setClientCatFilter] = useState('Todos'); 
-            
+            const [showOutOfRangeModal, setShowOutOfRangeModal] = useState(false); // New state for modal
+
             useEffect(() => {
                 const storedOrderId = localStorage.getItem('client_active_order_id');
                 if (storedOrderId) {
@@ -1676,11 +1765,10 @@
                 return () => clearTimeout(timer);
             }, [db]);
 
-            if ((!db || !db.products) && dbLoading) {
-                 return <div className="h-screen bg-cover bg-center" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
+            // Ensure store closed logic is robust
+            if (!db.settings.storeOpen || (!db.products || db.products.length === 0)) {
+                 return <div className="h-screen bg-cover bg-center fixed inset-0 z-[9999]" style={{backgroundImage:`url(${CLOSED_IMG})`, backgroundColor: 'black'}}></div>;
             }
-            
-            if(!db.settings.storeOpen || (!db.products || db.products.length === 0)) return <div className="h-screen bg-cover bg-center fixed inset-0 z-[9999]" style={{backgroundImage:`url(${CLOSED_IMG})`}}></div>;
 
             const deliveryFee = useMemo(() => {
                 if(form.type==='delivery' && clientCoords) {
@@ -1693,6 +1781,15 @@
             const total = cart.reduce((a,b)=>a+b.price*b.qty,0) + deliveryFee;
 
             const preSubmit = () => {
+                 // Check range here before going to checkout
+                 if (clientCoords) {
+                     const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], clientCoords[0], clientCoords[1]);
+                     if (dist > db.settings.deliveryRadius) {
+                         setShowOutOfRangeModal(true);
+                         return;
+                     }
+                 }
+
                  const hasComplements = db.products.some(p => p.isComplement && p.active);
                  if (hasComplements && !showComplements) {
                      setShowComplements(true);
@@ -1897,6 +1994,17 @@
                         )}
                     </div>
                     
+                    {/* OUT OF RANGE MODAL */}
+                    {showOutOfRangeModal && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
+                            <div className="bg-[var(--bg-card)] p-6 rounded-xl w-full max-w-sm text-center border border-red-500 shadow-2xl animate-bounce">
+                                <h3 className="text-xl font-bold text-red-500 mb-2">🚫 FUERA DE ZONA</h3>
+                                <p className="text-white mb-4">Lo sentimos, tu ubicación parece estar fuera de nuestro rango de reparto.</p>
+                                <button onClick={() => { setShowOutOfRangeModal(false); setView('checkout'); }} className="w-full bg-[var(--gold)] text-black font-bold py-3 rounded-lg">INDICAR DIRECCIÓN DIFERENTE</button>
+                            </div>
+                        </div>
+                    )}
+                    
                     {showComplements && (
                         <div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end p-4 animate-in slide-in-from-bottom">
                             <div className="bg-[var(--bg-card)] rounded-t-2xl p-6 border-t border-[var(--gold)]">
@@ -1965,7 +2073,7 @@
                                     <input className="input-std" placeholder="Referencias (Casa color, portón...)" value={form.references} onChange={e=>setForm({...form,references:e.target.value})}/>
                                     <p className="text-xs text-gray-500">Toca el mapa si la ubicación no es exacta:</p>
                                     
-                                    <div className="h-32 w-full rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'', isClient:true}, {pos:STORE_COORDS, emoji:'', isStore:true}]} onClickMap={handleMapClick} zoom={15} /></div>
+                                    <div className="h-64 w-full rounded border overflow-hidden relative"><LeafletMap center={clientCoords||STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'', isClient:true}, {pos:STORE_COORDS, emoji:'', isStore:true}]} onClickMap={handleMapClick} zoom={14} radius={db.settings.deliveryRadius} /></div>
                                 </div>
                             )}
                         </div>
