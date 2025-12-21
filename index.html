@@ -1059,26 +1059,6 @@
             );
         };
 
-        const AdminPanel = ({ db, updateDB }) => {
-            const [tab, setTab] = useState('dash');
-            return (
-                <div className="h-full flex flex-col bg-[var(--bg-body)]">
-                    <div className="flex gap-2 p-4 bg-[var(--bg-card)] border-b border-[var(--border)] overflow-x-auto scroll-hide">
-                        {['dash','menu','inv','staff','coup','conf','tickets'].map(t => <button key={t} onClick={()=>setTab(t)} className={`px-4 py-2 rounded font-bold uppercase whitespace-nowrap ${tab===t?'bg-[var(--gold)] text-black':'text-gray-500 bg-[#222]'}`}>{t}</button>)}
-                    </div>
-                    <div className="flex-1 p-6 overflow-hidden">
-                        {tab==='dash' && <Dashboard db={db}/>}
-                        {tab==='menu' && <ProductManager db={db} updateDB={updateDB}/>}
-                        {tab==='inv' && <InventoryManager db={db} updateDB={updateDB}/>}
-                        {tab==='staff' && <StaffManager db={db} updateDB={updateDB}/>}
-                        {tab==='coup' && <CouponManager db={db} updateDB={updateDB}/>}
-                        {tab==='conf' && <SettingsManager db={db} updateDB={updateDB}/>}
-                        {tab==='tickets' && <TicketPreview db={db} updateDB={updateDB}/>}
-                    </div>
-                </div>
-            );
-        };
-
         const POS = ({ db, updateDB, user }) => {
             const [cart, setCart] = useState([]);
             const [modal, setModal] = useState(null); 
