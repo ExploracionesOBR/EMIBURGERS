@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EMI BURGERS - EL SABOR QUE MANDA!</title>
+    <title>EMI BURGERS - ERP V77 FINAL</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@300;400;500;700;900&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
@@ -338,7 +338,6 @@
                 } else {
                      const currentCenter = mapInstance.current.getCenter();
                      const dist = Math.sqrt(Math.pow(currentCenter.lat - center[0], 2) + Math.pow(currentCenter.lng - center[1], 2));
-                     // Only re-center if distance is significant to avoid jitter
                      if (dist > 0.001) { 
                          mapInstance.current.setView(center, zoom); 
                      }
