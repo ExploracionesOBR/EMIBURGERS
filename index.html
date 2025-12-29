@@ -20,81 +20,80 @@
 
     <!-- QR Scanner Lib -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<style>
+    <style>
         :root {
             --gold: #FFD700; --accent: #FF4500; --success: #00e676; --danger: #ff3333;
-            --z-ui: 10; --z-fab: 2000; --z-loader: 10000;
+            --z-map: 0; --z-ui: 10; --z-fab: 2000; --z-modal: 5000; --z-toast: 6000; --z-loader: 10000;
         }
-        body { background-color: #050505; color: #f0f0f0; font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; height: 100vh; width: 100vw; }
-        #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
-        .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
-        .card { background-color: #141414; border: 1px solid #333; border-radius: 0.75rem; }
-        .input-std { background-color: #222 !important; border: 1px solid #333 !important; color: white !important; padding: 0.75rem; width: 100%; outline: none; border-radius: 0.5rem; }
-        .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; }
         
-        /* --- CORRECCIÓN BANNER (Para que se vea completo) --- */
-        .banner-container {
-            width: 100%;
-            height: 140px; /* Altura fija reducida */
-            background-color: #000; /* Fondo negro para rellenar huecos */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+        /* Tema y Fondos */
+        body { background-color: #050505; color: #f0f0f0; font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; height: 100vh; width: 100vw; }
+        
+        /* Login y Tarjetas (Fondo Sólido) */
+        .card { 
+            background-color: #141414 !important; /* Fondo sólido forzado */
+            border: 1px solid #333; 
+            border-radius: 0.75rem; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8); /* Sombra fuerte */
+            position: relative; z-index: 20;
         }
-        .mobile-banner { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; /* AJUSTA LA IMAGEN PARA QUE QUEPA ENTERA */
-            display: block; 
+        
+        /* Controles Admin (Visibles por defecto) */
+        .theme-toggle, .share-btn, .gods-eye, .dash-map-btn, .logout-ghost { 
+            display: flex !important; 
+            opacity: 1 !important; 
+            visibility: visible !important; 
         }
 
-        /* --- CORRECCIÓN VIDEO (Tamaño Visible) --- */
-        .mobile-video-container { 
-            position: fixed; bottom: 70px; left: 0; width: 100%; height: 120px; /* Tamaño restaurado */
-            z-index: 50; pointer-events: none; background: black; overflow: hidden; 
-            border-top: 2px solid var(--gold); /* Borde estético */
+        /* OCULTAR SOLO EN MODO CLIENTE */
+        body.client-mode .theme-toggle, 
+        body.client-mode .share-btn, 
+        body.client-mode .gods-eye, 
+        body.client-mode .dash-map-btn, 
+        body.client-mode .logout-ghost { 
+            display: none !important; 
         }
-        .mobile-video-container video { 
-            width: 100%; height: 100%; 
-            object-fit: cover; 
-            opacity: 0.8; 
-        }
-        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%); }
 
-        /* --- LOADER --- */
+        /* --- RESTO DE ESTILOS (Banner, Video, DiDi, Loader) --- */
         .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
         .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
         .loader-bar { width: 200px; height: 4px; background: #333; border-radius: 4px; overflow: hidden; }
         .loader-progress { height: 100%; background: var(--accent); width: 50%; animation: load-slide 1s infinite; }
-        @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
-        @keyframes load-slide { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
+        
+        /* Banner y Video */
+        .banner-container { width: 100%; height: 140px; background-color: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .mobile-banner { width: 100%; height: 100%; object-fit: contain; display: block; }
+        .mobile-video-container { position: fixed; bottom: 70px; left: 0; width: 100%; height: 120px; z-index: 50; pointer-events: none; background: black; overflow: hidden; border-top: 2px solid var(--gold); }
+        .mobile-video-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%); }
 
-        /* --- BOTÓN INSTALAR --- */
-        .install-btn { 
-            position: fixed; bottom: 20px !important; left: 20px !important; top: auto !important;
-            z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; 
-            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.8); animation: bounce 2s infinite; 
-        }
+        /* Botones Flotantes */
+        .install-btn { position: fixed; bottom: 20px !important; left: 20px !important; top: auto !important; z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.8); animation: bounce 2s infinite; }
         .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
-        /* --- GENERALES Y UTILIDADES --- */
-        .theme-toggle, .share-btn, .gods-eye, .dash-map-btn, .logout-ghost { display: none !important; } /* Ocultar UI de admin en móvil si es necesario */
-        body:not(.client-mode) .theme-toggle { display: flex !important; position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); background: #141414; padding: 0; border-radius: 50%; width: 40px; height: 40px; justify-content: center; align-items: center; border: 1px solid #333; }
-        body:not(.client-mode) .share-btn { display: flex !important; position: fixed; top: 15px; right: 15px; background: var(--gold); border-radius: 50%; width: 45px; height: 45px; align-items: center; justify-content: center; z-index: 9999; }
+        .theme-toggle { position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); background: #141414; padding: 0; border-radius: 50%; width: 40px; height: 40px; border: 1px solid #333; }
+        .logout-ghost { position: fixed; top: 10px; left: 10px; z-index: var(--z-fab); opacity: 0.8; }
+        .share-btn { position: fixed; top: 15px; right: 15px; background: var(--gold); border-radius: 50%; width: 45px; height: 45px; align-items: center; justify-content: center; z-index: 9999; }
+        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); opacity: 0.6; transform: scale(0.9); cursor: pointer; }
+        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); z-index: 5001; }
         
         .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
         
-        /* DiDi UI */
+        /* Inputs y Botones */
+        .input-std { background-color: #222 !important; border: 1px solid #333 !important; color: white !important; padding: 0.75rem; width: 100%; outline: none; border-radius: 0.5rem; }
+        .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+        .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
+
+        /* Animaciones */
+        @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
+        @keyframes load-slide { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        /* Utilidades DiDi y Mapas */
         .didi-search-container { background: white; border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .didi-input { flex: 1; border: none; outline: none; font-size: 16px; color: black; }
         .didi-btn-orange { background: #FF6600; color: white; font-weight: bold; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
         .didi-suggestions { background: white; border-radius: 0 0 8px 8px; margin-top: -5px; max-height: 200px; overflow-y: auto; color: black; }
         .didi-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        
-        /* Leaflet & Mapas */
         .leaflet-container { background: #1a1a1a; width: 100%; height: 100%; z-index: 0; }
         .track-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; height: 100%; padding: 1rem; overflow-y: auto; }
         @media (min-width: 768px) { .track-grid { grid-template-columns: 1fr 1fr; overflow: hidden; } }
@@ -2462,12 +2461,11 @@ const App = () => {
             const [centerNotification, setCenterNotification] = useState(null);
             const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-            // Contadores para Admin
+            // Contadores
             const onlineStaff = db.users ? db.users.filter(u => u.online && u.role !== 'viewer').length : 0;
             const activeViewers = db.users ? db.users.filter(u => u.role === 'viewer' && (Date.now() - (u.lastActive || 0) < 300000)).length : 0;
             const saveTimeout = useRef(null);
 
-            // ID Dispositivo
             useEffect(() => {
                 if(!localStorage.getItem('device_id')) localStorage.setItem('device_id', 'DEV_' + Math.random().toString(36).substr(2, 9));
             }, []);
@@ -2477,35 +2475,43 @@ const App = () => {
                 if (typeof newDataOrFn === 'function') { newData = newDataOrFn(db); } else { newData = newDataOrFn; }
                 newData._ver = Date.now();
                 setDB(newData);
-                // NOTA: Ya no guardamos en local storage "emi_v87_supreme_data" para evitar datos viejos
+                try { localStorage.setItem('emi_v87_supreme_data', JSON.stringify(newData)); } catch (e) {}
                 if (saveTimeout.current) clearTimeout(saveTimeout.current);
                 saveTimeout.current = setTimeout(() => { saveCloudDB(newData); }, 2000);
             };
 
-            // CARGA DE DATOS (FORZAR NUBE)
+            // LOGICA MAESTRA DE CARGA
             useEffect(() => { 
                 const init = async () => {
                     setIsInitialLoading(true);
                     try {
-                        console.log("Iniciando descarga de nube...");
                         const cloudResp = await fetchCloudDB();
                         const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
                         
-                        if(remoteData && remoteData.products) {
-                            console.log("Datos recibidos:", remoteData.products.length, "productos");
+                        // Si la nube tiene datos válidos
+                        if(remoteData && remoteData.products && Array.isArray(remoteData.products) && remoteData.products.length > 0) {
                             setDB(remoteData);
+                            localStorage.setItem('emi_v87_supreme_data', JSON.stringify(remoteData));
                         } else {
-                            console.error("Nube vacía o error estructura", cloudResp);
+                            console.warn("Nube vacía, inicializando con datos por defecto...");
+                            // SI LA NUBE ESTÁ VACÍA, USAR DATOS LOCALES O INICIALES Y GUARDAR ARRIBA
+                            const localData = localStorage.getItem('emi_v87_supreme_data');
+                            if(localData) {
+                                setDB(JSON.parse(localData));
+                            } else {
+                                setDB(initialDB); 
+                                saveCloudDB(initialDB); // Autoreparación de nube vacía
+                            }
                         }
                     } catch(e) {
-                        console.error("Error fatal descarga", e);
+                        console.error("Error carga", e);
+                        setDB(initialDB);
                     } finally {
                         setIsInitialLoading(false);
                     }
                 };
                 init();
                 
-                // Sincronización continua
                 const interval = setInterval(async () => {
                      const cloudResp = await fetchCloudDB();
                      const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
@@ -2514,21 +2520,20 @@ const App = () => {
                               setDB(remoteData);
                               if(remoteData.orders.length > db.orders.length) playSound();
                          }
-                         if(db.settings.storeOpen && !remoteData.settings.storeOpen) setDB(remoteData); // Cierre forzoso
+                         if(db.settings.storeOpen && !remoteData.settings.storeOpen) setDB(remoteData);
                      }
                 }, 3000);
                 return () => clearInterval(interval);
-            }, []); // Sin dependencias para que corra 1 vez limpio al inicio
+            }, []);
 
             useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
             
-            // Auto Login Cliente
+            // Detección de Cliente
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('menu') === 'true' || params.get('take_order')) {
                     const devId = localStorage.getItem('device_id');
                     setUser({role:'cliente', name:'Invitado', id: devId});
-                    // Registro visita
                     setTimeout(() => {
                         setDB(prevDB => {
                             if(!prevDB.users) return prevDB;
@@ -2565,7 +2570,7 @@ const App = () => {
                         <img src={LOGO_URL} className="loader-logo"/>
                         <h2 className="text-xl mb-2">CONECTANDO...</h2>
                         <div className="loader-bar"><div className="loader-progress"></div></div>
-                        <p className="text-xs text-gray-500 mt-2">Obteniendo menú de la nube</p>
+                        <p className="text-xs text-gray-500 mt-2">Sincronizando menú</p>
                     </div>
                 );
             }
@@ -2573,7 +2578,7 @@ const App = () => {
             if(!user) return (
                 <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
                     <div className="absolute inset-0 z-0" style={{backgroundImage: `url(${BANNER_URL})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.4)'}}></div>
-                    <div className="card p-8 w-full max-w-sm text-center bg-[var(--bg-card)] z-10 shadow-2xl">
+                    <div className="card p-8 w-full max-w-sm text-center z-10">
                         <img src={LOGO_URL} className="w-32 mx-auto mb-6" onError={(e) => e.target.style.display='none'} />
                         <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI Burgers</h1>
                         <input className="input-std text-center mb-2" placeholder="Usuario" value={loginData.u} onChange={e=>setLoginData({...loginData, u:e.target.value})}/>
@@ -2589,12 +2594,35 @@ const App = () => {
                     {user.role !== 'cliente' && <div className="logout-ghost"><button onClick={handleLogout} className="bg-red-600/90 text-white px-3 py-1 rounded text-xs font-bold backdrop-blur shadow-md hover:bg-red-500 transition">SALIR</button></div>}
                     {centerNotification && <div className="center-alert"><div className="text-4xl mb-4">📢</div><h3 className="text-2xl font-brand text-[var(--gold)] mb-2">ATENCIÓN</h3><p className="text-xl font-bold">{centerNotification}</p></div>}
                     
+                    <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
                     {user.role!=='cajero' && user.role!=='cliente' && <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>}
+
                     {user.role==='admin' && <AdminPanel db={db} updateDB={updateDB} stats={{onlineStaff, activeViewers}}/>}
                     {user.role==='cajero' && <POS db={db} updateDB={updateDB} user={user}/>}
                     {user.role==='cliente' && <ClientApp db={db} updateDB={updateDB}/>}
                     {user.role==='repartidor' && <DriverApp db={db} updateDB={updateDB} user={user}/>}
                     {user.role==='cocina' && <Kitchen db={db} updateDB={updateDB}/>}
+                    
+                    {user.name==='Super Admin' && (
+                        <div className={`gods-eye group ${godMenuOpen ? 'active' : ''}`}>
+                            <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_15px_var(--gold)] z-50 relative" onClick={()=>setGodMenuOpen(!godMenuOpen)}><Eye size={30} className="text-black"/></button>
+                            {godMenuOpen && (
+                                <div className="gods-menu">
+                                    <p className="text-[var(--gold)] text-[10px] font-bold text-center mb-2 uppercase">CAMBIAR VISTA</p>
+                                    <div className="grid grid-cols-2 gap-2 mb-3">
+                                        <button onClick={()=>setUser({...user, role:'admin'})} className="bg-blue-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">ADMIN</button>
+                                        <button onClick={()=>setUser({...user, role:'cajero'})} className="bg-green-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">CAJA</button>
+                                        <button onClick={()=>setUser({...user, role:'cocina'})} className="bg-orange-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">COCINA</button>
+                                        <button onClick={()=>setUser({...user, role:'repartidor'})} className="bg-purple-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">DRIVER</button>
+                                        <button onClick={()=>setUser({...user, role:'cliente'})} className="bg-yellow-500 text-black text-[10px] font-bold p-2 rounded col-span-2 hover:scale-105 transition">VISTA CLIENTE</button>
+                                    </div>
+                                    <hr className="border-[#333] mb-2"/>
+                                    <button onClick={resetApp} className="text-red-500 font-bold text-xs bg-black/50 p-2 rounded w-full hover:bg-red-900/20 mb-1">🔥 RESET FÁBRICA</button>
+                                    <button className="text-gray-400 text-[10px] text-center w-full">{db.orders.length} Pedidos</button>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             );
         };
