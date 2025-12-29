@@ -120,6 +120,29 @@
         @media (min-width: 768px) { .track-grid { grid-template-columns: 1fr 1fr; overflow: hidden; } }
         .track-col-left { display: flex; flex-direction: column; gap: 1rem; }
         .track-col-right { background: #111; border-radius: 1rem; padding: 1rem; overflow-y: auto; height: fit-content; }
+    /* PANTALLA DE CARGA INICIAL */
+        .app-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000; z-index: 10000;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Bangers', cursive;
+        }
+        .loader-logo {
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 4px solid var(--gold); object-fit: cover;
+            animation: pulse-load 1s infinite; margin-bottom: 20px;
+        }
+        .loader-bar {
+            width: 200px; height: 4px; background: #333;
+            border-radius: 4px; overflow: hidden;
+        }
+        .loader-progress {
+            height: 100%; background: var(--accent);
+            width: 50%; animation: load-slide 1s infinite;
+        }
+        @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
+        @keyframes load-slide { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
     </style>
 </head>
 <body class="dark">
@@ -2244,13 +2267,13 @@ const App = () => {
             const [godMenuOpen, setGodMenuOpen] = useState(false);
             const [centerNotification, setCenterNotification] = useState(null);
             
-            // CONTADORES EN TIEMPO REAL
-            const onlineStaff = db.users.filter(u => u.online && u.role !== 'viewer').length;
-            const activeViewers = db.users.filter(u => u.role === 'viewer' && (Date.now() - (u.lastActive || 0) < 300000)).length; // Activos en 5 min
+            // ESTADO NUEVO: CARGANDO DATOS
+            const [isInitialLoading, setIsInitialLoading] = useState(true);
 
+            const onlineStaff = db.users.filter(u => u.online && u.role !== 'viewer').length;
+            const activeViewers = db.users.filter(u => u.role === 'viewer' && (Date.now() - (u.lastActive || 0) < 300000)).length;
             const saveTimeout = useRef(null);
 
-            // Identificación de Dispositivo
             useEffect(() => {
                 if(!localStorage.getItem('device_id')) {
                     localStorage.setItem('device_id', 'DEV_' + Math.random().toString(36).substr(2, 9));
@@ -2267,14 +2290,26 @@ const App = () => {
                 saveTimeout.current = setTimeout(() => { saveCloudDB(newData); }, 2000);
             };
 
+            // CARGA INICIAL ROBUSTA
             useEffect(() => { 
                 const init = async () => {
-                    const cloudData = await fetchCloudDB();
-                    if(cloudData && cloudData.data) {
-                        setDB(cloudData.data);
-                        localStorage.setItem('emi_v87_supreme_data', JSON.stringify(cloudData.data));
-                    } else {
-                        try { const s = localStorage.getItem('emi_v87_supreme_data'); if(s) setDB(JSON.parse(s)); } catch(e) {}
+                    setIsInitialLoading(true); // Bloquear pantalla
+                    try {
+                        const cloudData = await fetchCloudDB();
+                        if(cloudData && cloudData.data) {
+                            setDB(cloudData.data);
+                            localStorage.setItem('emi_v87_supreme_data', JSON.stringify(cloudData.data));
+                            console.log("Datos frescos cargados");
+                        } else {
+                            // Fallback a local si no hay internet
+                            const s = localStorage.getItem('emi_v87_supreme_data'); 
+                            if(s) setDB(JSON.parse(s)); 
+                        }
+                    } catch(e) {
+                        console.error("Error carga inicial", e);
+                    } finally {
+                        // DESBLOQUEAR PANTALLA SOLO CUANDO TENGAMOS DATOS
+                        setIsInitialLoading(false); 
                     }
                 };
                 init();
@@ -2293,27 +2328,22 @@ const App = () => {
 
             useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
             
-            // AUTO-LOGIN CLIENTE + REGISTRO DE VISITA
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('menu') === 'true' || params.get('take_order')) {
                     const devId = localStorage.getItem('device_id');
                     setUser({role:'cliente', name:'Invitado', id: devId});
                     
-                    // Registrar visita en DB (Solo si no existe o es vieja)
-                    // Hacemos esto con cuidado para no saturar
+                    // Registrar visita en segundo plano
                     setTimeout(() => {
                         setDB(prevDB => {
-                            const existing = prevDB.users.find(u => u.id === devId);
                             const now = Date.now();
-                            if(!existing || (now - (existing.lastActive || 0) > 300000)) { // 5 min
-                                const newUsers = prevDB.users.filter(u => u.id !== devId); // Limpiar viejo
-                                newUsers.push({ id: devId, name: 'Cliente Web', role: 'viewer', online: true, lastActive: now });
-                                return { ...prevDB, users: newUsers };
-                            }
-                            return prevDB;
+                            // Clonamos para no mutar directamente si no hay cambios reales
+                            const newUsers = prevDB.users.filter(u => u.id !== devId); 
+                            newUsers.push({ id: devId, name: 'Cliente Web', role: 'viewer', online: true, lastActive: now });
+                            return { ...prevDB, users: newUsers };
                         });
-                    }, 5000); // Esperar a que cargue todo
+                    }, 5000); 
                 }
             }, []);
             
@@ -2333,6 +2363,18 @@ const App = () => {
             const handleLogin = async () => { if(loginData.p === SUPER_USER_PASS) return setUser({role:'admin', name:'Super Admin', superUser:true}); const found = db.users.find(u => u.username === loginData.u && u.password === loginData.p); if(found) setUser(found); else showToast("Credenciales incorrectas"); };
             const resetApp = async () => { if(confirm("¿RESET TOTAL?")) { localStorage.removeItem('emi_v87_supreme_data'); await saveCloudDB(initialDB); window.location.reload(); } };
             const handleLogout = () => { if(confirm("¿Cerrar sesión?")) setUser(null); };
+
+            // PANTALLA DE CARGA (AQUÍ ESTÁ LA MAGIA)
+            if (isInitialLoading) {
+                return (
+                    <div className="app-loader">
+                        <img src={LOGO_URL} className="loader-logo"/>
+                        <h2 className="text-xl mb-2">CARGANDO MENÚ...</h2>
+                        <div className="loader-bar"><div className="loader-progress"></div></div>
+                        <p className="text-xs text-gray-500 mt-2">Sincronizando con Tienda</p>
+                    </div>
+                );
+            }
 
             if(!user) return (
                 <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
@@ -2356,7 +2398,6 @@ const App = () => {
                     <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
                     {user.role!=='cajero' && user.role!=='cliente' && <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>}
 
-                    {/* Pasamos los contadores al AdminPanel */}
                     {user.role==='admin' && <AdminPanel db={db} updateDB={updateDB} stats={{onlineStaff, activeViewers}}/>}
                     {user.role==='cajero' && <POS db={db} updateDB={updateDB} user={user}/>}
                     {user.role==='cliente' && <ClientApp db={db} updateDB={updateDB}/>}
