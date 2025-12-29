@@ -33,6 +33,7 @@
             --z-fab: 2000;
             --z-modal: 5000;
             --z-toast: 6000;
+            --z-loader: 10000;
         }
         
         body.dark { --bg-body: #050505; --bg-card: #141414; --text-main: #f0f0f0; --input-bg: #222; --border: #333; }
@@ -55,41 +56,65 @@
         .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; text-transform: uppercase; border-radius: 0.75rem; padding: 0.8rem; border: none; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); transition: transform 0.1s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; cursor: pointer; }
         .btn-gold:active { transform: scale(0.96); }
         
-        /* CORRECCIÓN VISUAL CLIENTE (BANNER Y VIDEO) */
-        .mobile-banner { 
-            width: 100%; height: 120px; /* Más pequeño */
-            object-fit: cover; display: block; 
-            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+        /* CORRECCIÓN BOTÓN INSTALAR (Flotante Abajo Izquierda) */
+        .install-btn { 
+            position: fixed; 
+            bottom: 20px !important; 
+            left: 20px !important; 
+            top: auto !important; /* Importante para anular estilos heredados */
+            z-index: 9999 !important; 
+            background: black; 
+            border: 2px solid var(--gold); 
+            border-radius: 50%; 
+            width: 50px; height: 50px; 
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            animation: bounce 2s infinite; 
         }
-        .mobile-video-container { 
-            position: fixed; bottom: 70px; left: 0; width: 100%; height: 80px; /* Video discreto */
-            z-index: 50; pointer-events: none; background: black;
-            overflow: hidden;
-        }
-        .mobile-video-container video { 
-            width: 100%; height: 100%; object-fit: cover; opacity: 0.6; 
-            transform: scale(1.1); /* Zoom out ligero */
-        }
-        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, var(--bg-body), transparent); }
-
-        /* UI DIDI Y FLOTANTES */
-        .install-btn { position: fixed; top: 15px; left: 15px; z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); animation: bounce 2s infinite; }
         .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+        /* PANTALLA CARGA */
+        .app-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000; z-index: var(--z-loader);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--gold); font-family: 'Bangers', cursive;
+        }
+        .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
+        .loader-bar { width: 200px; height: 4px; background: #333; border-radius: 4px; overflow: hidden; }
+        .loader-progress { height: 100%; background: var(--accent); width: 50%; animation: load-slide 1s infinite; }
+        @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
+        @keyframes load-slide { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
+
+        /* ESTILOS CLIENTE OPTIMIZADOS */
+        .mobile-banner { width: 100%; height: 140px; object-fit: cover; display: block; mask-image: linear-gradient(to bottom, black 85%, transparent 100%); }
+        .mobile-video-container { position: fixed; bottom: 70px; left: 0; width: 100%; height: 100px; z-index: 50; pointer-events: none; background: black; overflow: hidden; }
+        .mobile-video-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
+        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, var(--bg-body) 10%, transparent); }
+
+        /* UI FLOTANTE GENERAL */
+        .theme-toggle { position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); background: var(--bg-card); padding: 0; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
+        .logout-ghost { position: fixed; top: 10px; left: 10px; z-index: var(--z-fab); opacity: 0.8; transition: opacity 0.2s; }
+        .share-btn { position: fixed; top: 15px; right: 15px; background: var(--gold); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
+        .dash-map-btn { position: fixed; top: 75px; right: 0; background: #2563eb; color: white; padding: 10px 15px 10px 20px; border-radius: 30px 0 0 30px; font-weight: bold; font-size: 12px; z-index: 9998; box-shadow: -2px 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 5px; }
+        
+        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); opacity: 0.6; transition: all 0.3s; transform: scale(0.9); }
+        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
+        
+        /* DIDI SEARCH & MAPS */
         .didi-search-container { background: white; border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .didi-input { flex: 1; border: none; outline: none; font-size: 16px; color: black; font-weight: 500; }
         .didi-btn-orange { background: #FF6600; color: white; font-weight: bold; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
         .didi-suggestions { background: white; border-radius: 0 0 8px 8px; margin-top: -5px; max-height: 200px; overflow-y: auto; color: black; }
         .didi-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         
-        .theme-toggle { position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); background: var(--bg-card); padding: 0; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
-        .logout-ghost { position: fixed; top: 10px; left: 10px; z-index: var(--z-fab); opacity: 0.8; transition: opacity 0.2s; }
-        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); opacity: 0.6; transition: all 0.3s; transform: scale(0.9); }
-        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
-        .share-btn { position: fixed; top: 15px; right: 15px; background: var(--gold); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.2s; }
-        .dash-map-btn { position: fixed; top: 75px; right: 0; background: #2563eb; color: white; padding: 10px 15px 10px 20px; border-radius: 30px 0 0 30px; font-weight: bold; font-size: 12px; z-index: 9998; box-shadow: -2px 2px 10px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 5px; transition: transform 0.2s; }
-        
         .leaflet-container { background: #1a1a1a; width: 100%; height: 100%; z-index: 0; }
         .custom-pin { font-size: 32px; text-align: center; filter: drop-shadow(0 2px 3px black); }
+        .driver-order-icon { position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .driver-order-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; font-weight: 900; color: white; -webkit-text-stroke: 1px black; pointer-events: none; z-index: 10; }
+
+        /* UTILIDADES */
         .bill-btn { width: 100%; height: 60px; background-size: cover; background-repeat: no-repeat; background-position: center; border-radius: 8px; border: 1px solid #444; cursor: pointer; background-color: white; color: transparent; }
         .grid-cockpit { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 1.5rem; height: 100%; }
         .cockpit-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; position: relative; }
@@ -98,51 +123,30 @@
         .center-alert { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); border: 2px solid var(--gold); color: white; padding: 30px; border-radius: 15px; z-index: var(--z-modal); text-align: center; max-width: 90%; width: 400px; box-shadow: 0 0 50px rgba(255, 215, 0, 0.5); }
         .custom-toast { position: fixed; top: 20px; right: 20px; background: #e74c3c; border-left: 5px solid #c0392b; padding: 15px; border-radius: 5px; color: white; z-index: var(--z-toast); animation: slideIn 0.3s; display: flex; gap: 10px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-weight: bold; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
-        .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #777; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
-        .driver-nav-btn.active { color: var(--gold); }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         
         .waiting-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; background: white; color: black; }
         .logo-spinner-wrapper { position: relative; width: 150px; height: 150px; display: flex; items-center; justify-content: center; margin-bottom: 2rem; }
         .logo-pulse { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; animation: pulse-scale 1.5s infinite ease-in-out; z-index: 2; border: 4px solid var(--gold); }
         .ring-spin { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 4px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); animation: spin 1.5s linear infinite; z-index: 1; }
-        @keyframes pulse-scale { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
         .scan-region { width: 100%; height: 300px; overflow: hidden; background: #000; position: relative; border-radius: 12px; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; }
         .manual-input-container { display: flex; gap: 10px; margin-top: 20px; width: 100%; max-width: 300px; }
         .scanner-line { position: absolute; width: 100%; height: 2px; background: red; box-shadow: 0 0 10px red; animation: scan 2s infinite linear; top: 0; }
         @keyframes scan { 0% { top: 0; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        
         .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
         .admin-fab { position: fixed; bottom: 90px; left: 20px; z-index: 9000; }
         .admin-fab-menu { position: absolute; bottom: 60px; left: 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
         #reader { width: 100%; height: 100%; background: black; margin-bottom: 0; border: none; }
+        .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
+        .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #777; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
+        .driver-nav-btn.active { color: var(--gold); }
+        
         .track-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; height: 100%; padding: 1rem; overflow-y: auto; }
         @media (min-width: 768px) { .track-grid { grid-template-columns: 1fr 1fr; overflow: hidden; } }
         .track-col-left { display: flex; flex-direction: column; gap: 1rem; }
         .track-col-right { background: #111; border-radius: 1rem; padding: 1rem; overflow-y: auto; height: fit-content; }
-    /* PANTALLA DE CARGA INICIAL */
-        .app-loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #000; z-index: 10000;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            color: var(--gold); font-family: 'Bangers', cursive;
-        }
-        .loader-logo {
-            width: 120px; height: 120px; border-radius: 50%;
-            border: 4px solid var(--gold); object-fit: cover;
-            animation: pulse-load 1s infinite; margin-bottom: 20px;
-        }
-        .loader-bar {
-            width: 200px; height: 4px; background: #333;
-            border-radius: 4px; overflow: hidden;
-        }
-        .loader-progress {
-            height: 100%; background: var(--accent);
-            width: 50%; animation: load-slide 1s infinite;
-        }
-        @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
-        @keyframes load-slide { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
     </style>
 </head>
 <body class="dark">
@@ -1849,42 +1853,31 @@ const ClientApp = ({ db, updateDB }) => {
             const [ingredientsProduct, setIngredientsProduct] = useState(null);
             const [showLargeMap, setShowLargeMap] = useState(false);
             
-            // 1. PERSISTENCIA DE SESIÓN (Recuperar pedido al recargar)
-            useEffect(() => {
-                // Recuperar ID de pedido local
-                const storedOrderId = localStorage.getItem('client_active_order_id');
-                // Recuperar ID de dispositivo
-                const deviceId = localStorage.getItem('device_id');
+            // CIERRE AUTOMÁTICO REAL
+            if(!db.settings.storeOpen) return <div className="closed-store-overlay"></div>;
 
+            // ... (Resto de useEffects y funciones igual que antes) ...
+            // Incluir useEffect de persistencia y GPS aquí...
+            useEffect(() => {
+                const storedOrderId = localStorage.getItem('client_active_order_id');
                 if (storedOrderId) {
-                    // Buscar pedido actualizado en la DB que llega de la nube
                     const existingOrder = db.orders.find(o => o.id === storedOrderId);
                     if (existingOrder) {
-                        // Si ya se entregó, limpiar
                         if (existingOrder.status === 'delivered' || existingOrder.status === 'cancelled') {
                             localStorage.removeItem('client_active_order_id');
                             if(existingOrder.status === 'delivered') showToast("¡Pedido Entregado! Gracias.");
                         } else {
-                            // Si sigue activo, restaurar vista
                             setActiveOrder(existingOrder);
                             setView('track');
                         }
                     }
                 }
-                
-                // Forzar modo oscuro
                 document.body.classList.add('client-mode');
                 document.body.classList.add('dark');
                 document.body.classList.remove('light');
                 return () => { document.body.classList.remove('client-mode'); };
-            }, [db.orders]); // Se ejecuta cada vez que la DB se actualiza
+            }, [db.orders]);
 
-            // 2. DETECCIÓN TIENDA CERRADA
-            useEffect(() => {
-                if(!db.settings.storeOpen) setView('menu'); // Si cierran, volver al menú (bloqueado)
-            }, [db.settings.storeOpen]);
-
-            // GPS Inicial
             useEffect(() => {
                 navigator.geolocation.getCurrentPosition((pos) => {
                     const coords = [pos.coords.latitude, pos.coords.longitude];
@@ -1896,8 +1889,7 @@ const ClientApp = ({ db, updateDB }) => {
                 }, () => setClientCoords(STORE_COORDS)); 
             }, []);
 
-            if(!db.settings.storeOpen) return <div className="closed-store-overlay"></div>;
-
+            // Cálculos
             const deliveryFee = useMemo(() => {
                 if(form.type==='delivery' && deliveryCoords) {
                     const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]);
@@ -1905,11 +1897,10 @@ const ClientApp = ({ db, updateDB }) => {
                 }
                 return 0;
             }, [deliveryCoords, form.type, db.settings.deliveryTable]);
-
             const total = cart.reduce((a,b)=>a+b.price*b.qty,0) + deliveryFee;
 
+            // Funciones de Submit y Update (Mismas de siempre)
             const preSubmit = () => { const hasComplements = db.products.some(p => p.isComplement && p.active); if (hasComplements && !showComplements) setShowComplements(true); else { setView('checkout'); setShowComplements(false); } };
-
             const submit = () => {
                 if(activeOrder) return showToast("Ya tienes un pedido en curso");
                 if(!form.name) return showToast("Falta Nombre");
@@ -1919,22 +1910,10 @@ const ClientApp = ({ db, updateDB }) => {
                     if (!form.address) return showToast("Falta Dirección");
                     if (deliveryCoords) { const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]); if (dist > db.settings.deliveryRadius) return showToast("Fuera de zona"); }
                 }
-                
-                const order = { 
-                    id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, 
-                    items: cart, total, status: 'web_pending_payment', method: form.pay, payAmount: form.payAmount, 
-                    createdAt: new Date().toISOString(), address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', 
-                    clientName: form.name, clientPhone: form.phone, clientLoc: deliveryCoords || clientCoords, source: 'web',
-                    deviceId: localStorage.getItem('device_id') // Guardar ID dispositivo para tracking
-                };
-                
+                const order = { id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, items: cart, total, status: 'web_pending_payment', method: form.pay, payAmount: form.payAmount, createdAt: new Date().toISOString(), address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', clientName: form.name, clientPhone: form.phone, clientLoc: deliveryCoords || clientCoords, source: 'web', deviceId: localStorage.getItem('device_id') };
                 localStorage.setItem('client_active_order_id', order.id);
-                updateDB({...db, orders: [...db.orders, order]}); 
-                setActiveOrder(order); 
-                setView('track');
+                updateDB({...db, orders: [...db.orders, order]}); setActiveOrder(order); setView('track');
             };
-
-            // ... (Resto de funciones: updateLocationFromAddress, useGPS, etc. IGUAL QUE ANTES) ...
             const updateLocationFromAddress = (addr) => { setForm(prev => ({...prev, address: addr})); if (addressTimer.current) clearTimeout(addressTimer.current); if(addr.length < 4) { setSuggestions([]); setIsLocating(false); return; } setIsLocating(true); addressTimer.current = setTimeout(async () => { try { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + CITY_SUFFIX)}&limit=5&addressdetails=1`); const data = await res.json(); setSuggestions(data || []); } catch(e) {} finally { setIsLocating(false); } }, 1000); };
             const selectSuggestion = (s) => { setForm({...form, address: s.display_name.split(',')[0]}); setDeliveryCoords([parseFloat(s.lat), parseFloat(s.lon)]); setSuggestions([]); };
             const useGPS = () => { setIsLocating(true); navigator.geolocation.getCurrentPosition(pos => { const coords = [pos.coords.latitude, pos.coords.longitude]; setDeliveryCoords(coords); setClientCoords(coords); fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`).then(r=>r.json()).then(d=>{ if(d && d.display_name){ const parts = d.display_name.split(','); setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); } }).catch(e=>{}); setIsLocating(false); }, () => setIsLocating(false)); };
@@ -1947,7 +1926,7 @@ const ClientApp = ({ db, updateDB }) => {
             const updateItemNote = (idx, note) => { const newCart = [...cart]; newCart[idx].note = note; setCart(newCart); };
             const getQty = (pId) => { const item = cart.find(i => i.id === pId); return item ? item.qty : 0; };
             
-            // REACTIVIDAD: Usamos db.products directamente, no memorizado
+            // Renderizado de Categorías
             const groupedProducts = {};
             if(db && db.products) {
                 db.products.filter(p => p.active && !p.isComplement).forEach(p => {
@@ -1964,15 +1943,44 @@ const ClientApp = ({ db, updateDB }) => {
                     {activeOrder && ( <div onClick={()=>setView('track')} className="fixed top-20 left-4 right-4 bg-red-600 text-white p-6 rounded-2xl shadow-2xl z-[100] animate-pulse cursor-pointer border-4 border-[var(--gold)] text-center"><h2 className="text-3xl font-brand">🛵 PEDIDO EN CURSO</h2><p className="font-bold text-sm mt-2">TOCA PARA VER EL MAPA</p></div> )}
                     <div className="w-full bg-black"><img src={BANNER_URL} className="mobile-banner" alt="Banner"/></div>
                     <div className="p-2 flex gap-2 overflow-x-auto bg-[var(--bg-card)] border-b border-[var(--border)]">{uniqueClientCategories.map(c=><button key={c} onClick={()=>setClientCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${clientCatFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-[#222] text-white'}`}>{c}</button>)}</div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-48">{Object.entries(groupedProducts).filter(([cat]) => clientCatFilter === 'Todos' || cat === clientCatFilter).map(([cat, prods]) => (<div key={cat}><div className="space-y-4">{prods.map(p=>{ const qty = getQty(p.id); return (<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)] relative"><img src={p.img} className="w-20 h-20 rounded object-cover cursor-pointer" onClick={()=>setIngredientsProduct(p)}/><div className="flex-1"><p className="font-bold text-[var(--text-main)] text-lg cursor-pointer" onClick={()=>setIngredientsProduct(p)}>{p.name}</p><p className="text-gray-500 text-xs italic mb-1 line-clamp-2">{p.ingredients}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)] text-xl">{formatCurrency(p.price)}</span><div className="flex items-center gap-2 bg-[#222] rounded-full p-1 border border-[#444]">{qty === 0 ? (<button onClick={()=>adjustQty(p, 1)} className="bg-[var(--gold)] text-black font-bold px-4 py-1 rounded-full text-sm shadow hover:scale-105 transition">PEDIR</button>) : (<><button onClick={()=>adjustQty(p, -1)} className="w-8 h-8 rounded-full bg-gray-700 text-white font-bold flex items-center justify-center active:scale-90">-</button><span className="w-6 text-center font-bold text-white text-sm">{qty}</span><button onClick={()=>adjustQty(p, 1)} className="w-8 h-8 rounded-full bg-[var(--gold)] text-black font-bold flex items-center justify-center active:scale-90 shadow">+</button></>)}</div></div></div></div>)})}</div></div>))}</div>
+                    
+                    {/* MENÚ CON IMAGEN ERROR HANDLER */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-48">
+                        {Object.keys(groupedProducts).length === 0 ? (
+                            <div className="text-center text-gray-500 mt-10">Cargando menú o sin productos...</div>
+                        ) : (
+                            Object.entries(groupedProducts).filter(([cat]) => clientCatFilter === 'Todos' || cat === clientCatFilter).map(([cat, prods]) => (
+                                <div key={cat}><div className="space-y-4">{prods.map(p=>{ const qty = getQty(p.id); return (
+                                    <div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)] relative">
+                                        <img 
+                                            src={p.img && p.img.length > 10 ? p.img : LOGO_URL} 
+                                            onError={(e) => e.target.src = LOGO_URL} 
+                                            className="w-20 h-20 rounded object-cover cursor-pointer" 
+                                            onClick={()=>setIngredientsProduct(p)}
+                                        />
+                                        <div className="flex-1">
+                                            <p className="font-bold text-[var(--text-main)] text-lg cursor-pointer" onClick={()=>setIngredientsProduct(p)}>{p.name}</p>
+                                            <p className="text-gray-500 text-xs italic mb-1 line-clamp-2">{p.ingredients}</p>
+                                            <div className="flex justify-between items-center mt-2">
+                                                <span className="font-bold text-[var(--accent)] text-xl">{formatCurrency(p.price)}</span>
+                                                <div className="flex items-center gap-2 bg-[#222] rounded-full p-1 border border-[#444]">{qty === 0 ? (<button onClick={()=>adjustQty(p, 1)} className="bg-[var(--gold)] text-black font-bold px-4 py-1 rounded-full text-sm shadow hover:scale-105 transition">PEDIR</button>) : (<><button onClick={()=>adjustQty(p, -1)} className="w-8 h-8 rounded-full bg-gray-700 text-white font-bold flex items-center justify-center active:scale-90">-</button><span className="w-6 text-center font-bold text-white text-sm">{qty}</span><button onClick={()=>adjustQty(p, 1)} className="w-8 h-8 rounded-full bg-[var(--gold)] text-black font-bold flex items-center justify-center active:scale-90 shadow">+</button></>)}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )})}</div></div>
+                            ))
+                        )}
+                    </div>
+                    
                     <div className="mobile-video-container"><video src={VIDEO_URL} autoPlay loop muted playsInline></video><div className="mobile-video-overlay"></div></div>
                     <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile">{activeOrder ? (<button onClick={()=>setView('track')} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg animate-pulse flex items-center justify-center gap-2">🛵 PEDIDO EN CURSO</button>) : (cart.length > 0 && <button onClick={preSubmit} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button>)}</div>
                     {showComplements && (<div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end p-4 animate-in slide-in-from-bottom"><div className="bg-[var(--bg-card)] rounded-t-2xl p-6 border-t border-[var(--gold)]"><h3 className="text-xl font-bold text-[var(--gold)] mb-4 text-center">¿SE TE ANTOJA ALGO MÁS? 🍟🥤</h3><div className="flex gap-4 overflow-x-auto pb-4">{db.products.filter(p => p.isComplement && p.active).map(p => (<div key={p.id} className="min-w-[120px] bg-[#222] p-2 rounded-lg text-center cursor-pointer border border-transparent hover:border-[var(--gold)]" onClick={()=>{adjustQty(p, 1); showToast("Agregado!");}}><img src={p.img} className="w-20 h-20 mx-auto rounded mb-2 object-cover"/><p className="text-xs font-bold text-white line-clamp-1">{p.name}</p><p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p><button className="mt-1 bg-[var(--gold)] text-black text-xs px-2 py-1 rounded-full font-bold">+</button></div>))}</div><button onClick={()=>{setView('checkout'); setShowComplements(false);}} className="w-full bg-white text-black font-bold py-3 rounded-xl">LISTO, CONTINUAR</button></div></div>)}
                 </div>
             );
 
-            // ... (Resto de la App Cliente: checkout y track, MANTENER IGUAL QUE ANTES) ...
+            // ... (El resto de la App -Checkout y Track- se mantiene igual, ya está correcto en tu código)
             if(view === 'checkout') return (
+                // ... (Código de Checkout anterior con DiDi search) ...
                 <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto app-view-mobile relative flex flex-col pb-32">
                     <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2 font-bold"><ArrowLeft/> VOLVER</button>
                     <h2 className="font-bold text-xl mb-4 text-[var(--text-main)]">FINALIZAR PEDIDO</h2>
@@ -2000,7 +2008,6 @@ const ClientApp = ({ db, updateDB }) => {
             );
 
             if(view === 'track') {
-                // ... (Mismo código de track que ya tienes, no cambia) ...
                 const assignedDriver = activeOrder.driver ? db.users.find(u => u.username === activeOrder.driver) : null;
                 const driverLoc = assignedDriver && assignedDriver.location ? assignedDriver.location : STORE_COORDS;
                 const trackMarkers = [{ pos: deliveryCoords || clientCoords || STORE_COORDS, emoji: '🍔', isClient: true }, { pos: STORE_COORDS, emoji: '', isStore: true }];
@@ -2266,10 +2273,9 @@ const App = () => {
             const [loginData, setLoginData] = useState({u:'', p:''});
             const [godMenuOpen, setGodMenuOpen] = useState(false);
             const [centerNotification, setCenterNotification] = useState(null);
-            
-            // ESTADO NUEVO: CARGANDO DATOS
             const [isInitialLoading, setIsInitialLoading] = useState(true);
 
+            // Contadores
             const onlineStaff = db.users.filter(u => u.online && u.role !== 'viewer').length;
             const activeViewers = db.users.filter(u => u.role === 'viewer' && (Date.now() - (u.lastActive || 0) < 300000)).length;
             const saveTimeout = useRef(null);
@@ -2290,36 +2296,43 @@ const App = () => {
                 saveTimeout.current = setTimeout(() => { saveCloudDB(newData); }, 2000);
             };
 
-            // CARGA INICIAL ROBUSTA
+            // CARGA DE DATOS ROBUSTA
             useEffect(() => { 
                 const init = async () => {
-                    setIsInitialLoading(true); // Bloquear pantalla
+                    setIsInitialLoading(true);
                     try {
-                        const cloudData = await fetchCloudDB();
-                        if(cloudData && cloudData.data) {
-                            setDB(cloudData.data);
-                            localStorage.setItem('emi_v87_supreme_data', JSON.stringify(cloudData.data));
-                            console.log("Datos frescos cargados");
+                        const cloudResp = await fetchCloudDB();
+                        // CORRECCIÓN: Detectar si viene con wrapper .data o directo
+                        const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
+                        
+                        if(remoteData && remoteData.products) {
+                            setDB(remoteData);
+                            localStorage.setItem('emi_v87_supreme_data', JSON.stringify(remoteData));
+                            console.log("Datos sincronizados OK");
                         } else {
-                            // Fallback a local si no hay internet
+                            // Fallback local
                             const s = localStorage.getItem('emi_v87_supreme_data'); 
                             if(s) setDB(JSON.parse(s)); 
                         }
                     } catch(e) {
-                        console.error("Error carga inicial", e);
+                        console.error("Error carga", e);
+                        const s = localStorage.getItem('emi_v87_supreme_data'); 
+                        if(s) setDB(JSON.parse(s));
                     } finally {
-                        // DESBLOQUEAR PANTALLA SOLO CUANDO TENGAMOS DATOS
-                        setIsInitialLoading(false); 
+                        setIsInitialLoading(false);
                     }
                 };
                 init();
                 
                 const interval = setInterval(async () => {
-                     const cloudData = await fetchCloudDB();
-                     if(cloudData && cloudData.data) {
-                         if((cloudData.data._ver || 0) > (db._ver || 0)) {
-                              setDB(cloudData.data);
-                              if(cloudData.data.orders.length > db.orders.length) playSound();
+                     const cloudResp = await fetchCloudDB();
+                     const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
+                     
+                     if(remoteData && remoteData.products) {
+                         // Comparar versiones
+                         if((remoteData._ver || 0) > (db._ver || 0)) {
+                              setDB(remoteData);
+                              if(remoteData.orders.length > db.orders.length) playSound();
                          }
                      }
                 }, 4000);
@@ -2328,17 +2341,17 @@ const App = () => {
 
             useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
             
+            // Login Automático Cliente
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('menu') === 'true' || params.get('take_order')) {
                     const devId = localStorage.getItem('device_id');
                     setUser({role:'cliente', name:'Invitado', id: devId});
                     
-                    // Registrar visita en segundo plano
+                    // Registrar Viewer
                     setTimeout(() => {
                         setDB(prevDB => {
                             const now = Date.now();
-                            // Clonamos para no mutar directamente si no hay cambios reales
                             const newUsers = prevDB.users.filter(u => u.id !== devId); 
                             newUsers.push({ id: devId, name: 'Cliente Web', role: 'viewer', online: true, lastActive: now });
                             return { ...prevDB, users: newUsers };
@@ -2364,14 +2377,13 @@ const App = () => {
             const resetApp = async () => { if(confirm("¿RESET TOTAL?")) { localStorage.removeItem('emi_v87_supreme_data'); await saveCloudDB(initialDB); window.location.reload(); } };
             const handleLogout = () => { if(confirm("¿Cerrar sesión?")) setUser(null); };
 
-            // PANTALLA DE CARGA (AQUÍ ESTÁ LA MAGIA)
+            // PANTALLA CARGA
             if (isInitialLoading) {
                 return (
                     <div className="app-loader">
                         <img src={LOGO_URL} className="loader-logo"/>
                         <h2 className="text-xl mb-2">CARGANDO MENÚ...</h2>
                         <div className="loader-bar"><div className="loader-progress"></div></div>
-                        <p className="text-xs text-gray-500 mt-2">Sincronizando con Tienda</p>
                     </div>
                 );
             }
