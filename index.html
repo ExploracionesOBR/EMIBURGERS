@@ -169,19 +169,21 @@
         const STORE_COORDS = [27.446895, -109.943874]; 
         const CITY_SUFFIX = ", Ciudad Obregón, Sonora, Mexico";
         const SUPER_USER_PASS = "OBR1995@";
-        const STORE_PHONE = "526442345678"; 
+        const STORE_PHONE = "526443366197"; 
         
         const LOGO_URL = "./LOGO_1.png";
         const BANNER_URL = "./BANNER_MENU.jpg"; 
         const VIDEO_URL = "./WEB_PROMOCIONES.mp4";
         const CLOSED_IMG = "./CERRADO_OFF.png"; 
 
-        const API_URL = "https://script.google.com/macros/s/AKfycbzQC10H2zUg1yWa_mjqvTafiYUpG50-TpCPDGEFHhFURs1UpJTDovyW8cEMdEP6kxKoxg/exec";
-        const DB_ID = "emi_db_v87_supreme";
+        // --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbxehvXqpEG_2oQCByz8nOqThDPPD_p24GQerg7JTLglBT6gKWgClnpWkaZplaOw3w6GWw/exec";
+        // --------------------------------------
+        
+        const DB_ID = "emi_db_v87_supreme_2";
 
         const generateId = () => Math.random().toString(36).substr(2, 9).toUpperCase();
         const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val || 0);
-
         const showToast = (message) => {
             const toast = document.createElement("div");
             toast.className = "custom-toast";
