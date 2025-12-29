@@ -22,37 +22,47 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <style>
         :root {
-            --gold: #FFD700; --accent: #FF4500; --success: #00e676; --danger: #ff3333; --warning: #ff9800;
-            --z-map: 0; --z-ui: 10; --z-fab: 2000; --z-modal: 5000; --z-toast: 6000; --z-loader: 10000;
+            --gold: #FFD700; --accent: #FF4500; --success: #00e676; --danger: #ff3333;
+            --z-ui: 10; --z-fab: 2000; --z-loader: 10000;
         }
-        body.dark { --bg-body: #050505; --bg-card: #141414; --text-main: #f0f0f0; --input-bg: #222; --border: #333; }
-        body.light { --bg-body: #f3f4f6; --bg-card: #ffffff; --text-main: #111827; --input-bg: #e5e7eb; --border: #d1d5db; }
-        body { background-color: var(--bg-body); color: var(--text-main); font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; height: 100vh; width: 100vw; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #050505; color: #f0f0f0; font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; height: 100vh; width: 100vw; }
         #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
         .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
-        .card { background-color: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .input-std { background-color: var(--input-bg) !important; border: 1px solid var(--border) !important; color: var(--text-main) !important; outline: none; width: 100%; border-radius: 0.5rem; padding: 0.75rem; }
-        .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; text-transform: uppercase; border-radius: 0.75rem; padding: 0.8rem; border: none; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+        .card { background-color: #141414; border: 1px solid #333; border-radius: 0.75rem; }
+        .input-std { background-color: #222 !important; border: 1px solid #333 !important; color: white !important; padding: 0.75rem; width: 100%; outline: none; border-radius: 0.5rem; }
+        .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; }
         
-        /* BANNER Y VIDEO OPTIMIZADOS (Pequeños y Ajustados) */
-        .mobile-banner { 
-            width: 100%; height: 140px; /* Altura fija pequeña */
-            object-fit: cover; /* Recorte inteligente */
-            display: block; 
-            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+        /* --- CORRECCIÓN BANNER (Para que se vea completo) --- */
+        .banner-container {
+            width: 100%;
+            height: 140px; /* Altura fija reducida */
+            background-color: #000; /* Fondo negro para rellenar huecos */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
+        .mobile-banner { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; /* AJUSTA LA IMAGEN PARA QUE QUEPA ENTERA */
+            display: block; 
+        }
+
+        /* --- CORRECCIÓN VIDEO (Tamaño Visible) --- */
         .mobile-video-container { 
-            position: fixed; bottom: 70px; left: 0; width: 100%; height: 100px; 
+            position: fixed; bottom: 70px; left: 0; width: 100%; height: 120px; /* Tamaño restaurado */
             z-index: 50; pointer-events: none; background: black; overflow: hidden; 
+            border-top: 2px solid var(--gold); /* Borde estético */
         }
         .mobile-video-container video { 
             width: 100%; height: 100%; 
-            object-fit: contain; /* Ajustar video completo sin cortar */
-            opacity: 0.8; transform: scale(0.9); /* Zoom Out para que quepa */
+            object-fit: cover; 
+            opacity: 0.8; 
         }
-        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, var(--bg-body) 10%, transparent); }
+        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%); }
 
-        /* LOADER */
+        /* --- LOADER --- */
         .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
         .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
         .loader-bar { width: 200px; height: 4px; background: #333; border-radius: 4px; overflow: hidden; }
@@ -60,32 +70,34 @@
         @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
         @keyframes load-slide { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
 
-        /* UI FLOTANTE */
-        .install-btn { position: fixed; bottom: 20px !important; left: 20px !important; top: auto !important; z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.8); animation: bounce 2s infinite; }
+        /* --- BOTÓN INSTALAR --- */
+        .install-btn { 
+            position: fixed; bottom: 20px !important; left: 20px !important; top: auto !important;
+            z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; 
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8); animation: bounce 2s infinite; 
+        }
         .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .theme-toggle { position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); background: var(--bg-card); border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border); }
-        .share-btn { position: fixed; top: 15px; right: 15px; background: var(--gold); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        /* --- GENERALES Y UTILIDADES --- */
+        .theme-toggle, .share-btn, .gods-eye, .dash-map-btn, .logout-ghost { display: none !important; } /* Ocultar UI de admin en móvil si es necesario */
+        body:not(.client-mode) .theme-toggle { display: flex !important; position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); background: #141414; padding: 0; border-radius: 50%; width: 40px; height: 40px; justify-content: center; align-items: center; border: 1px solid #333; }
+        body:not(.client-mode) .share-btn { display: flex !important; position: fixed; top: 15px; right: 15px; background: var(--gold); border-radius: 50%; width: 45px; height: 45px; align-items: center; justify-content: center; z-index: 9999; }
         
         .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
-        .didi-search-container { background: white; border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .didi-input { flex: 1; border: none; outline: none; font-size: 16px; color: black; font-weight: 500; }
-        .didi-btn-orange { background: #FF6600; color: white; font-weight: bold; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+        
+        /* DiDi UI */
+        .didi-search-container { background: white; border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .didi-input { flex: 1; border: none; outline: none; font-size: 16px; color: black; }
+        .didi-btn-orange { background: #FF6600; color: white; font-weight: bold; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
         .didi-suggestions { background: white; border-radius: 0 0 8px 8px; margin-top: -5px; max-height: 200px; overflow-y: auto; color: black; }
         .didi-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-
-        /* Utilidades */
+        
+        /* Leaflet & Mapas */
         .leaflet-container { background: #1a1a1a; width: 100%; height: 100%; z-index: 0; }
-        .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
-        .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #777; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
-        .driver-nav-btn.active { color: var(--gold); }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); opacity: 0.6; transform: scale(0.9); }
-        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); }
-        .logout-ghost { position: fixed; top: 10px; left: 10px; z-index: var(--z-fab); opacity: 0.8; }
         .track-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; height: 100%; padding: 1rem; overflow-y: auto; }
         @media (min-width: 768px) { .track-grid { grid-template-columns: 1fr 1fr; overflow: hidden; } }
-        .track-col-left { display: flex; flex-direction: column; gap: 1rem; }
-        .track-col-right { background: #111; border-radius: 1rem; padding: 1rem; overflow-y: auto; height: fit-content; }
     </style>
 </head>
 <body class="dark">
@@ -1792,40 +1804,51 @@ const ClientApp = ({ db, updateDB }) => {
             const [ingredientsProduct, setIngredientsProduct] = useState(null);
             const [showLargeMap, setShowLargeMap] = useState(false);
             
-            // CIERRE AUTOMÁTICO INSTANTÁNEO
+            // --- 1. BLOQUEO INMEDIATO SI TIENDA CIERRA ---
             if(!db.settings.storeOpen) return <div className="closed-store-overlay"></div>;
 
+            // --- 2. EFECTOS DE INICIO Y PERSISTENCIA ---
             useEffect(() => {
+                // Modo oscuro forzado para cliente
+                document.body.classList.add('client-mode');
+                document.body.classList.add('dark');
+                document.body.classList.remove('light');
+
+                // Recuperar pedido activo si se recarga la página
                 const storedOrderId = localStorage.getItem('client_active_order_id');
                 if (storedOrderId) {
                     const existingOrder = db.orders.find(o => o.id === storedOrderId);
                     if (existingOrder) {
                         if (existingOrder.status === 'delivered' || existingOrder.status === 'cancelled') {
                             localStorage.removeItem('client_active_order_id');
-                            if(existingOrder.status === 'delivered') showToast("¡Pedido Entregado! Gracias.");
+                            if(existingOrder.status === 'delivered') showToast("¡Pedido Entregado! Gracias por su compra.");
                         } else {
                             setActiveOrder(existingOrder);
                             setView('track');
                         }
                     }
                 }
-                document.body.classList.add('client-mode');
-                document.body.classList.add('dark');
-                document.body.classList.remove('light');
-                return () => { document.body.classList.remove('client-mode'); };
-            }, [db.orders]);
-
-            useEffect(() => {
+                
+                // Obtener GPS inicial
                 navigator.geolocation.getCurrentPosition((pos) => {
                     const coords = [pos.coords.latitude, pos.coords.longitude];
                     setClientCoords(coords);
                     if(!deliveryCoords) setDeliveryCoords(coords); 
-                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`).then(r=>r.json()).then(d=>{
-                            if(d && d.display_name && !form.address){ const parts = d.display_name.split(','); setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); }
+                    // Intentar obtener dirección textual inicial
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
+                        .then(r=>r.json())
+                        .then(d=>{
+                            if(d && d.display_name && !form.address){ 
+                                const parts = d.display_name.split(','); 
+                                setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); 
+                            }
                         }).catch(e=>{});
                 }, () => setClientCoords(STORE_COORDS)); 
-            }, []);
 
+                return () => { document.body.classList.remove('client-mode'); };
+            }, [db.orders]);
+
+            // --- 3. CÁLCULOS ---
             const deliveryFee = useMemo(() => {
                 if(form.type==='delivery' && deliveryCoords) {
                     const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]);
@@ -1833,94 +1856,262 @@ const ClientApp = ({ db, updateDB }) => {
                 }
                 return 0;
             }, [deliveryCoords, form.type, db.settings.deliveryTable]);
+
             const total = cart.reduce((a,b)=>a+b.price*b.qty,0) + deliveryFee;
 
-            const preSubmit = () => { const hasComplements = db.products.some(p => p.isComplement && (p.active !== false)); if (hasComplements && !showComplements) setShowComplements(true); else { setView('checkout'); setShowComplements(false); } };
+            // --- 4. FUNCIONES DEL CARRITO Y PEDIDO ---
+            const adjustQty = (p, delta) => { 
+                const existing = cart.find(i => i.id === p.id); 
+                if (existing) { 
+                    const newQty = existing.qty + delta; 
+                    if (newQty <= 0) setCart(cart.filter(i => i.id !== p.id)); 
+                    else setCart(cart.map(i => i.id === p.id ? {...i, qty: newQty} : i)); 
+                } else if (delta > 0) {
+                    setCart([...cart, {...p, qty: 1}]); 
+                }
+            };
+
+            const getQty = (pId) => { const item = cart.find(i => i.id === pId); return item ? item.qty : 0; };
+            
+            const updateItemNote = (idx, note) => { const newCart = [...cart]; newCart[idx].note = note; setCart(newCart); };
+
+            const preSubmit = () => { 
+                const hasComplements = db.products.some(p => p.isComplement && (p.active !== false)); 
+                if (hasComplements && !showComplements) setShowComplements(true); 
+                else { setView('checkout'); setShowComplements(false); } 
+            };
+
             const submit = () => {
                 if(activeOrder) return showToast("Ya tienes un pedido en curso");
                 if(!form.name) return showToast("Falta Nombre");
-                if(!form.phone || form.phone.length !== 10) return showToast("Teléfono inválido");
+                if(!form.phone || form.phone.length !== 10) return showToast("Teléfono inválido (10 dígitos)");
                 if (form.type === 'delivery') {
-                    if (!db.settings.deliveryEnabled) return showToast("Sin servicio a domicilio");
+                    if (!db.settings.deliveryEnabled) return showToast("Servicio a domicilio no disponible");
                     if (!form.address) return showToast("Falta Dirección");
-                    if (deliveryCoords) { const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]); if (dist > db.settings.deliveryRadius) return showToast("Fuera de zona"); }
+                    if (deliveryCoords) { 
+                        const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]); 
+                        if (dist > db.settings.deliveryRadius) return showToast("Upss! Dirección fuera de zona de cobertura."); 
+                    }
                 }
-                const order = { id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, items: cart, total, status: 'web_pending_payment', method: form.pay, payAmount: form.payAmount, createdAt: new Date().toISOString(), address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', clientName: form.name, clientPhone: form.phone, clientLoc: deliveryCoords || clientCoords, source: 'web', deviceId: localStorage.getItem('device_id') };
+                if(form.pay === 'cash' && (!form.payAmount || form.payAmount < total)) return showToast("Monto insuficiente o inválido");
+                
+                const order = { 
+                    id: generateId(), 
+                    orderNum: Math.floor(Math.random()*9000)+1000, 
+                    items: cart, 
+                    total, 
+                    status: 'web_pending_payment', 
+                    method: form.pay, 
+                    payAmount: form.payAmount, 
+                    createdAt: new Date().toISOString(), 
+                    address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', 
+                    clientName: form.name, 
+                    clientPhone: form.phone, 
+                    clientLoc: deliveryCoords || clientCoords, 
+                    source: 'web',
+                    deviceId: localStorage.getItem('device_id')
+                };
+                
                 localStorage.setItem('client_active_order_id', order.id);
-                updateDB({...db, orders: [...db.orders, order]}); setActiveOrder(order); setView('track');
+                updateDB({...db, orders: [...db.orders, order]}); 
+                setActiveOrder(order); 
+                setView('track');
             };
-            const updateLocationFromAddress = (addr) => { setForm(prev => ({...prev, address: addr})); if (addressTimer.current) clearTimeout(addressTimer.current); if(addr.length < 4) { setSuggestions([]); setIsLocating(false); return; } setIsLocating(true); addressTimer.current = setTimeout(async () => { try { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + CITY_SUFFIX)}&limit=5&addressdetails=1`); const data = await res.json(); setSuggestions(data || []); } catch(e) {} finally { setIsLocating(false); } }, 1000); };
-            const selectSuggestion = (s) => { setForm({...form, address: s.display_name.split(',')[0]}); setDeliveryCoords([parseFloat(s.lat), parseFloat(s.lon)]); setSuggestions([]); };
-            const useGPS = () => { setIsLocating(true); navigator.geolocation.getCurrentPosition(pos => { const coords = [pos.coords.latitude, pos.coords.longitude]; setDeliveryCoords(coords); setClientCoords(coords); fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`).then(r=>r.json()).then(d=>{ if(d && d.display_name){ const parts = d.display_name.split(','); setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); } }).catch(e=>{}); setIsLocating(false); }, () => setIsLocating(false)); };
-            const handleMapClick = async (coords) => { setDeliveryCoords(coords); setIsLocating(true); try { const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`); const data = await res.json(); if(data && data.display_name) { const addrParts = data.display_name.split(','); setForm(prev => ({...prev, address: addrParts[0] + (addrParts[1]||'')})); setSuggestions([]); } } catch(e) {} finally { setIsLocating(false); } };
+
+            // --- 5. FUNCIONES DE MAPA Y BUSQUEDA (DIDI STYLE) ---
+            const updateLocationFromAddress = (addr) => {
+                setForm(prev => ({...prev, address: addr}));
+                if (addressTimer.current) clearTimeout(addressTimer.current);
+                if(addr.length < 4) { setSuggestions([]); setIsLocating(false); return; }
+                setIsLocating(true);
+                addressTimer.current = setTimeout(async () => {
+                    try { 
+                        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + CITY_SUFFIX)}&limit=5&addressdetails=1`); 
+                        const data = await res.json(); 
+                        setSuggestions(data || []); 
+                    } catch(e) {} finally { setIsLocating(false); }
+                }, 1000); 
+            };
+            
+            const selectSuggestion = (s) => {
+                setForm({...form, address: s.display_name.split(',')[0]});
+                setDeliveryCoords([parseFloat(s.lat), parseFloat(s.lon)]);
+                setSuggestions([]);
+            };
+
+            const useGPS = () => { 
+                setIsLocating(true); 
+                navigator.geolocation.getCurrentPosition(pos => { 
+                    const coords = [pos.coords.latitude, pos.coords.longitude]; 
+                    setDeliveryCoords(coords); 
+                    setClientCoords(coords); 
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
+                        .then(r=>r.json())
+                        .then(d=>{ 
+                            if(d && d.display_name){ 
+                                const parts = d.display_name.split(','); 
+                                setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); 
+                            } 
+                        }).catch(e=>{}); 
+                    setIsLocating(false); 
+                }, () => setIsLocating(false)); 
+            };
+
+            const handleMapClick = async (coords) => { 
+                setDeliveryCoords(coords); 
+                setIsLocating(true); 
+                try { 
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`); 
+                    const data = await res.json(); 
+                    if(data && data.display_name) { 
+                        const addrParts = data.display_name.split(','); 
+                        setForm(prev => ({...prev, address: addrParts[0] + (addrParts[1]||'')})); 
+                        setSuggestions([]); 
+                    } 
+                } catch(e) {} finally { setIsLocating(false); } 
+            };
+
+            // --- 6. HELPERS UI ---
             const showInstallInstructions = () => showToast("Para instalar: Toca 'Compartir' -> 'Agregar a Inicio'");
             const handleCashSelect = () => setShowCashModal(true);
             const confirmCash = () => { if(parseFloat(tempCashAmount) < total) return showToast("El monto debe ser mayor al total"); setForm({...form, pay:'cash', payAmount: parseFloat(tempCashAmount)}); setShowCashModal(false); };
             const cancelCash = () => { setForm({...form, pay:'card', payAmount: 0}); setShowCashModal(false); };
-            const adjustQty = (p, delta) => { const existing = cart.find(i => i.id === p.id); if (existing) { const newQty = existing.qty + delta; if (newQty <= 0) setCart(cart.filter(i => i.id !== p.id)); else setCart(cart.map(i => i.id === p.id ? {...i, qty: newQty} : i)); } else if (delta > 0) setCart([...cart, {...p, qty: 1}]); };
-            const updateItemNote = (idx, note) => { const newCart = [...cart]; newCart[idx].note = note; setCart(newCart); };
-            const getQty = (pId) => { const item = cart.find(i => i.id === pId); return item ? item.qty : 0; };
-            
-            // CORRECCIÓN: FILTRO DE PRODUCTOS MÁS PERMISIVO (Para evitar menú vacío)
-            const groupedProducts = {};
-            if(db && db.products) {
-                db.products.filter(p => (p.active !== false) && !p.isComplement).forEach(p => {
-                    const cat = p.cat || 'Otros';
-                    if (!groupedProducts[cat]) groupedProducts[cat] = [];
-                    groupedProducts[cat].push(p);
-                });
-            }
-            const uniqueClientCategories = ['Todos', ...Object.keys(groupedProducts)];
 
+            // --- 7. FILTRADO DE PRODUCTOS (CORREGIDO PARA EVITAR MENU VACIO) ---
+            const groupedProducts = useMemo(() => {
+                const groups = {};
+                if(db && db.products) {
+                    // Filtro más permisivo: solo ocultamos si isComplement es true
+                    db.products.filter(p => !p.isComplement).forEach(p => {
+                        const cat = p.cat || 'Otros';
+                        if (!groups[cat]) groups[cat] = [];
+                        groups[cat].push(p);
+                    });
+                }
+                return groups;
+            }, [db.products]);
+            
+            const uniqueClientCategories = ['Todos', ...Object.keys(groupedProducts)];
+            const rawProductsCount = db.products ? db.products.length : 0;
+
+            // --- VISTA 1: MENÚ ---
             if(view === 'menu') return (
                 <div className="h-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] relative app-view-mobile">
-                    <button className="install-btn" onClick={showInstallInstructions}><img src={LOGO_URL}/></button>
-                    {activeOrder && ( <div onClick={()=>setView('track')} className="fixed top-20 left-4 right-4 bg-red-600 text-white p-6 rounded-2xl shadow-2xl z-[100] animate-pulse cursor-pointer border-4 border-[var(--gold)] text-center"><h2 className="text-3xl font-brand">🛵 PEDIDO EN CURSO</h2><p className="font-bold text-sm mt-2">TOCA PARA VER EL MAPA</p></div> )}
-                    <div className="w-full bg-black"><img src={BANNER_URL} className="mobile-banner" alt="Banner"/></div>
-                    <div className="p-2 flex gap-2 overflow-x-auto bg-[var(--bg-card)] border-b border-[var(--border)]">{uniqueClientCategories.map(c=><button key={c} onClick={()=>setClientCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${clientCatFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-[#222] text-white'}`}>{c}</button>)}</div>
                     
-                    {/* MENÚ */}
+                    {/* Botón Flotante Instalar */}
+                    <button className="install-btn" onClick={showInstallInstructions}><img src={LOGO_URL}/></button>
+                    
+                    {/* Banner Pedido Activo */}
+                    {activeOrder && ( 
+                        <div onClick={()=>setView('track')} className="fixed top-20 left-4 right-4 bg-red-600 text-white p-6 rounded-2xl shadow-2xl z-[100] animate-pulse cursor-pointer border-4 border-[var(--gold)] text-center">
+                            <h2 className="text-3xl font-brand">🛵 PEDIDO EN CURSO</h2>
+                            <p className="font-bold text-sm mt-2">TOCA PARA VER EL MAPA</p>
+                        </div> 
+                    )}
+                    
+                    {/* Banner Principal Corregido (Fit Contain) */}
+                    <div className="banner-container">
+                        <img src={BANNER_URL} className="mobile-banner" alt="Banner"/>
+                    </div>
+                    
+                    {/* Filtros Categoría */}
+                    <div className="p-2 flex gap-2 overflow-x-auto bg-[var(--bg-card)] border-b border-[var(--border)]">
+                        {uniqueClientCategories.map(c=><button key={c} onClick={()=>setClientCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${clientCatFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-[#222] text-white'}`}>{c}</button>)}
+                    </div>
+                    
+                    {/* Lista Productos */}
                     <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-48">
                         {Object.keys(groupedProducts).length === 0 ? (
                             <div className="text-center text-gray-500 mt-10 p-4 border border-dashed border-gray-600 rounded">
-                                <p>Cargando menú...</p>
-                                <p className="text-xs mt-2 text-gray-600">(Si tarda mucho, revisa que tengas productos activos en Admin)</p>
+                                <p>Menú Vacío</p>
+                                <p className="text-xs mt-2 text-red-500">Diagnóstico: {rawProductsCount} productos en DB.</p>
+                                {rawProductsCount === 0 && <p className="text-xs text-yellow-500">Esperando sincronización de nube...</p>}
                             </div>
                         ) : (
                             Object.entries(groupedProducts).filter(([cat]) => clientCatFilter === 'Todos' || cat === clientCatFilter).map(([cat, prods]) => (
-                                <div key={cat}><div className="space-y-4">{prods.map(p=>{ const qty = getQty(p.id); return (
-                                    <div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)] relative">
-                                        <img 
-                                            src={p.img && p.img.length > 10 ? p.img : LOGO_URL} 
-                                            onError={(e) => e.target.src = LOGO_URL} 
-                                            className="w-20 h-20 rounded object-cover cursor-pointer" 
-                                            onClick={()=>setIngredientsProduct(p)}
-                                        />
-                                        <div className="flex-1">
-                                            <p className="font-bold text-[var(--text-main)] text-lg cursor-pointer" onClick={()=>setIngredientsProduct(p)}>{p.name}</p>
-                                            <p className="text-gray-500 text-xs italic mb-1 line-clamp-2">{p.ingredients}</p>
-                                            <div className="flex justify-between items-center mt-2">
-                                                <span className="font-bold text-[var(--accent)] text-xl">{formatCurrency(p.price)}</span>
-                                                <div className="flex items-center gap-2 bg-[#222] rounded-full p-1 border border-[#444]">{qty === 0 ? (<button onClick={()=>adjustQty(p, 1)} className="bg-[var(--gold)] text-black font-bold px-4 py-1 rounded-full text-sm shadow hover:scale-105 transition">PEDIR</button>) : (<><button onClick={()=>adjustQty(p, -1)} className="w-8 h-8 rounded-full bg-gray-700 text-white font-bold flex items-center justify-center active:scale-90">-</button><span className="w-6 text-center font-bold text-white text-sm">{qty}</span><button onClick={()=>adjustQty(p, 1)} className="w-8 h-8 rounded-full bg-[var(--gold)] text-black font-bold flex items-center justify-center active:scale-90 shadow">+</button></>)}</div>
-                                            </div>
-                                        </div>
+                                <div key={cat}>
+                                    <div className="space-y-4">
+                                        {prods.map(p=>{ 
+                                            const qty = getQty(p.id); 
+                                            return (
+                                                <div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)] relative">
+                                                    <img 
+                                                        src={p.img && p.img.length > 10 ? p.img : LOGO_URL} 
+                                                        onError={(e) => e.target.src = LOGO_URL} 
+                                                        className="w-20 h-20 rounded object-cover cursor-pointer" 
+                                                        onClick={()=>setIngredientsProduct(p)}
+                                                    />
+                                                    <div className="flex-1">
+                                                        <p className="font-bold text-[var(--text-main)] text-lg cursor-pointer" onClick={()=>setIngredientsProduct(p)}>{p.name}</p>
+                                                        <p className="text-gray-500 text-xs italic mb-1 line-clamp-2">{p.ingredients}</p>
+                                                        <div className="flex justify-between items-center mt-2">
+                                                            <span className="font-bold text-[var(--accent)] text-xl">{formatCurrency(p.price)}</span>
+                                                            <div className="flex items-center gap-2 bg-[#222] rounded-full p-1 border border-[#444]">
+                                                                {qty === 0 ? (
+                                                                    <button onClick={()=>adjustQty(p, 1)} className="bg-[var(--gold)] text-black font-bold px-4 py-1 rounded-full text-sm shadow hover:scale-105 transition">PEDIR</button>
+                                                                ) : (
+                                                                    <>
+                                                                        <button onClick={()=>adjustQty(p, -1)} className="w-8 h-8 rounded-full bg-gray-700 text-white font-bold flex items-center justify-center active:scale-90">-</button>
+                                                                        <span className="w-6 text-center font-bold text-white text-sm">{qty}</span>
+                                                                        <button onClick={()=>adjustQty(p, 1)} className="w-8 h-8 rounded-full bg-[var(--gold)] text-black font-bold flex items-center justify-center active:scale-90 shadow">+</button>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
                                     </div>
-                                )})}</div></div>
+                                </div>
                             ))
                         )}
                     </div>
                     
-                    <div className="mobile-video-container"><video src={VIDEO_URL} autoPlay loop muted playsInline></video><div className="mobile-video-overlay"></div></div>
-                    <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile">{activeOrder ? (<button onClick={()=>setView('track')} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg animate-pulse flex items-center justify-center gap-2">🛵 PEDIDO EN CURSO</button>) : (cart.length > 0 && <button onClick={preSubmit} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button>)}</div>
-                    {showComplements && (<div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end p-4 animate-in slide-in-from-bottom"><div className="bg-[var(--bg-card)] rounded-t-2xl p-6 border-t border-[var(--gold)]"><h3 className="text-xl font-bold text-[var(--gold)] mb-4 text-center">¿SE TE ANTOJA ALGO MÁS? 🍟🥤</h3><div className="flex gap-4 overflow-x-auto pb-4">{db.products.filter(p => p.isComplement && (p.active !== false)).map(p => (<div key={p.id} className="min-w-[120px] bg-[#222] p-2 rounded-lg text-center cursor-pointer border border-transparent hover:border-[var(--gold)]" onClick={()=>{adjustQty(p, 1); showToast("Agregado!");}}><img src={p.img} className="w-20 h-20 mx-auto rounded mb-2 object-cover"/><p className="text-xs font-bold text-white line-clamp-1">{p.name}</p><p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p><button className="mt-1 bg-[var(--gold)] text-black text-xs px-2 py-1 rounded-full font-bold">+</button></div>))}</div><button onClick={()=>{setView('checkout'); setShowComplements(false);}} className="w-full bg-white text-black font-bold py-3 rounded-xl">LISTO, CONTINUAR</button></div></div>)}
+                    {/* Video Promocional */}
+                    <div className="mobile-video-container">
+                        <video src={VIDEO_URL} autoPlay loop muted playsInline></video>
+                        <div className="mobile-video-overlay"></div>
+                    </div>
+                    
+                    {/* Barra Inferior */}
+                    <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile">
+                        {activeOrder ? (
+                            <button onClick={()=>setView('track')} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg animate-pulse flex items-center justify-center gap-2">🛵 PEDIDO EN CURSO</button>
+                        ) : (
+                            cart.length > 0 && <button onClick={preSubmit} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button>
+                        )}
+                    </div>
+                    
+                    {/* Modal Complementos */}
+                    {showComplements && (
+                        <div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end p-4 animate-in slide-in-from-bottom">
+                            <div className="bg-[var(--bg-card)] rounded-t-2xl p-6 border-t border-[var(--gold)]">
+                                <h3 className="text-xl font-bold text-[var(--gold)] mb-4 text-center">¿SE TE ANTOJA ALGO MÁS? 🍟🥤</h3>
+                                <div className="flex gap-4 overflow-x-auto pb-4">
+                                    {db.products.filter(p => p.isComplement).map(p => (
+                                        <div key={p.id} className="min-w-[120px] bg-[#222] p-2 rounded-lg text-center cursor-pointer border border-transparent hover:border-[var(--gold)]" onClick={()=>{adjustQty(p, 1); showToast("Agregado!");}}>
+                                            <img src={p.img} className="w-20 h-20 mx-auto rounded mb-2 object-cover"/>
+                                            <p className="text-xs font-bold text-white line-clamp-1">{p.name}</p>
+                                            <p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p>
+                                            <button className="mt-1 bg-[var(--gold)] text-black text-xs px-2 py-1 rounded-full font-bold">+</button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button onClick={()=>{setView('checkout'); setShowComplements(false);}} className="w-full bg-white text-black font-bold py-3 rounded-xl">LISTO, CONTINUAR</button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
 
-            // ... MANTENER EL RESTO DE LAS VISTAS (CHECKOUT Y TRACK) IGUAL ...
+            // --- VISTA 2: CHECKOUT ---
             if(view === 'checkout') return (
                 <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto app-view-mobile relative flex flex-col pb-32">
                     <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2 font-bold"><ArrowLeft/> VOLVER</button>
                     <h2 className="font-bold text-xl mb-4 text-[var(--text-main)]">FINALIZAR PEDIDO</h2>
+                    
+                    {/* Dirección estilo DiDi */}
                     {form.type === 'delivery' && (
                         <div className="mb-6 animate-in fade-in">
                             <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-700 pb-1 mb-2">4. Dirección</h3>
@@ -1929,21 +2120,81 @@ const ClientApp = ({ db, updateDB }) => {
                                 <input className="didi-input" placeholder="Ingresa tu dirección..." value={form.address} onChange={e=>updateLocationFromAddress(e.target.value)}/>
                                 <button className="didi-btn-orange" onClick={useGPS}>UBICACIÓN ACTUAL</button>
                             </div>
-                            {suggestions.length > 0 && (<div className="didi-suggestions">{suggestions.map((s,i) => (<div key={i} className="didi-item" onClick={() => selectSuggestion(s)}><MapPin className="text-[var(--gold)]" size={16}/><div className="flex flex-col"><span className="font-bold text-sm text-black">{s.address.road || s.display_name.split(',')[0]}</span><span className="text-[10px] text-gray-500">{s.display_name}</span></div></div>))}</div>)}
+                            
+                            {suggestions.length > 0 && (
+                                <div className="didi-suggestions">
+                                    {suggestions.map((s,i) => (
+                                        <div key={i} className="didi-item" onClick={() => selectSuggestion(s)}>
+                                            <MapPin className="text-[var(--gold)]" size={16}/>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-sm text-black">{s.address.road || s.display_name.split(',')[0]}</span>
+                                                <span className="text-[10px] text-gray-500">{s.display_name}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            
                             <input className="input-std mt-2" placeholder="Referencias (Casa color, portón...)" value={form.references} onChange={e=>setForm({...form,references:e.target.value})}/>
-                            <div className="h-40 w-full rounded border border-[var(--gold)] overflow-hidden relative shadow-lg mt-2"><LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'', isClient:true}, {pos:deliveryCoords||STORE_COORDS, emoji:'🍔', label:'Entrega'}, {pos:STORE_COORDS, emoji:'', isStore:true}]} onClickMap={handleMapClick} zoom={15} /></div>
+                            <div className="h-40 w-full rounded border border-[var(--gold)] overflow-hidden relative shadow-lg mt-2">
+                                <LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'', isClient:true}, {pos:deliveryCoords||STORE_COORDS, emoji:'🍔', label:'Entrega'}, {pos:STORE_COORDS, emoji:'', isStore:true}]} onClickMap={handleMapClick} zoom={15} />
+                            </div>
                         </div>
                     )}
-                    <div className="mb-6 space-y-3"><h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-700 pb-1 mb-2">Tus Datos</h3><input className="input-std" placeholder="Tu Nombre" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/><input className="input-std" type="number" placeholder="Teléfono" value={form.phone} maxLength={10} onChange={e=>setForm({...form,phone:e.target.value})}/></div>
-                    <div className="mb-6"><h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-700 pb-1 mb-2">Entrega</h3><div className="flex gap-2"><button onClick={()=>setForm({...form, type:'delivery'})} className={`flex-1 p-3 rounded font-bold border transition ${form.type==='delivery'?'border-[var(--accent)] bg-[var(--accent)] text-white':'border-gray-500 text-gray-500'}`}>DOMICILIO</button>{db.settings.pickupEnabled && <button onClick={()=>setForm({...form, type:'pickup'})} className={`flex-1 p-3 rounded font-bold border transition ${form.type==='pickup'?'border-[var(--accent)] bg-[var(--accent)] text-white':'border-gray-500 text-gray-500'}`}>RECOGER</button>}</div></div>
-                    <div className="mb-6 card p-4 border border-[var(--gold)]"><h3 className="text-sm font-bold text-[var(--gold)] uppercase mb-2">Método de Pago</h3><div className="flex gap-2 mb-2"><label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='cash'?'border-green-500 bg-green-900/20 text-green-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='cash'} onChange={handleCashSelect}/> Efectivo</label><label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='card'?'border-blue-500 bg-blue-900/20 text-blue-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='card'} onChange={()=>setForm({...form,pay:'card'})}/> Tarjeta</label></div>{form.pay === 'cash' && form.payAmount > 0 && <p className="text-center text-sm text-green-500">Pagas con: {formatCurrency(form.payAmount)} (Cambio: {formatCurrency(Math.max(0, form.payAmount - total))})</p>}</div>
-                    <div className="mb-6 space-y-2"><h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-700 pb-1 mb-2">Tus Productos</h3>{cart.map((item, idx) => ( <div key={idx} className="bg-[var(--bg-card)] p-3 rounded border border-[var(--border)]"><div className="flex justify-between items-center mb-1"><div><p className="font-bold text-[var(--text-main)]">{item.name}</p><p className="text-xs text-[var(--gold)]">{formatCurrency(item.price)}</p></div><div className="flex items-center gap-3"><button onClick={()=>adjustQty(item, -1)} className="w-8 h-8 bg-gray-700 text-white rounded-full font-bold">-</button><span className="font-bold text-[var(--text-main)]">{item.qty}</span><button onClick={()=>adjustQty(item, 1)} className="w-8 h-8 bg-[var(--gold)] text-black rounded-full font-bold">+</button></div></div>{!item.isComplement && <input className="w-full bg-transparent border-b border-gray-600 text-xs text-[var(--text-main)] p-1 outline-none" placeholder="Nota (Sin cebolla...)" value={item.note || ''} onChange={(e)=>updateItemNote(idx, e.target.value)}/>}</div> ))}</div>
-                    <div className="bg-[var(--bg-card)] p-4 rounded mb-6 space-y-2 border border-[#333]"><div className="flex justify-between text-[var(--text-main)]"><span>Subtotal:</span><span>{formatCurrency(cart.reduce((a,b)=>a+b.price*b.qty,0))}</span></div><div className="flex justify-between text-[var(--gold)]"><span>Envío Estimado:</span><span>{formatCurrency(deliveryFee)}</span></div><div className="border-t border-[#444] pt-2 flex justify-between text-xl font-black text-[var(--text-main)]"><span>TOTAL:</span><span>{formatCurrency(total)}</span></div></div>
+
+                    <div className="mb-6 space-y-3">
+                        <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-700 pb-1 mb-2">Tus Datos</h3>
+                        <input className="input-std" placeholder="Tu Nombre" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
+                        <input className="input-std" type="number" placeholder="Teléfono" value={form.phone} maxLength={10} onChange={e=>setForm({...form,phone:e.target.value})}/>
+                    </div>
+
+                    <div className="mb-6">
+                        <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-700 pb-1 mb-2">Entrega</h3>
+                        <div className="flex gap-2">
+                            <button onClick={()=>setForm({...form, type:'delivery'})} className={`flex-1 p-3 rounded font-bold border transition ${form.type==='delivery'?'border-[var(--accent)] bg-[var(--accent)] text-white':'border-gray-500 text-gray-500'}`}>DOMICILIO</button>
+                            {db.settings.pickupEnabled && <button onClick={()=>setForm({...form, type:'pickup'})} className={`flex-1 p-3 rounded font-bold border transition ${form.type==='pickup'?'border-[var(--accent)] bg-[var(--accent)] text-white':'border-gray-500 text-gray-500'}`}>RECOGER</button>}
+                        </div>
+                    </div>
+
+                    <div className="mb-6 card p-4 border border-[var(--gold)]">
+                        <h3 className="text-sm font-bold text-[var(--gold)] uppercase mb-2">Método de Pago</h3>
+                        <div className="flex gap-2 mb-2">
+                            <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='cash'?'border-green-500 bg-green-900/20 text-green-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='cash'} onChange={handleCashSelect}/> Efectivo</label>
+                            <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='card'?'border-blue-500 bg-blue-900/20 text-blue-500':'border-gray-600 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='card'} onChange={()=>setForm({...form,pay:'card'})}/> Tarjeta</label>
+                        </div>
+                        {form.pay === 'cash' && form.payAmount > 0 && <p className="text-center text-sm text-green-500">Pagas con: {formatCurrency(form.payAmount)} (Cambio: {formatCurrency(Math.max(0, form.payAmount - total))})</p>}
+                    </div>
+
+                    <div className="mb-6 space-y-2">
+                        <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-700 pb-1 mb-2">Tus Productos</h3>
+                        {cart.map((item, idx) => ( 
+                            <div key={idx} className="bg-[var(--bg-card)] p-3 rounded border border-[var(--border)]">
+                                <div className="flex justify-between items-center mb-1">
+                                    <div><p className="font-bold text-[var(--text-main)]">{item.name}</p><p className="text-xs text-[var(--gold)]">{formatCurrency(item.price)}</p></div>
+                                    <div className="flex items-center gap-3">
+                                        <button onClick={()=>adjustQty(item, -1)} className="w-8 h-8 bg-gray-700 text-white rounded-full font-bold">-</button>
+                                        <span className="font-bold text-[var(--text-main)]">{item.qty}</span>
+                                        <button onClick={()=>adjustQty(item, 1)} className="w-8 h-8 bg-[var(--gold)] text-black rounded-full font-bold">+</button>
+                                    </div>
+                                </div>
+                                {!item.isComplement && <input className="w-full bg-transparent border-b border-gray-600 text-xs text-[var(--text-main)] p-1 outline-none" placeholder="Nota (Sin cebolla...)" value={item.note || ''} onChange={(e)=>updateItemNote(idx, e.target.value)}/>}
+                            </div> 
+                        ))}
+                    </div>
+
+                    <div className="bg-[var(--bg-card)] p-4 rounded mb-6 space-y-2 border border-[#333]">
+                        <div className="flex justify-between text-[var(--text-main)]"><span>Subtotal:</span><span>{formatCurrency(cart.reduce((a,b)=>a+b.price*b.qty,0))}</span></div>
+                        <div className="flex justify-between text-[var(--gold)]"><span>Envío Estimado:</span><span>{formatCurrency(deliveryFee)}</span></div>
+                        <div className="border-t border-[#444] pt-2 flex justify-between text-xl font-black text-[var(--text-main)]"><span>TOTAL:</span><span>{formatCurrency(total)}</span></div>
+                    </div>
+                    
                     <button onClick={submit} className="w-full bg-[var(--accent)] text-white py-4 rounded-lg font-bold shadow-lg text-lg">ENVIAR PEDIDO</button>
+                    
                     {showCashModal && (<div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4"><div className="bg-[var(--bg-card)] p-6 rounded-xl w-full max-w-sm text-center border border-[var(--gold)]"><h3 className="text-xl font-bold text-[var(--gold)] mb-4">¿CON CUÁNTO PAGAS?</h3><p className="text-[var(--text-main)] mb-2">Total a pagar: {formatCurrency(total)}</p><input type="number" className="input-std text-center text-2xl font-bold mb-4" placeholder="$0.00" value={tempCashAmount} onChange={e=>setTempCashAmount(e.target.value)} autoFocus/><div className="flex gap-2"><button onClick={cancelCash} className="flex-1 bg-gray-600 text-white py-2 rounded font-bold">CANCELAR</button><button onClick={confirmCash} className="flex-1 btn-gold py-2 rounded font-bold">CONFIRMAR</button></div></div></div>)}
                 </div>
             );
 
+            // --- VISTA 3: TRACKING ---
             if(view === 'track') {
                 const assignedDriver = activeOrder.driver ? db.users.find(u => u.username === activeOrder.driver) : null;
                 const driverLoc = assignedDriver && assignedDriver.location ? assignedDriver.location : STORE_COORDS;
@@ -2211,86 +2462,73 @@ const App = () => {
             const [centerNotification, setCenterNotification] = useState(null);
             const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-            // Contadores
+            // Contadores para Admin
             const onlineStaff = db.users ? db.users.filter(u => u.online && u.role !== 'viewer').length : 0;
             const activeViewers = db.users ? db.users.filter(u => u.role === 'viewer' && (Date.now() - (u.lastActive || 0) < 300000)).length : 0;
-            
             const saveTimeout = useRef(null);
 
+            // ID Dispositivo
             useEffect(() => {
-                if(!localStorage.getItem('device_id')) {
-                    localStorage.setItem('device_id', 'DEV_' + Math.random().toString(36).substr(2, 9));
-                }
+                if(!localStorage.getItem('device_id')) localStorage.setItem('device_id', 'DEV_' + Math.random().toString(36).substr(2, 9));
             }, []);
 
             const updateDB = (newDataOrFn) => { 
                 let newData;
                 if (typeof newDataOrFn === 'function') { newData = newDataOrFn(db); } else { newData = newDataOrFn; }
-                
-                newData._ver = Date.now(); // Marca de tiempo nueva
-                setDB(newData); // Actualiza visualmente YA
-                
-                try { localStorage.setItem('emi_v87_supreme_data', JSON.stringify(newData)); } catch (e) {}
-                
+                newData._ver = Date.now();
+                setDB(newData);
+                // NOTA: Ya no guardamos en local storage "emi_v87_supreme_data" para evitar datos viejos
                 if (saveTimeout.current) clearTimeout(saveTimeout.current);
-                // Guardar en nube tras 2 segundos de inactividad
                 saveTimeout.current = setTimeout(() => { saveCloudDB(newData); }, 2000);
             };
 
-            // SINCRONIZACIÓN Y CARGA
+            // CARGA DE DATOS (FORZAR NUBE)
             useEffect(() => { 
                 const init = async () => {
                     setIsInitialLoading(true);
                     try {
+                        console.log("Iniciando descarga de nube...");
                         const cloudResp = await fetchCloudDB();
-                        // LÓGICA BLINDADA: Acepta data directa o anidada
                         const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
                         
-                        if(remoteData && remoteData.products) { // Verifica que tenga productos
+                        if(remoteData && remoteData.products) {
+                            console.log("Datos recibidos:", remoteData.products.length, "productos");
                             setDB(remoteData);
-                            localStorage.setItem('emi_v87_supreme_data', JSON.stringify(remoteData));
                         } else {
-                            const s = localStorage.getItem('emi_v87_supreme_data'); 
-                            if(s) setDB(JSON.parse(s)); 
+                            console.error("Nube vacía o error estructura", cloudResp);
                         }
                     } catch(e) {
-                        const s = localStorage.getItem('emi_v87_supreme_data'); 
-                        if(s) setDB(JSON.parse(s));
+                        console.error("Error fatal descarga", e);
                     } finally {
                         setIsInitialLoading(false);
                     }
                 };
                 init();
                 
-                // Polling cada 2.5 segundos (Más rápido para detectar cierre de tienda)
+                // Sincronización continua
                 const interval = setInterval(async () => {
                      const cloudResp = await fetchCloudDB();
                      const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
-                     
                      if(remoteData && remoteData.products) {
-                         // Solo actualiza si la nube tiene una versión MÁS NUEVA
                          if((remoteData._ver || 0) > (db._ver || 0)) {
                               setDB(remoteData);
                               if(remoteData.orders.length > db.orders.length) playSound();
                          }
-                         // Si la tienda cerró remotamente, forzar actualización aunque la versión sea igual
-                         if(db.settings.storeOpen && !remoteData.settings.storeOpen) {
-                             setDB(remoteData);
-                         }
+                         if(db.settings.storeOpen && !remoteData.settings.storeOpen) setDB(remoteData); // Cierre forzoso
                      }
-                }, 2500);
+                }, 3000);
                 return () => clearInterval(interval);
-            }, [db._ver, db.settings.storeOpen]);
+            }, []); // Sin dependencias para que corra 1 vez limpio al inicio
 
             useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
             
+            // Auto Login Cliente
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('menu') === 'true' || params.get('take_order')) {
                     const devId = localStorage.getItem('device_id');
                     setUser({role:'cliente', name:'Invitado', id: devId});
-                    
-                    // Registrar visita
+                    // Registro visita
                     setTimeout(() => {
                         setDB(prevDB => {
                             if(!prevDB.users) return prevDB;
@@ -2303,6 +2541,7 @@ const App = () => {
                 }
             }, []);
             
+            // Notificaciones
             useEffect(() => {
                 if(db.settings.notification && db.settings.notification.id !== localStorage.getItem('last_notif_id')) {
                     const target = db.settings.notification.target;
@@ -2317,16 +2556,16 @@ const App = () => {
 
             const toggleTheme = () => { const newT = theme==='dark'?'light':'dark'; setTheme(newT); document.body.className = newT; };
             const handleLogin = async () => { if(loginData.p === SUPER_USER_PASS) return setUser({role:'admin', name:'Super Admin', superUser:true}); const found = db.users.find(u => u.username === loginData.u && u.password === loginData.p); if(found) setUser(found); else showToast("Credenciales incorrectas"); };
-            const resetApp = async () => { if(confirm("¿RESET TOTAL?")) { localStorage.removeItem('emi_v87_supreme_data'); await saveCloudDB(initialDB); window.location.reload(); } };
+            const resetApp = async () => { if(confirm("¿RESET TOTAL?")) { await saveCloudDB(initialDB); window.location.reload(); } };
             const handleLogout = () => { if(confirm("¿Cerrar sesión?")) setUser(null); };
 
-            // PANTALLA CARGA
             if (isInitialLoading) {
                 return (
                     <div className="app-loader">
                         <img src={LOGO_URL} className="loader-logo"/>
-                        <h2 className="text-xl mb-2">CARGANDO MENÚ...</h2>
+                        <h2 className="text-xl mb-2">CONECTANDO...</h2>
                         <div className="loader-bar"><div className="loader-progress"></div></div>
+                        <p className="text-xs text-gray-500 mt-2">Obteniendo menú de la nube</p>
                     </div>
                 );
             }
@@ -2334,7 +2573,6 @@ const App = () => {
             if(!user) return (
                 <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
                     <div className="absolute inset-0 z-0" style={{backgroundImage: `url(${BANNER_URL})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.4)'}}></div>
-                    <button onClick={toggleTheme} className="theme-toggle z-10">{theme==='dark'?'☀️':'🌛'}</button>
                     <div className="card p-8 w-full max-w-sm text-center bg-[var(--bg-card)] z-10 shadow-2xl">
                         <img src={LOGO_URL} className="w-32 mx-auto mb-6" onError={(e) => e.target.style.display='none'} />
                         <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI Burgers</h1>
@@ -2350,35 +2588,13 @@ const App = () => {
                 <div className={`h-screen w-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] ${theme}`}>
                     {user.role !== 'cliente' && <div className="logout-ghost"><button onClick={handleLogout} className="bg-red-600/90 text-white px-3 py-1 rounded text-xs font-bold backdrop-blur shadow-md hover:bg-red-500 transition">SALIR</button></div>}
                     {centerNotification && <div className="center-alert"><div className="text-4xl mb-4">📢</div><h3 className="text-2xl font-brand text-[var(--gold)] mb-2">ATENCIÓN</h3><p className="text-xl font-bold">{centerNotification}</p></div>}
-                    <button onClick={toggleTheme} className="theme-toggle">{theme==='dark'?'☀️':'🌛'}</button>
+                    
                     {user.role!=='cajero' && user.role!=='cliente' && <button className="share-btn" onClick={()=>copyToClipboard(window.location.href)}><Share2 size={24} className="text-black"/></button>}
-
                     {user.role==='admin' && <AdminPanel db={db} updateDB={updateDB} stats={{onlineStaff, activeViewers}}/>}
                     {user.role==='cajero' && <POS db={db} updateDB={updateDB} user={user}/>}
                     {user.role==='cliente' && <ClientApp db={db} updateDB={updateDB}/>}
                     {user.role==='repartidor' && <DriverApp db={db} updateDB={updateDB} user={user}/>}
                     {user.role==='cocina' && <Kitchen db={db} updateDB={updateDB}/>}
-                    
-                    {user.name==='Super Admin' && (
-                        <div className={`gods-eye group ${godMenuOpen ? 'active' : ''}`}>
-                            <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_15px_var(--gold)] z-50 relative" onClick={()=>setGodMenuOpen(!godMenuOpen)}><Eye size={30} className="text-black"/></button>
-                            {godMenuOpen && (
-                                <div className="gods-menu">
-                                    <p className="text-[var(--gold)] text-[10px] font-bold text-center mb-2 uppercase">CAMBIAR VISTA</p>
-                                    <div className="grid grid-cols-2 gap-2 mb-3">
-                                        <button onClick={()=>setUser({...user, role:'admin'})} className="bg-blue-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">ADMIN</button>
-                                        <button onClick={()=>setUser({...user, role:'cajero'})} className="bg-green-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">CAJA</button>
-                                        <button onClick={()=>setUser({...user, role:'cocina'})} className="bg-orange-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">COCINA</button>
-                                        <button onClick={()=>setUser({...user, role:'repartidor'})} className="bg-purple-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">DRIVER</button>
-                                        <button onClick={()=>setUser({...user, role:'cliente'})} className="bg-yellow-500 text-black text-[10px] font-bold p-2 rounded col-span-2 hover:scale-105 transition">VISTA CLIENTE</button>
-                                    </div>
-                                    <hr className="border-[#333] mb-2"/>
-                                    <button onClick={resetApp} className="text-red-500 font-bold text-xs bg-black/50 p-2 rounded w-full hover:bg-red-900/20 mb-1">🔥 RESET FÁBRICA</button>
-                                    <button className="text-gray-400 text-[10px] text-center w-full">{db.orders.length} Pedidos</button>
-                                </div>
-                            )}
-                        </div>
-                    )}
                 </div>
             );
         };
