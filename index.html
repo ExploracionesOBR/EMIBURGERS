@@ -195,34 +195,95 @@
         // URL DE TU SCRIPT DE GOOGLE
         const API_URL = "https://script.google.com/macros/s/AKfycbxehvXqpEG_2oQCByz8nOqThDPPD_p24GQerg7JTLglBT6gKWgClnpWkaZplaOw3w6GWw/exec";
         
-        // --- NUEVO ID DE BASE DE DATOS (LIMPIEZA TOTAL) ---
+        // --- NUEVO ID DE BASE DE DATOS ---
         const DB_ID = "emi_db_v87_supreme_3";
 
-        // --- UTILIDADES BÁSICAS ---
+        // --- UTILIDADES GLOBALES (DEFINIDAS UNA SOLA VEZ) ---
         const generateId = () => Math.random().toString(36).substr(2, 9).toUpperCase();
         const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val || 0);
+
+        const showToast = (msg) => {
+            const div = document.createElement('div');
+            div.className = 'custom-toast';
+            div.innerHTML = `<span>🔔 ${msg}</span>`;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        };
+
+        const playSound = () => {
+             try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime); 
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.2);
+             } catch(e) { console.log("Audio not supported"); }
+        };
+
+        const copyToClipboard = (text) => {
+            // Intento inteligente de crear link de menú si es la URL base
+            try {
+                const urlObj = new URL(text);
+                if(urlObj.href.includes(window.location.host)) {
+                    urlObj.searchParams.set('menu', 'true');
+                    text = urlObj.toString();
+                }
+            } catch(e) {}
+
+            // Método compatible
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => showToast("Copiado")).catch(() => fallbackCopy(text));
+            } else {
+                fallbackCopy(text);
+            }
+        };
+
+        const fallbackCopy = (text) => {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try { document.execCommand('copy'); showToast('Copiado'); } catch (err) {}
+            document.body.removeChild(textArea);
+        };
+
+        const printTicket = (html) => {
+            const win = window.open('', '', 'width=300,height=600');
+            if(win){
+                const currentUrl = window.location.href;
+                const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+                win.document.write(`<html><head><base href="${baseUrl}"><style>body{font-family:monospace;font-size:12px;width:280px;margin:0;padding:10px;} .center{text-align:center;} .bold{font-weight:bold;} hr{border-top:1px dashed #000;} img{display:block;margin:0 auto;}</style></head><body>${html}</body></html>`);
+                win.document.close(); setTimeout(() => { win.print(); win.close(); }, 500);
+            } else { showToast("Permite popups para imprimir"); }
+        };
 
         // --- 2. FUNCIONES DE CONEXIÓN A NUBE (API) ---
         const fetchCloudDB = async () => {
             try {
-                // Forzamos un parámetro random 't' para evitar que el navegador use memoria vieja
                 const res = await fetch(`${API_URL}?action=read&id=${DB_ID}&t=${Date.now()}`);
+                if (!res.ok) throw new Error("Network response was not ok");
                 return await res.json();
             } catch (e) { console.error("Error fetch", e); return null; }
         };
 
         const saveCloudDB = async (data) => {
             try {
-                // Siempre enviamos el ID nuevo
                 await fetch(API_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // 'no-cors' es vital para que no falle el envío a Google
+                    mode: 'no-cors',
                     body: JSON.stringify({ action: 'update', id: DB_ID, data: data })
                 });
             } catch (e) { console.error("Error save", e); }
         };
 
-        // --- 3. BASE DE DATOS INICIAL (Para Reset de Fábrica y Primera Carga) ---
+        // --- 3. BASE DE DATOS INICIAL ---
         const initialDB = {
             settings: {
                 storeOpen: true,
@@ -272,138 +333,6 @@
             return rule ? rule.price : (sorted[sorted.length-1]?.price || 0);
         };
 
-        // --- 5. UTILIDADES UI ---
-        const showToast = (msg) => {
-            const div = document.createElement('div');
-            div.className = 'custom-toast';
-            div.innerHTML = `<span>🔔 ${msg}</span>`;
-            document.body.appendChild(div);
-            setTimeout(() => div.remove(), 3000);
-        };
-
-        const playSound = () => {
-             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, ctx.currentTime); 
-                const gain = ctx.createGain();
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.2);
-             } catch(e) { console.log("Audio not supported"); }
-        };
-
-        const copyToClipboard = (text) => {
-            // Intentamos crear un link de menú si es la URL base
-            try {
-                const urlObj = new URL(text);
-                if(urlObj.href.includes(window.location.host)) {
-                    urlObj.searchParams.set('menu', 'true');
-                    text = urlObj.toString();
-                }
-            } catch(e) {}
-
-            // Método compatible con móviles antiguos
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.position = "fixed";  
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                showToast('Enlace copiado');
-            } catch (err) {
-                navigator.clipboard.writeText(text).then(() => showToast("Copiado"));
-            }
-            document.body.removeChild(textArea);
-        };
-         const fetchCloudDB = async () => {
-            try {
-                const res = await fetch(`${API_URL}?action=read&id=${DB_ID}`);
-                if (!res.ok) throw new Error("Network response was not ok");
-                const json = await res.json();
-                return json && json.id ? json : null;
-            } catch (e) { 
-                console.error("Read Error", e); 
-                return null; 
-            }
-        };
-
-        const saveCloudDB = async (db) => {
-            try {
-                let res = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain' }, 
-                    body: JSON.stringify({ action: 'update', id: DB_ID, data: db })
-                });
-                let json = await res.json();
-                if (!json.success) {
-                     await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain' }, 
-                        body: JSON.stringify({ action: 'create', id: DB_ID, collection: 'db', data: db })
-                    });
-                }
-                return true;
-            } catch (e) { 
-                console.error("Save Error", e); 
-                return false; 
-            }
-        };
-
-        const initialDB = {
-            products: [], 
-            users: [], 
-            orders: [],
-            coupons: [],
-            supplies: [],
-            settings: {
-                storeOpen: true,
-                pickupEnabled: true,
-                deliveryEnabled: true,
-                paymentMethods: { cash: true, card: true },
-                deliveryRadius: 15,
-                driverAssign: 'manual',
-                supervisorKey: 'ADMIN123',
-                cashLimit: 2000,
-                providers: [], 
-                platforms: ['Uber Eats', 'DiDi Food', 'Rappi'],
-                ticketConfig: { header: 'EMI BURGERS\nCD. OBREGON', footer: '¡GRACIAS POR SU COMPRA!' },
-                deliveryTable: [
-                    { min: 0, max: 3, price: 30 },
-                    { min: 3.1, max: 7, price: 50 },
-                    { min: 7.1, max: 15, price: 80 }
-                ],
-                notification: null
-            },
-            cashDrawer: { current: 0, initial: 0 },
-            expenses: []
-        };
-
-        const calculateDistance = (lat1, lon1, lat2, lon2) => {
-            if(!lat1 || !lon1 || !lat2 || !lon2) return 0;
-            const R = 6371; 
-            const dLat = (lat2 - lat1) * Math.PI / 180; 
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-        };
-        const getDeliveryPrice = (dist, table) => { const rule = table.find(r => dist >= r.min && dist <= r.max); return rule ? rule.price : (table[table.length-1]?.price || 0); };
-        
-        const printTicket = (html) => {
-            const win = window.open('', '', 'width=300,height=600');
-            if(win){
-                const currentUrl = window.location.href;
-                const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
-                win.document.write(`<html><head><base href="${baseUrl}"><style>body{font-family:monospace;font-size:12px;width:280px;margin:0;padding:10px;} .center{text-align:center;} .bold{font-weight:bold;} hr{border-top:1px dashed #000;} img{display:block;margin:0 auto;}</style></head><body>${html}</body></html>`);
-                win.document.close(); setTimeout(() => { win.print(); win.close(); }, 500);
-            } else { showToast("Permite popups para imprimir"); }
-        };
-        
         const getCirclePoints = (center, radiusKm) => {
             const points = [];
             const earthRadius = 6371;
@@ -412,15 +341,13 @@
                 const lon1 = center[1] * Math.PI / 180;
                 const brng = i * Math.PI / 180;
                 const dist = radiusKm / earthRadius;
-                
                 const lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist) + Math.cos(lat1) * Math.sin(dist) * Math.cos(brng));
                 const lon2 = lon1 + Math.atan2(Math.sin(brng) * Math.sin(dist) * Math.cos(lat1), Math.cos(dist) - Math.sin(lat1) * Math.sin(lat2));
-                
                 points.push([lat2 * 180 / Math.PI, lon2 * 180 / Math.PI]);
             }
             return points;
         };
-
+     
         const ModalAlert = ({ message, type, onConfirm, onCancel }) => (
             <div className="fixed inset-0 bg-black/90 z-[12000] flex items-center justify-center p-4 animate-in fade-in">
                 <div className={`bg-[#1a1a1a] border-2 ${type==='confirm'?'border-[var(--gold)]':'border-red-500'} p-6 rounded-xl w-full max-w-sm text-center shadow-2xl`}>
