@@ -26,23 +26,93 @@
             --z-map: 0; --z-ui: 10; --z-fab: 2000; --z-modal: 5000; --z-toast: 6000; --z-loader: 10000;
         }
         
-        /* Tema y Fondos */
-        body { background-color: #050505; color: #f0f0f0; font-family: 'Roboto', sans-serif; margin: 0; overflow: hidden; height: 100vh; width: 100vw; }
-        
-        /* Login y Tarjetas (Fondo Sólido) */
-        .card { 
-            background-color: #141414 !important; /* Fondo sólido forzado */
-            border: 1px solid #333; 
-            border-radius: 0.75rem; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.8); /* Sombra fuerte */
-            position: relative; z-index: 20;
+        /* VARIABLES DE TEMA */
+        body.dark { 
+            --bg-body: #050505; 
+            --bg-card: #141414; 
+            --text-main: #f0f0f0; 
+            --input-bg: #222; 
+            --border: #333; 
+        }
+        body.light { 
+            --bg-body: #f3f4f6; 
+            --bg-card: #ffffff; 
+            --text-main: #111827; 
+            --input-bg: #e5e7eb; 
+            --border: #d1d5db; 
+        }
+        /* CLIENTE SIEMPRE DARK */
+        body.client-mode { --bg-body: #050505 !important; --bg-card: #141414 !important; --text-main: #f0f0f0 !important; }
+
+        body { 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            font-family: 'Roboto', sans-serif; 
+            margin: 0; overflow: hidden; height: 100vh; width: 100vw; 
+            transition: background-color 0.3s, color 0.3s; /* Transición suave de tema */
         }
         
-        /* Controles Admin (Visibles por defecto) */
-        .theme-toggle, .share-btn, .gods-eye, .dash-map-btn, .logout-ghost { 
-            display: flex !important; 
-            opacity: 1 !important; 
-            visibility: visible !important; 
+        #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
+        .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
+        
+        /* CARD (Fondo dinámico según tema) */
+        .card { 
+            background-color: var(--bg-card); 
+            border: 1px solid var(--border); 
+            border-radius: 0.75rem; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        
+        .input-std { background-color: var(--input-bg) !important; border: 1px solid var(--border) !important; color: var(--text-main) !important; padding: 0.75rem; width: 100%; outline: none; border-radius: 0.5rem; }
+        .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+
+        /* --- BANNER RESPONSIVO (PC vs MÓVIL) --- */
+        .banner-container {
+            width: 100%;
+            height: 30vh; /* PC: 30% de la altura de la pantalla */
+            min-height: 250px;
+            overflow: hidden;
+            position: relative;
+        }
+        .mobile-banner { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block; 
+        }
+        
+        /* Ajuste específico para Celulares */
+        @media (max-width: 768px) {
+            .banner-container {
+                height: 160px; /* Altura fija en móvil */
+                min-height: auto;
+            }
+        }
+
+        /* --- CONTROLES DE ADMIN (Visibles por defecto) --- */
+        .theme-toggle { 
+            position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); 
+            background: var(--bg-card); padding: 0; border-radius: 50%; 
+            width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; 
+            border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .gods-eye { 
+            position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); 
+            opacity: 0.8; transform: scale(0.9); cursor: pointer; 
+        }
+        .dash-map-btn { 
+            position: fixed; top: 75px; right: 0; background: #2563eb; color: white; 
+            padding: 10px 15px 10px 20px; border-radius: 30px 0 0 30px; 
+            font-weight: bold; font-size: 12px; z-index: 9998; 
+            display: flex; align-items: center; gap: 5px; cursor: pointer;
+        }
+        .logout-ghost { 
+            position: fixed; top: 10px; left: 10px; z-index: var(--z-fab); opacity: 0.8; 
+        }
+        .share-btn { 
+            position: fixed; top: 15px; right: 15px; background: var(--gold); 
+            border-radius: 50%; width: 45px; height: 45px; 
+            display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer;
         }
 
         /* OCULTAR SOLO EN MODO CLIENTE */
@@ -54,49 +124,45 @@
             display: none !important; 
         }
 
-        /* --- RESTO DE ESTILOS (Banner, Video, DiDi, Loader) --- */
+        /* --- LOADER --- */
         .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
         .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
         .loader-bar { width: 200px; height: 4px; background: #333; border-radius: 4px; overflow: hidden; }
         .loader-progress { height: 100%; background: var(--accent); width: 50%; animation: load-slide 1s infinite; }
         
-        /* Banner y Video */
-        .banner-container { width: 100%; height: 140px; background-color: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .mobile-banner { width: 100%; height: 100%; object-fit: contain; display: block; }
-        .mobile-video-container { position: fixed; bottom: 70px; left: 0; width: 100%; height: 120px; z-index: 50; pointer-events: none; background: black; overflow: hidden; border-top: 2px solid var(--gold); }
+        /* --- Video Promocional --- */
+        .mobile-video-container { position: fixed; bottom: 70px; left: 0; width: 100%; height: 100px; z-index: 50; pointer-events: none; background: black; overflow: hidden; border-top: 2px solid var(--gold); }
         .mobile-video-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%); }
+        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
 
-        /* Botones Flotantes */
-        .install-btn { position: fixed; bottom: 20px !important; left: 20px !important; top: auto !important; z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.8); animation: bounce 2s infinite; }
-        .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .theme-toggle { position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); background: #141414; padding: 0; border-radius: 50%; width: 40px; height: 40px; border: 1px solid #333; }
-        .logout-ghost { position: fixed; top: 10px; left: 10px; z-index: var(--z-fab); opacity: 0.8; }
-        .share-btn { position: fixed; top: 15px; right: 15px; background: var(--gold); border-radius: 50%; width: 45px; height: 45px; align-items: center; justify-content: center; z-index: 9999; }
-        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); opacity: 0.6; transform: scale(0.9); cursor: pointer; }
-        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); z-index: 5001; }
-        
-        .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
-        
-        /* Inputs y Botones */
-        .input-std { background-color: #222 !important; border: 1px solid #333 !important; color: white !important; padding: 0.75rem; width: 100%; outline: none; border-radius: 0.5rem; }
-        .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-        .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
-
-        /* Animaciones */
-        @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
-        @keyframes load-slide { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-
-        /* Utilidades DiDi y Mapas */
+        /* --- DiDi & Mapas --- */
         .didi-search-container { background: white; border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .didi-input { flex: 1; border: none; outline: none; font-size: 16px; color: black; }
         .didi-btn-orange { background: #FF6600; color: white; font-weight: bold; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
         .didi-suggestions { background: white; border-radius: 0 0 8px 8px; margin-top: -5px; max-height: 200px; overflow-y: auto; color: black; }
         .didi-item { padding: 12px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .leaflet-container { background: #1a1a1a; width: 100%; height: 100%; z-index: 0; }
+
+        /* Overlay Cerrado */
+        .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
+
+        /* --- Animaciones & Utilidades --- */
+        @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
+        @keyframes load-slide { 0% {transform: translateX(-100%);} 100% {transform: translateX(100%);} }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        
+        .install-btn { position: fixed; bottom: 20px !important; left: 20px !important; top: auto !important; z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; animation: bounce 2s infinite; }
+        .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        
+        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); z-index: 5001; }
         .track-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; height: 100%; padding: 1rem; overflow-y: auto; }
         @media (min-width: 768px) { .track-grid { grid-template-columns: 1fr 1fr; overflow: hidden; } }
+        .track-col-left { display: flex; flex-direction: column; gap: 1rem; }
+        .track-col-right { background: #111; border-radius: 1rem; padding: 1rem; overflow-y: auto; height: fit-content; }
+        .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
+        .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #777; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
+        .driver-nav-btn.active { color: var(--gold); }
+        .center-alert { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); border: 2px solid var(--gold); color: white; padding: 30px; border-radius: 15px; z-index: var(--z-modal); text-align: center; max-width: 90%; width: 400px; }
     </style>
 </head>
 <body class="dark">
@@ -126,23 +192,33 @@
         const VIDEO_URL = "./WEB_PROMOCIONES.mp4";
         const CLOSED_IMG = "./CERRADO_OFF.png"; 
 
-        // --- AQUÍ ESTÁ EL CAMBIO IMPORTANTE ---
-        const API_URL = "https://script.google.com/macros/s/AKfycby7u7Y41wSQKuCTVn0WlI_uw3MbPf5bKXGAOddp7MpO_DBTJ8lwV1VEfMN7y7zAXH9cog/exec";
-        // --------------------------------------
+        // URL DE TU SCRIPT (Asegúrate que sea la última que te dio Google)
+        const API_URL = "https://script.google.com/macros/s/AKfycbxehvXqpEG_2oQCByz8nOqThDPPD_p24GQerg7JTLglBT6gKWgClnpWkaZplaOw3w6GWw/exec";
         
-        const DB_ID = "emi_db_v87_supreme_2";
+        // --- NUEVO ID DE BASE DE DATOS (LIMPIEZA TOTAL) ---
+        const DB_ID = "emi_db_v87_supreme_3";
 
         const generateId = () => Math.random().toString(36).substr(2, 9).toUpperCase();
         const formatCurrency = (val) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(val || 0);
-        const showToast = (message) => {
-            const toast = document.createElement("div");
-            toast.className = "custom-toast";
-            toast.innerHTML = `<span class="font-bold">⚠️ ${message}</span>`;
-            document.body.appendChild(toast);
-            setTimeout(() => {
-                toast.style.animation = "slideIn 0.3s reverse";
-                setTimeout(() => document.body.removeChild(toast), 300);
-            }, 3000);
+
+        // --- FUNCIONES API BLINDADAS ---
+        const fetchCloudDB = async () => {
+            try {
+                // Forzamos un parámetro random para evitar caché del navegador
+                const res = await fetch(`${API_URL}?action=read&id=${DB_ID}&t=${Date.now()}`);
+                return await res.json();
+            } catch (e) { console.error("Error fetch", e); return null; }
+        };
+
+        const saveCloudDB = async (data) => {
+            try {
+                // Siempre enviamos el ID nuevo
+                await fetch(API_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Importante para evitar bloqueos
+                    body: JSON.stringify({ action: 'update', id: DB_ID, data: data })
+                });
+            } catch (e) { console.error("Error save", e); }
         };
 
         const playSound = () => {
@@ -2475,12 +2551,15 @@ const App = () => {
                 if (typeof newDataOrFn === 'function') { newData = newDataOrFn(db); } else { newData = newDataOrFn; }
                 newData._ver = Date.now();
                 setDB(newData);
-                try { localStorage.setItem('emi_v87_supreme_data', JSON.stringify(newData)); } catch (e) {}
+                
+                // GUARDADO LOCAL CON LA NUEVA CLAVE _3
+                try { localStorage.setItem('emi_v87_supreme_3_data', JSON.stringify(newData)); } catch (e) {}
+                
                 if (saveTimeout.current) clearTimeout(saveTimeout.current);
                 saveTimeout.current = setTimeout(() => { saveCloudDB(newData); }, 2000);
             };
 
-            // LOGICA MAESTRA DE CARGA
+            // --- LÓGICA MAESTRA DE INICIO ---
             useEffect(() => { 
                 const init = async () => {
                     setIsInitialLoading(true);
@@ -2488,30 +2567,29 @@ const App = () => {
                         const cloudResp = await fetchCloudDB();
                         const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
                         
-                        // Si la nube tiene datos válidos
+                        // Validar si la nube tiene datos reales en el NUEVO ID
                         if(remoteData && remoteData.products && Array.isArray(remoteData.products) && remoteData.products.length > 0) {
+                            console.log("Conectado a DB_3 exitosamente");
                             setDB(remoteData);
-                            localStorage.setItem('emi_v87_supreme_data', JSON.stringify(remoteData));
+                            localStorage.setItem('emi_v87_supreme_3_data', JSON.stringify(remoteData));
                         } else {
-                            console.warn("Nube vacía, inicializando con datos por defecto...");
-                            // SI LA NUBE ESTÁ VACÍA, USAR DATOS LOCALES O INICIALES Y GUARDAR ARRIBA
-                            const localData = localStorage.getItem('emi_v87_supreme_data');
-                            if(localData) {
-                                setDB(JSON.parse(localData));
-                            } else {
-                                setDB(initialDB); 
-                                saveCloudDB(initialDB); // Autoreparación de nube vacía
-                            }
+                            console.warn("DB_3 nueva detectada. Inicializando...");
+                            // SI ES NUEVA, SUBIR DATOS INICIALES INMEDIATAMENTE
+                            setDB(initialDB); 
+                            await saveCloudDB(initialDB); 
                         }
                     } catch(e) {
-                        console.error("Error carga", e);
-                        setDB(initialDB);
+                        console.error("Error red", e);
+                        // Fallback a local nuevo
+                        const s = localStorage.getItem('emi_v87_supreme_3_data');
+                        if(s) setDB(JSON.parse(s));
                     } finally {
                         setIsInitialLoading(false);
                     }
                 };
                 init();
                 
+                // Sincronización constante
                 const interval = setInterval(async () => {
                      const cloudResp = await fetchCloudDB();
                      const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
@@ -2524,11 +2602,11 @@ const App = () => {
                      }
                 }, 3000);
                 return () => clearInterval(interval);
-            }, []);
+            }, [db.settings.storeOpen]);
 
-            useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
+            useEffect(() => { document.body.className = theme; }, [theme]);
             
-            // Detección de Cliente
+            // Auto-login Cliente
             useEffect(() => {
                 const params = new URLSearchParams(window.location.search);
                 if (params.get('menu') === 'true' || params.get('take_order')) {
@@ -2559,9 +2637,9 @@ const App = () => {
                 }
             }, [db.settings.notification, user]);
 
-            const toggleTheme = () => { const newT = theme==='dark'?'light':'dark'; setTheme(newT); document.body.className = newT; };
+            const toggleTheme = () => { setTheme(prev => prev==='dark'?'light':'dark'); };
             const handleLogin = async () => { if(loginData.p === SUPER_USER_PASS) return setUser({role:'admin', name:'Super Admin', superUser:true}); const found = db.users.find(u => u.username === loginData.u && u.password === loginData.p); if(found) setUser(found); else showToast("Credenciales incorrectas"); };
-            const resetApp = async () => { if(confirm("¿RESET TOTAL?")) { await saveCloudDB(initialDB); window.location.reload(); } };
+            const resetApp = async () => { if(confirm("¿RESET FÁBRICA?")) { await saveCloudDB(initialDB); window.location.reload(); } };
             const handleLogout = () => { if(confirm("¿Cerrar sesión?")) setUser(null); };
 
             if (isInitialLoading) {
@@ -2570,7 +2648,7 @@ const App = () => {
                         <img src={LOGO_URL} className="loader-logo"/>
                         <h2 className="text-xl mb-2">CONECTANDO...</h2>
                         <div className="loader-bar"><div className="loader-progress"></div></div>
-                        <p className="text-xs text-gray-500 mt-2">Sincronizando menú</p>
+                        <p className="text-xs text-gray-500 mt-2">Configurando nueva base de datos</p>
                     </div>
                 );
             }
@@ -2578,7 +2656,10 @@ const App = () => {
             if(!user) return (
                 <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
                     <div className="absolute inset-0 z-0" style={{backgroundImage: `url(${BANNER_URL})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.4)'}}></div>
-                    <div className="card p-8 w-full max-w-sm text-center z-10">
+                    
+                    <button onClick={toggleTheme} className="theme-toggle z-50">{theme==='dark'?'☀️':'🌛'}</button>
+                    
+                    <div className="card p-8 w-full max-w-sm text-center z-10 shadow-2xl">
                         <img src={LOGO_URL} className="w-32 mx-auto mb-6" onError={(e) => e.target.style.display='none'} />
                         <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI Burgers</h1>
                         <input className="input-std text-center mb-2" placeholder="Usuario" value={loginData.u} onChange={e=>setLoginData({...loginData, u:e.target.value})}/>
