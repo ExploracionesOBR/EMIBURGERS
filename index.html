@@ -28,28 +28,23 @@
             --success: #00e676;
             --danger: #ff3333;
             --warning: #ff9800;
-            --blue-maps: #4285F4;
             
             --z-map: 0;
             --z-ui: 10;
-            --z-fab: 2000; /* Z-Index alto para botones flotantes */
+            --z-fab: 2000;
             --z-modal: 5000;
             --z-toast: 6000;
         }
         
         body.dark { --bg-body: #050505; --bg-card: #141414; --text-main: #f0f0f0; --input-bg: #222; --border: #333; }
         body.light { --bg-body: #f3f4f6; --bg-card: #ffffff; --text-main: #111827; --input-bg: #e5e7eb; --border: #d1d5db; }
-
-        /* MODO CLIENTE (Sin botón de tema) */
         body.client-mode { background-color: #050505 !important; color: #f0f0f0 !important; }
         body.client-mode .theme-toggle { display: none !important; }
 
         body { 
             background-color: var(--bg-body); color: var(--text-main); 
             font-family: 'Roboto', sans-serif; margin: 0; 
-            overflow: hidden; 
-            user-select: none; -webkit-tap-highlight-color: transparent;
-            transition: background-color 0.3s, color 0.3s;
+            overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent;
             height: 100vh; width: 100vw;
         }
         
@@ -61,63 +56,25 @@
         .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; text-transform: uppercase; border-radius: 0.75rem; padding: 0.8rem; border: none; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2); transition: transform 0.1s; display: flex; justify-content: center; align-items: center; gap: 0.5rem; cursor: pointer; }
         .btn-gold:active { transform: scale(0.96); }
         
-        /* POSICIONAMIENTO BOTONES FLOTANTES (CORREGIDO) */
-        
-        /* 1. Botón Tema: Abajo Derecha (Pegado al borde) */
-        .theme-toggle { 
-            position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); 
-            background: var(--bg-card); padding: 0; border-radius: 50%; 
-            border: 1px solid var(--border); cursor: pointer; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 40px; height: 40px; 
-            display: flex; justify-content: center; align-items: center; 
-        }
-
-        /* 2. Botón Salir: Arriba Izquierda (Lejos de la acción) */
-        .logout-ghost { 
-            position: fixed; top: 10px; left: 10px; z-index: var(--z-fab); 
-            opacity: 0.8; transition: opacity 0.2s; 
-        }
-        .logout-ghost:hover { opacity: 1; }
-
-        /* 3. Ojo de Dios: Abajo Izquierda (Esquina) */
-        .gods-eye { 
-            position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); 
-            opacity: 0.6; transition: all 0.3s; transform: scale(0.9);
-        }
-        .gods-eye:hover, .gods-eye.active { opacity: 1; transform: scale(1.1); }
-        
-        /* Menú del Ojo de Dios (Abre hacia arriba) */
-        .gods-menu { 
-            position: absolute; bottom: 60px; left: 0; width: 220px; 
-            background: rgba(0,0,0,0.95); border: 1px solid var(--gold); 
-            border-radius: 12px; padding: 15px; display: flex; flex-direction: column; 
-            gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out;
-        }
-
-        /* 4. Admin FAB (Menú POS): Abajo Izquierda (Encima del Ojo o desplazado) */
-        /* Lo subimos un poco para que no tape al Ojo de Dios si ambos están presentes */
-        .admin-fab { position: fixed; bottom: 90px; left: 20px; z-index: 9000; }
-        .admin-fab-menu { position: absolute; bottom: 60px; left: 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-
-        /* Share Button: Arriba Derecha */
-        .share-btn { position: fixed; top: 10px; right: 10px; background: var(--gold); border-radius: 50%; padding: 10px; z-index: 9999; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.3); opacity: 0.8; }
-        
-        /* RESTO DE ESTILOS... */
-        .leaflet-container { background: #222; width: 100%; height: 100%; z-index: 0; }
+        /* CORRECCIÓN MAPA OSCURO */
+        .leaflet-container { background: #1a1a1a; width: 100%; height: 100%; z-index: 0; }
         .leaflet-pane { z-index: 10 !important; }
         .leaflet-bottom { z-index: 20 !important; }
-        .leaflet-div-icon { background: transparent !important; border: none !important; }
+        
+        /* ICONOS MAPA */
         .custom-pin { font-size: 32px; text-align: center; filter: drop-shadow(0 2px 3px black); }
         .driver-order-icon { position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 32px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         .driver-order-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; font-weight: 900; color: white; -webkit-text-stroke: 1px black; pointer-events: none; z-index: 10; }
-        .waiting-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; background: white; color: black; }
-        .logo-spinner-wrapper { position: relative; width: 150px; height: 150px; display: flex; items-center; justify-content: center; margin-bottom: 2rem; }
-        .logo-pulse { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; animation: pulse-scale 1.5s infinite ease-in-out; z-index: 2; border: 4px solid var(--gold); }
-        .ring-spin { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 4px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); animation: spin 1.5s linear infinite; z-index: 1; }
-        @keyframes pulse-scale { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* UI FLOTANTE */
+        .theme-toggle { position: fixed; bottom: 10px; right: 10px; z-index: var(--z-fab); background: var(--bg-card); padding: 0; border-radius: 50%; border: 1px solid var(--border); cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; }
+        .logout-ghost { position: fixed; top: 10px; left: 10px; z-index: var(--z-fab); opacity: 0.8; transition: opacity 0.2s; }
+        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); opacity: 0.6; transition: all 0.3s; transform: scale(0.9); }
+        .gods-menu { position: absolute; bottom: 60px; left: 0; width: 220px; background: rgba(0,0,0,0.95); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 5px; backdrop-filter: blur(10px); animation: slideUp 0.2s ease-out; }
+        .admin-fab { position: fixed; bottom: 90px; left: 20px; z-index: 9000; }
+        .admin-fab-menu { position: absolute; bottom: 60px; left: 0; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+        
         .bill-btn { width: 100%; height: 60px; background-size: cover; background-repeat: no-repeat; background-position: center; border-radius: 8px; border: 1px solid #444; cursor: pointer; background-color: white; color: transparent; }
-        .bill-btn:active { transform: scale(0.95); filter: brightness(1.2); }
         .grid-cockpit { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 1.5rem; height: 100%; }
         .cockpit-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; position: relative; }
         .mode-btn { padding: 1.5rem; border: 2px solid var(--border); border-radius: 0.75rem; text-align: left; font-weight: bold; font-size: 1.1rem; color: #888; transition: all 0.2s; cursor: pointer; }
@@ -125,27 +82,45 @@
         .center-alert { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); border: 2px solid var(--gold); color: white; padding: 30px; border-radius: 15px; z-index: var(--z-modal); text-align: center; max-width: 90%; width: 400px; box-shadow: 0 0 50px rgba(255, 215, 0, 0.5); }
         .custom-toast { position: fixed; top: 20px; right: 20px; background: #e74c3c; border-left: 5px solid #c0392b; padding: 15px; border-radius: 5px; color: white; z-index: var(--z-toast); animation: slideIn 0.3s; display: flex; gap: 10px; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-weight: bold; }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .progress-bar { height: 8px; border-radius: 4px; background: #333; overflow: hidden; }
-        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-        .dash-map-btn { position: fixed; top: 15%; right: 0; transform: translateY(-50%); background: #2563eb; border-radius: 20px 0 0 20px; padding: 12px; z-index: 9999; cursor: pointer; box-shadow: -2px 0 10px rgba(0,0,0,0.3); color: white; font-weight: bold; display: flex; align-items: center; gap: 5px; opacity: 0.8; }
-        .dash-map-btn:hover { opacity: 1; padding-right: 20px; }
-        .install-btn { position: fixed; bottom: 80px; left: 20px; z-index: 9999; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; animation: bounce 2s infinite; }
-        .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        .gps-btn { position: relative; overflow: hidden; }
-        .gps-btn::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; border-radius: 50%; background: rgba(255, 255, 255, 0.3); animation: ripple 1.5s infinite; }
-        @keyframes ripple { 0% { width: 0; height: 0; opacity: 0.5; } 100% { width: 200%; height: 200%; opacity: 0; } }
-        .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
-        .admin-scroll-container { max-height: calc(100vh - 150px); overflow-y: auto; }
+        
+        .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
+        .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #777; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
+        .driver-nav-btn.active { color: var(--gold); }
+        .driver-nav-btn svg { margin-bottom: 5px; }
+
+        /* AJUSTES CLIENTE (BANNER Y VIDEO) */
+        .mobile-banner { width: 100%; height: 160px; object-fit: cover; display: block; }
+        .mobile-video-container { 
+            position: fixed; bottom: 65px; left: 0; width: 100%; height: 120px; 
+            z-index: 50; pointer-events: none; background: black;
+        }
+        .mobile-video-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,1), transparent); }
+
+        /* SCANNER */
         #reader { width: 100%; height: 100%; background: black; margin-bottom: 0; border: none; }
         #reader video { object-fit: cover; width: 100%; height: 100%; }
+        
+        .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
+        .admin-scroll-container { max-height: calc(100vh - 150px); overflow-y: auto; }
         .scroll-container { overflow-y: auto; -webkit-overflow-scrolling: touch; }
         .track-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; height: 100%; padding: 1rem; overflow-y: auto; }
         @media (min-width: 768px) { .track-grid { grid-template-columns: 1fr 1fr; overflow: hidden; } }
         .track-col-left { display: flex; flex-direction: column; gap: 1rem; }
         .track-col-right { background: #111; border-radius: 1rem; padding: 1rem; overflow-y: auto; height: fit-content; }
-        .pulse-btn { animation: pulse-shadow 2s infinite; }
-        @keyframes pulse-shadow { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
+        
+        /* Animaciones Cliente Espera */
+        .waiting-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; background: white; color: black; }
+        .logo-spinner-wrapper { position: relative; width: 150px; height: 150px; display: flex; items-center; justify-content: center; margin-bottom: 2rem; }
+        .logo-pulse { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; animation: pulse-scale 1.5s infinite ease-in-out; z-index: 2; border: 4px solid var(--gold); }
+        .ring-spin { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 4px solid transparent; border-top-color: var(--accent); border-right-color: var(--accent); animation: spin 1.5s linear infinite; z-index: 1; }
+        @keyframes pulse-scale { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .scan-region { width: 100%; height: 300px; overflow: hidden; background: #000; position: relative; border-radius: 12px; border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; }
+        .manual-input-container { display: flex; gap: 10px; margin-top: 20px; width: 100%; max-width: 300px; }
+        .scanner-line { position: absolute; width: 100%; height: 2px; background: red; box-shadow: 0 0 10px red; animation: scan 2s infinite linear; top: 0; }
+        @keyframes scan { 0% { top: 0; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
     </style>
 </head>
 <body class="dark">
@@ -1806,7 +1781,7 @@ const ClientApp = ({ db, updateDB }) => {
             const addressTimer = useRef(null);
             const [clientCatFilter, setClientCatFilter] = useState('Todos'); 
             const [ingredientsProduct, setIngredientsProduct] = useState(null);
-            const [showLargeMap, setShowLargeMap] = useState(false); // Nuevo para mapa grande
+            const [showLargeMap, setShowLargeMap] = useState(false);
             
             const hasProfanity = (text) => {
                 const badWords = ['puto', 'verga', 'pendejo', 'mierda', 'estupido', 'idiota', 'cabron', 'chinga', 'zorra', 'mamon'];
@@ -1818,9 +1793,7 @@ const ClientApp = ({ db, updateDB }) => {
                 document.body.classList.add('client-mode');
                 document.body.classList.add('dark');
                 document.body.classList.remove('light');
-                return () => {
-                    document.body.classList.remove('client-mode');
-                };
+                return () => { document.body.classList.remove('client-mode'); };
             }, []);
 
             useEffect(() => {
@@ -1879,13 +1852,7 @@ const ClientApp = ({ db, updateDB }) => {
                     if (deliveryCoords) { const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]); if (dist > db.settings.deliveryRadius) return showToast("Upss! Dirección fuera de zona de cobertura."); }
                 }
                 if(form.pay === 'cash' && (!form.payAmount || form.payAmount < total)) return showToast("Monto insuficiente o inválido");
-                
-                const order = { 
-                    id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, 
-                    items: cart, total, status: 'web_pending_payment', method: form.pay, payAmount: form.payAmount, 
-                    createdAt: new Date().toISOString(), address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', 
-                    clientName: form.name, clientPhone: form.phone, clientLoc: deliveryCoords || clientCoords, source: 'web' 
-                };
+                const order = { id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, items: cart, total, status: 'web_pending_payment', method: form.pay, payAmount: form.payAmount, createdAt: new Date().toISOString(), address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', clientName: form.name, clientPhone: form.phone, clientLoc: deliveryCoords || clientCoords, source: 'web' };
                 localStorage.setItem('client_active_order_id', order.id);
                 updateDB({...db, orders: [...db.orders, order]}); setActiveOrder(order); setView('track');
             };
@@ -1916,15 +1883,28 @@ const ClientApp = ({ db, updateDB }) => {
                 <div className="h-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] relative app-view-mobile">
                     <button className="install-btn" onClick={showInstallInstructions}><img src={LOGO_URL} className="w-8 h-8 rounded-full"/></button>
                     {activeOrder && ( <div onClick={()=>setView('track')} className="fixed top-20 left-4 right-4 bg-red-600 text-white p-6 rounded-2xl shadow-2xl z-[100] animate-pulse cursor-pointer border-4 border-[var(--gold)] text-center"><h2 className="text-3xl font-brand">🛵 PEDIDO EN CURSO</h2><p className="font-bold text-sm mt-2">TOCA PARA VER EL MAPA</p></div> )}
-                    <div className="w-full bg-black"><img src={BANNER_URL} className="w-full h-auto min-h-[250px] object-cover mx-auto block" alt="Banner"/></div>
+                    
+                    {/* BANNER RESTRINGIDO PARA MOVIL */}
+                    <div className="w-full bg-black">
+                         <img src={BANNER_URL} className="mobile-banner" alt="Banner"/>
+                    </div>
+
                     <div className="p-2 flex gap-2 overflow-x-auto bg-[var(--bg-card)] border-b border-[var(--border)]">{uniqueClientCategories.map(c=><button key={c} onClick={()=>setClientCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${clientCatFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-[#222] text-white'}`}>{c}</button>)}</div>
                     <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-48">{Object.entries(groupedProducts).filter(([cat]) => clientCatFilter === 'Todos' || cat === clientCatFilter).map(([cat, prods]) => (<div key={cat}><div className="space-y-4">{prods.map(p=>{ const qty = getQty(p.id); return (<div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)] relative"><img src={p.img} className="w-20 h-20 rounded object-cover cursor-pointer" onClick={()=>setIngredientsProduct(p)}/><div className="flex-1"><p className="font-bold text-[var(--text-main)] text-lg cursor-pointer" onClick={()=>setIngredientsProduct(p)}>{p.name}</p><p className="text-gray-500 text-xs italic mb-1 line-clamp-2">{p.ingredients}</p><div className="flex justify-between items-center mt-2"><span className="font-bold text-[var(--accent)] text-xl">{formatCurrency(p.price)}</span><div className="flex items-center gap-2 bg-[#222] rounded-full p-1 border border-[#444]">{qty === 0 ? (<button onClick={()=>adjustQty(p, 1)} className="bg-[var(--gold)] text-black font-bold px-4 py-1 rounded-full text-sm shadow hover:scale-105 transition">PEDIR</button>) : (<><button onClick={()=>adjustQty(p, -1)} className="w-8 h-8 rounded-full bg-gray-700 text-white font-bold flex items-center justify-center active:scale-90">-</button><span className="w-6 text-center font-bold text-white text-sm">{qty}</span><button onClick={()=>adjustQty(p, 1)} className="w-8 h-8 rounded-full bg-[var(--gold)] text-black font-bold flex items-center justify-center active:scale-90 shadow">+</button></>)}</div></div></div></div>)})}</div></div>))}</div>
-                    <div className="fixed bottom-[70px] left-0 w-full h-[150px] z-50 pointer-events-none bg-black border-none"><video src={VIDEO_URL} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-90 block"></video><div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-transparent to-transparent"></div></div>
+                    
+                    {/* VIDEO RESTRINGIDO PARA MOVIL */}
+                    <div className="mobile-video-container">
+                        <video src={VIDEO_URL} autoPlay loop muted playsInline></video>
+                        <div className="mobile-video-overlay"></div>
+                    </div>
+                    
                     <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60] app-view-mobile">{activeOrder ? (<button onClick={()=>setView('track')} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg animate-pulse flex items-center justify-center gap-2">🛵 PEDIDO EN CURSO</button>) : (cart.length > 0 && <button onClick={preSubmit} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button>)}</div>
                     {showComplements && (<div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end p-4 animate-in slide-in-from-bottom"><div className="bg-[var(--bg-card)] rounded-t-2xl p-6 border-t border-[var(--gold)]"><h3 className="text-xl font-bold text-[var(--gold)] mb-4 text-center">¿SE TE ANTOJA ALGO MÁS? 🍟🥤</h3><div className="flex gap-4 overflow-x-auto pb-4">{db.products.filter(p => p.isComplement && p.active).map(p => (<div key={p.id} className="min-w-[120px] bg-[#222] p-2 rounded-lg text-center cursor-pointer border border-transparent hover:border-[var(--gold)]" onClick={()=>{adjustQty(p, 1); showToast("Agregado!");}}><img src={p.img} className="w-20 h-20 mx-auto rounded mb-2 object-cover"/><p className="text-xs font-bold text-white line-clamp-1">{p.name}</p><p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p><button className="mt-1 bg-[var(--gold)] text-black text-xs px-2 py-1 rounded-full font-bold">+</button></div>))}</div><button onClick={()=>{setView('checkout'); setShowComplements(false);}} className="w-full bg-white text-black font-bold py-3 rounded-xl">LISTO, CONTINUAR</button></div></div>)}
                 </div>
             );
 
+            // ... (Rest of ClientApp same as previous, Checkout and Track views are already optimized in memory)
+            // Para mantener el bloque consistente, incluyo el resto de la función:
             if(view === 'checkout') return (
                 <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto app-view-mobile relative flex flex-col pb-32">
                     <button onClick={()=>setView('menu')} className="mb-4 text-gray-500 flex items-center gap-2 font-bold"><ArrowLeft/> VOLVER</button>
@@ -1940,137 +1920,34 @@ const ClientApp = ({ db, updateDB }) => {
                 </div>
             );
 
-            // VIEW TRACK (Rediseñado)
             if(view === 'track') {
                 const assignedDriver = activeOrder.driver ? db.users.find(u => u.username === activeOrder.driver) : null;
                 const driverLoc = assignedDriver && assignedDriver.location ? assignedDriver.location : STORE_COORDS;
-                
-                const trackMarkers = [
-                    { pos: deliveryCoords || clientCoords || STORE_COORDS, emoji: '🍔', isClient: true },
-                    { pos: STORE_COORDS, emoji: '', isStore: true }
-                ];
-                if (assignedDriver) {
-                    trackMarkers.push({ pos: driverLoc, emoji: '🏍️', type: 'driver', label: 'Tu Repartidor' });
-                }
-
+                const trackMarkers = [{ pos: deliveryCoords || clientCoords || STORE_COORDS, emoji: '🍔', isClient: true }, { pos: STORE_COORDS, emoji: '', isStore: true }];
+                if (assignedDriver) trackMarkers.push({ pos: driverLoc, emoji: '🏍️', type: 'driver', label: 'Tu Repartidor' });
                 const isWaitingAccept = activeOrder.status === 'web_pending_payment';
-                
-                const shareOrder = () => {
-                    const text = `¡Hola! Mira mi pedido de EMI BURGERS:\nOrden #${activeOrder.orderNum}\nTotal: ${formatCurrency(activeOrder.total)}\nEstado: ${activeOrder.status}`;
-                    if (navigator.share) {
-                        navigator.share({ title: 'Mi Pedido EMI BURGERS', text: text, url: window.location.href });
-                    } else {
-                        copyToClipboard(text);
-                        showToast("Detalles copiados al portapapeles");
-                    }
-                };
+                const shareOrder = () => { const text = `¡Hola! Mira mi pedido de EMI BURGERS:\nOrden #${activeOrder.orderNum}\nTotal: ${formatCurrency(activeOrder.total)}\nEstado: ${activeOrder.status}`; if (navigator.share) navigator.share({ title: 'Mi Pedido EMI BURGERS', text: text, url: window.location.href }); else { copyToClipboard(text); showToast("Detalles copiados"); } };
 
-                // PANTALLA 1: ESPERANDO ACEPTACIÓN (Pulsing Logo + Ring)
-                if (isWaitingAccept) {
-                    return (
-                        <div className="waiting-container client-mode">
-                            <div className="logo-spinner-wrapper">
-                                <img src={LOGO_URL} className="logo-pulse"/>
-                                <div className="ring-spin"></div>
-                            </div>
-                            <h2 className="text-3xl font-brand text-black mb-2">¡ESPERA!</h2>
-                            <p className="text-xl font-bold text-red-600 mb-4 px-4">NO ACTUALICES LA PÁGINA, ESTOY ENVIANDO TU PEDIDO AL RESTAURANTE.</p>
-                            <p className="text-gray-500 text-sm">Esto puede tardar unos minutos.</p>
-                        </div>
-                    );
-                }
+                if (isWaitingAccept) return (<div className="waiting-container client-mode"><div className="logo-spinner-wrapper"><img src={LOGO_URL} className="logo-pulse"/><div className="ring-spin"></div></div><h2 className="text-3xl font-brand text-black mb-2">¡ESPERA!</h2><p className="text-xl font-bold text-red-600 mb-4 px-4">NO ACTUALICES LA PÁGINA, ESTOY ENVIANDO TU PEDIDO AL RESTAURANTE.</p><p className="text-gray-500 text-sm">Esto puede tardar unos minutos.</p></div>);
 
-                // PANTALLA 2: RASTREO (Split Layout)
                 return (
                     <div className="track-grid client-mode">
                         <div className="track-col-left">
-                            <div className="text-center md:text-left">
-                                <img src={LOGO_URL} className="w-16 h-16 mx-auto md:mx-0 mb-2 rounded-full border-2 border-[var(--gold)]"/>
-                                <h1 className="text-3xl font-brand text-[var(--accent)] uppercase">YA ESTÁS LISTO</h1>
-                                
-                                <div className="mt-4 text-white">
-                                    <p className="font-bold flex items-center justify-center md:justify-start gap-2"><Truck size={20}/> {activeOrder.address === 'RECOGER' ? 'PARA RECOGER' : 'A DOMICILIO'}</p>
-                                    <p className="text-xl font-black mt-2">NÚMERO DE ORDEN <span className="text-[var(--gold)]">#{activeOrder.orderNum}</span></p>
-                                    <p className="text-sm text-gray-400 mt-1">FECHA: {new Date(activeOrder.createdAt).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-
-                            <div className="mt-4">
-                                <h3 className="font-bold text-white mb-2 uppercase">RASTREA TU PEDIDO</h3>
-                                <p className="text-xs text-gray-400 mb-2">Tu pedido va en camino! Lo puedes seguir aquí:</p>
-                                
-                                <div className={`w-full py-3 rounded text-center font-bold text-black uppercase mb-4 ${activeOrder.status === 'ready' ? 'bg-green-500' : 'bg-[var(--gold)]'}`}>
-                                    {activeOrder.status === 'pending' ? 'ORDEN RECIBIDA' : activeOrder.status === 'preparing' ? 'COCINANDO...' : activeOrder.status === 'ready' ? 'LISTO PARA ENTREGA' : 'EN CAMINO'}
-                                </div>
-
-                                {/* MAPA PEQUEÑO (CLICK -> GRANDE) */}
-                                <div className="relative w-full h-48 bg-gray-800 rounded border border-[#444] overflow-hidden cursor-pointer group" onClick={()=>setShowLargeMap(true)}>
-                                    <LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, deliveryCoords || STORE_COORDS] : null} zoom={13}/>
-                                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/10 transition">
-                                        <p className="bg-black/70 text-white px-3 py-1 rounded text-xs">TOCA PARA AMPLIAR</p>
-                                    </div>
-                                </div>
-                            </div>
+                            <div className="text-center md:text-left"><img src={LOGO_URL} className="w-16 h-16 mx-auto md:mx-0 mb-2 rounded-full border-2 border-[var(--gold)]"/><h1 className="text-3xl font-brand text-[var(--accent)] uppercase">YA ESTÁS LISTO</h1><div className="mt-4 text-white"><p className="font-bold flex items-center justify-center md:justify-start gap-2"><Truck size={20}/> {activeOrder.address === 'RECOGER' ? 'PARA RECOGER' : 'A DOMICILIO'}</p><p className="text-xl font-black mt-2">NÚMERO DE ORDEN <span className="text-[var(--gold)]">#{activeOrder.orderNum}</span></p><p className="text-sm text-gray-400 mt-1">FECHA: {new Date(activeOrder.createdAt).toLocaleDateString()}</p></div></div>
+                            <div className="mt-4"><h3 className="font-bold text-white mb-2 uppercase">RASTREA TU PEDIDO</h3><p className="text-xs text-gray-400 mb-2">Tu pedido va en camino! Lo puedes seguir aquí:</p><div className={`w-full py-3 rounded text-center font-bold text-black uppercase mb-4 ${activeOrder.status === 'ready' ? 'bg-green-500' : 'bg-[var(--gold)]'}`}>{activeOrder.status === 'pending' ? 'ORDEN RECIBIDA' : activeOrder.status === 'preparing' ? 'COCINANDO...' : activeOrder.status === 'ready' ? 'LISTO PARA ENTREGA' : 'EN CAMINO'}</div><div className="relative w-full h-48 bg-gray-800 rounded border border-[#444] overflow-hidden cursor-pointer group" onClick={()=>setShowLargeMap(true)}><LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, deliveryCoords || STORE_COORDS] : null} zoom={13}/><div className="absolute inset-0 bg-black/30 flex items-center justify-center group-hover:bg-black/10 transition"><p className="bg-black/70 text-white px-3 py-1 rounded text-xs">TOCA PARA AMPLIAR</p></div></div></div>
                         </div>
-
                         <div className="track-col-right">
-                            <div className="flex justify-between items-start mb-4 border-b border-[#333] pb-2">
-                                <div>
-                                    <p className="font-bold text-white">EMI BURGERS</p>
-                                    <p className="text-[10px] text-gray-400">Calle Miguel Aleman 123, Centro</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-xs text-gray-400">ORDEN #{activeOrder.orderNum}</p>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 mb-4 text-xs text-white">
-                                <div>
-                                    <p className="font-bold text-gray-500">Método de pago</p>
-                                    <p>{activeOrder.method === 'cash' ? 'Efectivo' : 'Tarjeta'}</p>
-                                </div>
-                                <div>
-                                    <p className="font-bold text-gray-500">Tiempo estimado</p>
-                                    <p>30-45 min</p>
-                                </div>
-                            </div>
-
-                            <div className="mb-4">
-                                <p className="font-bold text-white mb-2 border-b border-[#333] pb-1">MI PEDIDO</p>
-                                {activeOrder.items.map((i, idx) => (
-                                    <div key={idx} className="flex justify-between text-sm text-gray-300 mb-1">
-                                        <span><span className="text-[var(--accent)] font-bold">{i.qty}x</span> {i.name}</span>
-                                        <span>{formatCurrency(i.price * i.qty)}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="border-t border-[#333] pt-2 mt-auto">
-                                <div className="flex justify-between text-white font-black text-xl">
-                                    <span>Total</span>
-                                    <span>{formatCurrency(activeOrder.total)}</span>
-                                </div>
-                            </div>
-                            
-                            <button onClick={shareOrder} className="w-full mt-6 bg-red-600 text-white py-3 rounded font-bold flex items-center justify-center gap-2 hover:bg-red-700 transition">
-                                <Share2 size={18}/> COMPARTE
-                            </button>
+                            <div className="flex justify-between items-start mb-4 border-b border-[#333] pb-2"><div><p className="font-bold text-white">EMI BURGERS</p><p className="text-[10px] text-gray-400">Calle Miguel Aleman 123, Centro</p></div><div className="text-right"><p className="text-xs text-gray-400">ORDEN #{activeOrder.orderNum}</p></div></div>
+                            <div className="grid grid-cols-2 gap-4 mb-4 text-xs text-white"><div><p className="font-bold text-gray-500">Método de pago</p><p>{activeOrder.method === 'cash' ? 'Efectivo' : 'Tarjeta'}</p></div><div><p className="font-bold text-gray-500">Tiempo estimado</p><p>30-45 min</p></div></div>
+                            <div className="mb-4"><p className="font-bold text-white mb-2 border-b border-[#333] pb-1">MI PEDIDO</p>{activeOrder.items.map((i, idx) => (<div key={idx} className="flex justify-between text-sm text-gray-300 mb-1"><span><span className="text-[var(--accent)] font-bold">{i.qty}x</span> {i.name}</span><span>{formatCurrency(i.price * i.qty)}</span></div>))}</div>
+                            <div className="border-t border-[#333] pt-2 mt-auto"><div className="flex justify-between text-white font-black text-xl"><span>Total</span><span>{formatCurrency(activeOrder.total)}</span></div></div>
+                            <button onClick={shareOrder} className="w-full mt-6 bg-red-600 text-white py-3 rounded font-bold flex items-center justify-center gap-2 hover:bg-red-700 transition"><Share2 size={18}/> COMPARTE</button>
                         </div>
-
-                        {/* MODAL MAPA GRANDE */}
-                        {showLargeMap && (
-                            <div className="fixed inset-0 bg-black z-[6000] flex flex-col p-4 animate-in zoom-in">
-                                <button onClick={()=>setShowLargeMap(false)} className="absolute top-4 right-4 bg-white text-black rounded-full p-2 z-[7000] shadow-lg"><X size={24}/></button>
-                                <div className="flex-1 rounded border border-[var(--gold)] overflow-hidden relative">
-                                    <LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, deliveryCoords || STORE_COORDS] : null} zoom={14}/>
-                                </div>
-                            </div>
-                        )}
+                        {showLargeMap && (<div className="fixed inset-0 bg-black z-[6000] flex flex-col p-4 animate-in zoom-in"><button onClick={()=>setShowLargeMap(false)} className="absolute top-4 right-4 bg-white text-black rounded-full p-2 z-[7000] shadow-lg"><X size={24}/></button><div className="flex-1 rounded border border-[var(--gold)] overflow-hidden relative"><LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, deliveryCoords || STORE_COORDS] : null} zoom={14}/></div></div>)}
                     </div>
                 );
             }
         };
-
 const DriverApp = ({ db, updateDB, user }) => {
             const [showScanner, setShowScanner] = useState(false);
             const [selectedOrder, setSelectedOrder] = useState(null); 
@@ -2312,9 +2189,9 @@ const App = () => {
             const [user, setUser] = useState(null);
             const [loginData, setLoginData] = useState({u:'', p:''});
             const [godMenuOpen, setGodMenuOpen] = useState(false);
-            const [syncing, setSyncing] = useState(false);
             const [centerNotification, setCenterNotification] = useState(null);
 
+            // Sincronización: Siempre intenta guardar en nube
             const updateDB = (newDataOrFn) => { 
                 let newData;
                 if (typeof newDataOrFn === 'function') {
@@ -2322,51 +2199,47 @@ const App = () => {
                 } else {
                     newData = newDataOrFn;
                 }
-                newData._ver = Date.now();
+                newData._ver = Date.now(); // Marca de tiempo para forzar actualización
                 setDB(newData); 
                 try {
                     localStorage.setItem('emi_v86_fixed', JSON.stringify(newData));
-                } catch (e) {
-                    if (e.name === 'QuotaExceededError') {
-                        showToast("Memoria local llena.");
-                    }
-                }
+                } catch (e) {}
+                // Guardar en nube inmediatamente
                 saveCloudDB(newData);
             };
 
+            // Efecto de Sincronización (Polling)
             useEffect(() => { 
                 const init = async () => {
-                    setSyncing(true);
+                    // Cargar de nube al iniciar (CRITICO para otros dispositivos)
                     const cloudData = await fetchCloudDB();
-                    if(cloudData && cloudData.data) setDB(cloudData.data);
-                    else {
+                    if(cloudData && cloudData.data) {
+                        setDB(cloudData.data);
+                        console.log("Datos sincronizados de nube");
+                    } else {
+                        // Fallback a local
                         try {
                             const s = localStorage.getItem('emi_v86_fixed'); 
                             if(s) setDB(JSON.parse(s)); 
                         } catch(e) {}
                     }
-                    setSyncing(false);
                 };
                 init();
                 
+                // Polling cada 3 segundos para ver cambios de otros
                 const interval = setInterval(async () => {
                      const cloudData = await fetchCloudDB();
                      if(cloudData && cloudData.data) {
-                         const localVer = db._ver || 0;
-                         const cloudVer = cloudData.data._ver || 0;
-                         
-                         if(cloudVer > localVer && (cloudVer - localVer > 2000)) {
+                         // Si la versión en nube es mas nueva, actualizamos
+                         if(cloudData.data._ver > (db._ver || 0)) {
                               setDB(cloudData.data);
                               if(cloudData.data.orders.length > db.orders.length) playSound();
                          }
-                         else if(!cloudVer && JSON.stringify(cloudData.data.orders.length) !== JSON.stringify(db.orders.length)) {
-                              setDB(cloudData.data);
-                         }
                      }
-                }, 5000);
+                }, 3000);
                 
                 return () => clearInterval(interval);
-            }, [db._ver, db.orders.length]);
+            }, [db._ver]); // Dependencia para comparar versiones
 
             useEffect(() => { const h=new Date().getHours(); setTheme(h>=6&&h<18?'light':'dark'); document.body.className = h>=6&&h<18?'light':'dark'; }, []);
             
@@ -2379,12 +2252,15 @@ const App = () => {
             
             useEffect(() => {
                 if(db.settings.notification && db.settings.notification.id !== localStorage.getItem('last_notif_id')) {
-                    playSound();
-                    setCenterNotification(db.settings.notification.message);
-                    localStorage.setItem('last_notif_id', db.settings.notification.id);
-                    setTimeout(() => setCenterNotification(null), 8000);
+                    const target = db.settings.notification.target;
+                    if(target === 'all' || (user && (user.role === target || user.role === 'admin'))) {
+                        playSound();
+                        setCenterNotification(db.settings.notification.message);
+                        localStorage.setItem('last_notif_id', db.settings.notification.id);
+                        setTimeout(() => setCenterNotification(null), 8000);
+                    }
                 }
-            }, [db.settings.notification]);
+            }, [db.settings.notification, user]);
 
             const toggleTheme = () => { const newT = theme==='dark'?'light':'dark'; setTheme(newT); document.body.className = newT; };
             
@@ -2395,7 +2271,7 @@ const App = () => {
             };
 
             const resetApp = async () => {
-                if(confirm("¿RESET DE FÁBRICA TOTAL? Se borrarán todos los datos de la nube y locales.")) {
+                if(confirm("¿RESET DE FÁBRICA TOTAL? Se borrarán todos los datos.")) {
                     localStorage.removeItem('emi_v86_fixed');
                     await saveCloudDB(initialDB);
                     window.location.reload();
@@ -2403,9 +2279,7 @@ const App = () => {
             };
             
             const handleLogout = () => {
-                if(confirm("¿Cerrar sesión?")) {
-                    setUser(null);
-                }
+                if(confirm("¿Cerrar sesión?")) setUser(null);
             };
 
             if(!user) return (
@@ -2428,7 +2302,6 @@ const App = () => {
             return (
                 <div className={`h-screen w-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] ${theme}`}>
                     
-                    {/* BOTÓN SALIR (REUBICADO ARRIBA A LA IZQUIERDA) */}
                     {user.role !== 'cliente' && (
                         <div className="logout-ghost">
                             <button onClick={handleLogout} className="bg-red-600/90 text-white px-3 py-1 rounded text-xs font-bold backdrop-blur shadow-md hover:bg-red-500 transition">SALIR</button>
@@ -2453,7 +2326,6 @@ const App = () => {
                     {user.role==='repartidor' && <DriverApp db={db} updateDB={updateDB} user={user}/>}
                     {user.role==='cocina' && <Kitchen db={db} updateDB={updateDB}/>}
                     
-                    {/* OJO DE DIOS (REUBICADO ABAJO A LA IZQUIERDA, SIN CHOCAR) */}
                     {user.name==='Super Admin' && (
                         <div className={`gods-eye group ${godMenuOpen ? 'active' : ''}`}>
                             <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_15px_var(--gold)] z-50 relative" onClick={()=>setGodMenuOpen(!godMenuOpen)}>
@@ -2469,9 +2341,7 @@ const App = () => {
                                         <button onClick={()=>setUser({...user, role:'repartidor'})} className="bg-purple-600 text-white text-[10px] font-bold p-2 rounded hover:scale-105 transition">DRIVER</button>
                                         <button onClick={()=>setUser({...user, role:'cliente'})} className="bg-yellow-500 text-black text-[10px] font-bold p-2 rounded col-span-2 hover:scale-105 transition">VISTA CLIENTE</button>
                                     </div>
-                                    
                                     <hr className="border-[#333] mb-2"/>
-                                    
                                     <button onClick={resetApp} className="text-red-500 font-bold text-xs bg-black/50 p-2 rounded w-full hover:bg-red-900/20 mb-1">🔥 RESET FÁBRICA</button>
                                     <button className="text-gray-400 text-[10px] text-center w-full">{db.orders.length} Pedidos en DB</button>
                                 </div>
