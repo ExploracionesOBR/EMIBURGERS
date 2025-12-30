@@ -19,17 +19,18 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-   <style>
+    <style>
         :root {
             --gold: #FFD700; 
             --accent: #FF4500; 
-            --bg-special: #F0EBEB; /* Tono solicitado */
+            --bg-special: #F0EBEB; /* COLOR DE FONDO ESPECIAL */
             --text-main: #000000;
             --z-map: 0; --z-ui: 10; --z-fab: 2000; --z-modal: 5000; --z-toast: 6000; --z-loader: 10000;
         }
         
+        /* RESET GENERAL Y TEMA */
         body { 
-            background-color: white; 
+            background-color: var(--bg-special); 
             color: var(--text-main); 
             font-family: 'Roboto', sans-serif; 
             margin: 0; overflow: hidden; height: 100vh; width: 100vw; 
@@ -38,100 +39,91 @@
         #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
         .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
         
-        /* --- BANNER Y VIDEO (15% ALTURA + CONTENIDO COMPLETO) --- */
+        /* ARREGLO DE IMÁGENES GIGANTES */
         .banner-container {
             width: 100%;
-            height: 15vh; /* 15% Altura */
-            min-height: 120px;
-            background-color: black; /* Fondo negro para rellenar bordes */
-            position: relative;
+            height: 25vh; /* Altura controlada (25% de pantalla) */
+            min-height: 180px;
+            max-height: 300px;
             overflow: hidden;
+            position: relative;
+            background-color: black;
         }
+        
         .mobile-banner { 
             width: 100%; 
             height: 100%; 
-            object-fit: contain; /* SE VE COMPLETO */
+            object-fit: cover; /* Ajuste inteligente sin deformar */
             display: block; 
-        }
-        .mobile-video-container { 
-            position: fixed; bottom: 70px; left: 0; width: 100%; 
-            height: 15vh; /* 15% Altura */
-            z-index: 50; pointer-events: none; background: black; 
-            border-top: 2px solid var(--gold); 
-        }
-        .mobile-video-container video { 
-            width: 100%; height: 100%; 
-            object-fit: contain; /* SE VE COMPLETO */
-            opacity: 0.9; 
+            opacity: 0.9;
         }
 
-        /* --- INPUTS & UI --- */
-        .card { background-color: white; border: 1px solid #d1d5db; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* En modo escritorio, banner más discreto */
+        @media (min-width: 768px) {
+            .banner-container { height: 200px; }
+        }
+
+        /* COMPONENTES UI */
+        .card { 
+            background-color: white; 
+            border: 1px solid #d1d5db; 
+            border-radius: 0.75rem; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        }
         
+        /* INPUTS CON COLOR #F0EBEB */
         .input-std, .input-special { 
             background-color: var(--bg-special) !important; 
-            border: 1px solid #d1d5db !important; 
+            border: 1px solid #ccc !important; 
             color: black !important; 
-            padding: 0.75rem; width: 100%; outline: none; border-radius: 0.5rem; font-weight: 500;
+            padding: 0.75rem; 
+            width: 100%; 
+            outline: none; 
+            border-radius: 0.5rem; 
+            font-weight: 500;
         }
-        .input-std::placeholder, .input-special::placeholder { color: #666; }
+        
+        /* INPUT NEGRO PARA DIRECCIÓN (SOLICITADO) */
+        .input-dark-force {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border: 1px solid #333 !important;
+        }
+        .input-dark-force::placeholder { color: #888; }
+
         .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
 
-        /* --- INPUT DIRECCIÓN ESTILO DIDI (BOTÓN DENTRO) --- */
-        .didi-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
-        .didi-input-internal { 
-            width: 100%; background: var(--bg-special); border: 1px solid #ccc; 
-            padding: 12px 110px 12px 12px; /* Espacio derecho para el botón */
-            border-radius: 8px; outline: none; font-size: 16px; color: black;
-        }
-        .didi-btn-internal {
-            position: absolute; right: 0; top: 0; bottom: 0; margin: 0;
-            background: #FF6600; color: white; font-weight: bold; font-size: 11px;
-            border: none; border-radius: 0 8px 8px 0; padding: 0 15px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
-
-        /* --- GPS AZUL PULSANTE (Estilo Celular) --- */
-        .user-gps-dot {
-            width: 18px; height: 18px; background-color: #4285F4;
-            border: 3px solid white; border-radius: 50%;
-            box-shadow: 0 0 5px rgba(0,0,0,0.3);
-            position: relative;
-        }
-        .user-gps-dot::after {
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 40px; height: 40px; background-color: rgba(66, 133, 244, 0.4);
-            border-radius: 50%; animation: gps-pulse 2s infinite; z-index: -1;
-        }
-        @keyframes gps-pulse { 0% {transform: translate(-50%, -50%) scale(0.5); opacity: 1;} 100% {transform: translate(-50%, -50%) scale(1.5); opacity: 0;} }
-
-        /* --- FAB & UTILS --- */
+        /* BOTONES FLOTANTES */
         .admin-fab { position: fixed; bottom: 20px; right: 20px; z-index: var(--z-fab); display: flex; flex-direction: column; align-items: end; gap: 10px; }
-        .admin-fab-menu { display: flex; flex-direction: column; align-items: end; gap: 10px; margin-bottom: 10px; }
+        .admin-fab-menu { display: flex; flex-direction: column; align-items: end; gap: 10px; margin-bottom: 10px; animation: slide-up 0.3s ease-out; }
         
-        /* Ojo de dios subido para dar espacio al FAB */
-        .gods-eye { position: fixed; bottom: 90px; left: 20px; opacity: 0.8; transform: scale(0.9); z-index: var(--z-fab); }
         .logout-ghost { position: fixed; top: 10px; left: 10px; opacity: 0.8; z-index: var(--z-fab); }
+        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); opacity: 0.8; transform: scale(0.9); }
         
-        body.client-mode .gods-eye, body.client-mode .admin-fab, body.client-mode .logout-ghost { display: none !important; }
+        /* OCULTAR EN MODO CLIENTE */
+        body.client-mode .logout-ghost, body.client-mode .gods-eye, body.client-mode .admin-fab { display: none !important; }
 
-        /* --- POS UI --- */
-        .gestion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-        .grid-cockpit { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1rem; height: 90vh; }
-        @media (max-width: 1024px) { .grid-cockpit { grid-template-columns: 1fr; overflow-y: auto; display: flex; flex-direction: column; height: auto; } }
-        
-        .mode-btn { padding: 1rem; border-radius: 0.5rem; font-weight: bold; margin-bottom: 0.5rem; border: 1px solid #ccc; background: white; color: black; width: 100%; text-align: left; transition: all 0.2s; }
-        .mode-btn.active { background-color: var(--gold); border-color: black; transform: scale(1.02); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .bill-btn { background-size: cover; background-position: center; border-radius: 4px; height: 60px; width: 100%; border: 1px solid #ddd; cursor: pointer; background-color: white; }
-
-        /* --- EXTRAS --- */
-        .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
-        .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
+        /* ANIMACIONES Y EXTRAS */
         @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .leaflet-container { background: #f0f0f0; width: 100%; height: 100%; z-index: 0; }
+        .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-special); z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
+        .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
+        
+        .install-btn { position: fixed; bottom: 20px !important; left: 20px !important; top: auto !important; z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; animation: bounce 2s infinite; }
+        .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        
+        /* VIDEO MÓVIL */
+        .mobile-video-container { position: fixed; bottom: 70px; left: 0; width: 100%; height: 100px; z-index: 50; pointer-events: none; background: black; overflow: hidden; border-top: 2px solid var(--gold); }
+        .mobile-video-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+        
+        /* LEAFLET MAP */
+        .leaflet-container { background: #e5e5e5; width: 100%; height: 100%; z-index: 0; }
         .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
         
+        /* UI DRIVER */
         .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; }
         .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #999; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
         .driver-nav-btn.active { color: var(--gold); }
@@ -334,66 +326,178 @@
         );
 
 const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route, radius, onMarkerClick }) => {
-    const containerRef = useRef(null);
-    const mapInstance = useRef(null);
+            const containerRef = useRef(null);
+            const mapInstance = useRef(null);
+            const userInteracted = useRef(0);
 
-    useEffect(() => {
-        if (!containerRef.current || typeof L === 'undefined') return;
-        const safeCenter = (center && center[0]) ? center : STORE_COORDS;
-        
-        // SIEMPRE USAR MAPA CLARO
-        const lightUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'; 
+            // Efecto de Inicialización y Actualización de Elementos
+            useEffect(() => {
+                if (!containerRef.current || typeof L === 'undefined') return;
 
-        if (!mapInstance.current) {
-            mapInstance.current = L.map(containerRef.current, { zoomControl: false, attributionControl: false }).setView(safeCenter, zoom);
-            L.tileLayer(lightUrl).addTo(mapInstance.current);
-            if(onClickMap) mapInstance.current.on('click', (e) => onClickMap([e.latlng.lat, e.latlng.lng]));
-        } else {
-            mapInstance.current.setView(safeCenter, zoom);
-            setTimeout(() => mapInstance.current.invalidateSize(), 100);
-        }
+                const safeCenter = (center && center[0] && center[1]) ? center : STORE_COORDS;
+                // URLs limpias y correctas
+                const darkUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+                const lightUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                const isDark = document.body.classList.contains('dark');
 
-        // Limpiar capas previas
-        mapInstance.current.eachLayer(layer => {
-            if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline || layer instanceof L.Polygon) mapInstance.current.removeLayer(layer);
-        });
-
-        // Marcadores
-        markers.forEach((m) => {
-            if(m.pos && m.pos[0]) {
-                const el = document.createElement('div');
-                
-                // PUNTO GPS AZUL (Estilo Celular)
-                if (m.isMyLoc) {
-                    el.className = 'user-gps-dot'; 
-                } else if (m.isStore) {
-                    el.className = 'custom-pin';
-                    el.innerHTML = `<img src="${LOGO_URL}" style="width:40px;height:40px;border-radius:50%;border:2px solid gold;background:white;">`;
-                } else if (m.type === 'driver') {
-                    el.className = 'driver-pin';
-                    el.innerHTML = '🏍️';
+                if (!mapInstance.current) {
+                    mapInstance.current = L.map(containerRef.current, { zoomControl: false, attributionControl: false }).setView(safeCenter, zoom);
+                    L.tileLayer(isDark ? darkUrl : lightUrl).addTo(mapInstance.current);
+                    
+                    mapInstance.current.on('mousedown touchstart zoomstart', () => { userInteracted.current = Date.now(); });
+                    if(onClickMap) mapInstance.current.on('click', (e) => onClickMap([e.latlng.lat, e.latlng.lng]));
                 } else {
-                    el.className = 'custom-pin';
-                    el.innerHTML = m.emoji || '📍';
+                    // Recentrado inteligente solo si el usuario no movió el mapa recientemente
+                    if(Date.now() - userInteracted.current > 10000) {
+                          const currentCenter = mapInstance.current.getCenter();
+                          const dist = Math.sqrt(Math.pow(currentCenter.lat - safeCenter[0], 2) + Math.pow(currentCenter.lng - safeCenter[1], 2));
+                          if (dist > 0.001) mapInstance.current.setView(safeCenter, zoom); 
+                    }
+                    setTimeout(() => mapInstance.current.invalidateSize(), 100);
                 }
 
-                const iconSize = m.isMyLoc ? [20,20] : [40,40];
-                const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: iconSize, iconAnchor: [iconSize[0]/2, iconSize[1]/2] });
-                const marker = L.marker(m.pos, { icon }).addTo(mapInstance.current);
-                
-                if(m.popup) marker.bindPopup(m.popup);
-            }
-        });
+                // Limpieza de capas viejas
+                mapInstance.current.eachLayer(layer => {
+                    if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline || layer instanceof L.Polygon) mapInstance.current.removeLayer(layer);
+                });
 
-        // Ruta
-        if(route && route.length >= 2) {
-             const validRoute = route.filter(p => p && p[0]);
-             if(validRoute.length >= 2) L.polyline(validRoute, {color: '#4285F4', weight: 6, opacity: 0.8}).addTo(mapInstance.current);
-        }
-    }, [center, markers, route]);
+                // Dibujar Radio
+                if (radius) {
+                    const outerBounds = [[90, -180], [90, 180], [-90, 180], [-90, -180]];
+                    const hole = getCirclePoints(STORE_COORDS, radius);
+                    L.polygon([outerBounds, hole], { color: 'transparent', fillColor: '#111', fillOpacity: 0.6 }).addTo(mapInstance.current);
+                    L.circle(STORE_COORDS, { color: '#00e676', fillColor: 'transparent', weight: 2, radius: radius * 1000 }).addTo(mapInstance.current);
+                }
 
-    return <div ref={containerRef} className="h-full w-full bg-gray-100 z-0 relative"></div>;
-};
+                // Dibujar Marcadores
+                if(showHeatmap) {
+                     markers.forEach((m) => {
+                         if(m.pos && m.pos[0] && m.pos[1]) {
+                           if (!m.isStore) L.circle(m.pos, { color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 300, stroke: false }).addTo(mapInstance.current);
+                           else {
+                               const el = document.createElement('div');
+                               el.className = 'custom-pin';
+                               el.innerHTML = `<img src="${LOGO_URL}" style="width:40px;height:40px;border-radius:50%;border:2px solid gold;">`;
+                               const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: [40,40], iconAnchor: [20,20] });
+                               L.marker(m.pos, { icon }).addTo(mapInstance.current);
+                           }
+                         }
+                     });
+                } else {
+                    markers.forEach((m) => {
+                        if(m.pos && m.pos[0] && m.pos[1]) {
+                            const el = document.createElement('div');
+                            if (m.isMyLoc) {
+                                el.className = 'user-gps-dot';
+                            } else if(m.isClient) { 
+                                el.className = 'custom-pin';
+                                el.innerHTML = '<div style="font-size:30px;">🔵</div>'; 
+                            } else if (m.type === 'driver-order') {
+                                el.className = 'driver-order-icon';
+                                el.innerHTML = `<div>🍔</div><span class="driver-order-num">${m.label}</span>`;
+                            } else {
+                                el.className = m.type === 'driver' ? 'driver-pin' : 'custom-pin';
+                                if(m.isStore) { 
+                                    el.innerHTML = `<img src="${LOGO_URL}" style="width:40px;height:40px;border-radius:50%;border:2px solid gold;">`;
+                                } else if (m.type === 'driver') {
+                                    el.innerHTML = '🏍️';
+                                } else {
+                                    el.innerHTML = m.emoji || '📍';
+                                }
+                            }
+                            
+                            if(m.label && !m.isMyLoc && m.type !== 'driver-order') {
+                                 const lbl = document.createElement('div');
+                                 lbl.className = 'absolute -bottom-5 left-1/2 transform -translate-x-1/2 bg-black/80 text-white text-[10px] px-1 rounded whitespace-nowrap border border-white/20';
+                                 lbl.innerText = m.label;
+                                 el.appendChild(lbl);
+                            }
+                            const iconSize = m.isMyLoc ? [20,20] : (m.type==='driver'?[36,36]:[40,40]);
+                            const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: iconSize, iconAnchor: [iconSize[0]/2, iconSize[1]/2] });
+                            const marker = L.marker(m.pos, { icon }).addTo(mapInstance.current);
+                            if(m.popup) marker.bindPopup(m.popup);
+                            if(m.data && onMarkerClick) marker.on('click', () => onMarkerClick(m.data));
+                        }
+                    });
+                }
+
+                // Dibujar Ruta
+                if(route && route.length >= 2) {
+                     const validRoute = route.filter(p => p && p[0] && p[1]);
+                     if(validRoute.length >= 2) {
+                         L.polyline(validRoute, {color: '#4285F4', weight: 6, opacity: 0.9, dashArray: '10, 10'}).addTo(mapInstance.current);
+                         if(Date.now() - userInteracted.current > 10000) {
+                            const bounds = L.latLngBounds(validRoute);
+                            if(bounds.isValid()) mapInstance.current.fitBounds(bounds, { padding: [50, 50] });
+                         }
+                     }
+                }
+            }, [center, markers, showHeatmap, radius, route]); 
+
+            // DETECTOR DE CAMBIO DE TEMA (Para cambiar el mapa automáticamente)
+            useEffect(() => {
+                if(!mapInstance.current) return;
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.attributeName === "class") {
+                            const isDark = document.body.classList.contains('dark');
+                            const url = isDark 
+                                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
+                                : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                            
+                            mapInstance.current.eachLayer(layer => {
+                                if (layer instanceof L.TileLayer) layer.setUrl(url);
+                            });
+                        }
+                    });
+                });
+                observer.observe(document.body, { attributes: true });
+                return () => observer.disconnect();
+            }, []);
+            
+            if (typeof L === 'undefined') return <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white">Cargando Mapa...</div>;
+
+            return <div ref={containerRef} className="h-full w-full rounded-lg bg-[var(--bg-card)] border border-[var(--border)] z-0 relative overflow-hidden"></div>;
+        };
+
+        const QRScanner = ({ onScan, onClose }) => {
+             useEffect(() => {
+                const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
+                scanner.render((decodedText) => {
+                    onScan(decodedText);
+                    scanner.clear();
+                }, (error) => {});
+                return () => { try { scanner.clear(); } catch(e){} };
+            }, []);
+
+            return (
+                <div id="reader" style={{width:'100%', height:'100%'}}></div>
+            ); 
+        };
+
+        const AdminAuthModal = ({ onClose, onSuccess, db }) => {
+            const [pass, setPass] = useState('');
+            const check = () => {
+                if(pass === SUPER_USER_PASS || pass === db.settings.supervisorKey) {
+                    onSuccess();
+                } else {
+                    showToast("Contraseña incorrecta");
+                }
+            };
+            return (
+                <div className="fixed inset-0 bg-black/90 z-[10000] flex items-center justify-center p-4">
+                    <div className="bg-[var(--bg-card)] p-6 rounded border border-[var(--gold)] w-full max-w-xs text-center">
+                        <h3 className="text-xl font-bold text-white mb-4"><Lock className="inline mb-1"/> AUTORIZACIÓN</h3>
+                        <input type="password" className="input-std text-center text-xl mb-4" placeholder="Clave Admin/Supervisor" value={pass} onChange={e=>setPass(e.target.value)} autoFocus/>
+                        <div className="flex gap-2">
+                            <button onClick={onClose} className="flex-1 bg-gray-600 text-white py-2 rounded">CANCELAR</button>
+                            <button onClick={check} className="flex-1 btn-gold py-2 rounded">ACEPTAR</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
 const Dashboard = ({ db }) => {
             const chartRef = useRef(null);
             const canvasRef = useRef(null);
@@ -1084,7 +1188,7 @@ const Dashboard = ({ db }) => {
 
 const POS = ({ db, updateDB, user }) => {
     // --- ESTADOS ---
-    const [tab, setTab] = useState('pos'); // 3 Pestañas: pos, gestion, entrega
+    const [tab, setTab] = useState('pos'); // 'pos', 'gestion', 'entrega'
     const [cart, setCart] = useState([]);
     const [modal, setModal] = useState(null); 
     const [catFilter, setCatFilter] = useState('Todos');
@@ -1471,7 +1575,7 @@ const POS = ({ db, updateDB, user }) => {
                             ) : (
                                 <div className="gestion-grid">
                                     {webOrders.map(o => (
-                                       <div key={o.id} className="card p-4 border-l-4 border-blue-500 bg-white cursor-pointer hover:shadow-lg transition" onClick={()=>setSelectedWebOrder(o)}>
+                                       <div key={o.id} className="card p-4 border-l-4 border-blue-500 bg-white cursor-pointer hover:shadow-lg transition" onClick={()=>handleWebOrder(o)}>
                                              <div className="flex justify-between items-center mb-2">
                                                  <div><p className="font-bold text-blue-900">WEB #{o.orderNum}</p><p className="text-sm text-blue-600 font-medium">{o.clientName}</p></div>
                                                  <p className="text-[var(--gold)] font-black text-lg bg-black px-2 rounded">{formatCurrency(o.total)}</p>
@@ -1553,7 +1657,7 @@ const POS = ({ db, updateDB, user }) => {
                 )}
             </div>
 
-            {/* BOTÓN FLOTANTE (FAB) */}
+            {/* Menú Flotante Admin */}
             <div className="admin-fab">
                 {bottomMenuOpen && (
                     <div className="admin-fab-menu">
@@ -1566,60 +1670,252 @@ const POS = ({ db, updateDB, user }) => {
                 )}
                 <button className="bg-[var(--gold)] text-black p-4 rounded-full shadow-xl hover:scale-110 transition border-2 border-white" onClick={()=>setBottomMenuOpen(!bottomMenuOpen)}><Plus size={24} className={`transition duration-300 ${bottomMenuOpen?'rotate-45':''}`}/></button>
             </div>
+            
+            {/* Modal Info Ingrediente */}
+            {ingredientsProduct && (
+                <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4" onClick={()=>setIngredientsProduct(null)}>
+                    <div className="bg-white p-6 rounded-xl max-w-sm w-full text-center border-2 border-[var(--gold)] shadow-2xl" onClick={e=>e.stopPropagation()}>
+                        <h3 className="text-xl font-bold text-black mb-4">{ingredientsProduct.name}</h3>
+                        <p className="text-gray-600 mb-6 font-medium">{ingredientsProduct.ingredients || "No se especificaron ingredientes."}</p>
+                        <button onClick={()=>setIngredientsProduct(null)} className="btn-gold w-full shadow-md">CERRAR</button>
+                    </div>
+                </div>
+            )}
 
-            {/* MODAL COBRO (COCKPIT) */}
+            {/* MODAL COBRO (COCKPIT) - TEMA CLARO */}
             {modal === 'cockpit' && (
-                <div className="fixed inset-0 bg-black/80 z-50 p-4 animate-in fade-in zoom-in overflow-y-auto flex items-center justify-center">
-                    <div className="w-full max-w-6xl bg-white rounded-xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-3 h-[90vh]">
-                        <div className="p-4 bg-gray-50 border-r">
-                            <h3 className="font-black text-xl mb-4">1. TIPO</h3>
-                            <div className="space-y-2">
-                                {['takeaway','dinein','delivery','platform'].map(t=><button key={t} onClick={()=>setOrderType(t)} className={`mode-btn ${orderType===t?'active':''}`}>{t.toUpperCase()}</button>)}
-                            </div>
-                            <button onClick={()=>setModal(null)} className="mt-8 w-full border border-red-200 text-red-600 py-3 rounded font-bold hover:bg-red-50">CANCELAR</button>
+                <div className="fixed inset-0 bg-black/80 z-50 p-4 animate-in fade-in zoom-in duration-200 overflow-y-auto">
+                    <div className="h-full w-full max-w-7xl mx-auto grid-cockpit bg-white rounded-2xl shadow-2xl overflow-hidden text-black">
+                        <div className="cockpit-col p-4 bg-gray-50 border-r border-gray-200">
+                            <h3 className="text-black font-black text-xl uppercase mb-2 border-b-2 border-[var(--gold)] inline-block">1. TIPO</h3>
+                            <button onClick={()=>setOrderType('takeaway')} className={`mode-btn ${orderType==='takeaway'?'active':''}`}>PARA LLEVAR</button>
+                            <button onClick={()=>setOrderType('dinein')} className={`mode-btn ${orderType==='dinein'?'active':''}`}>COMER AQUÍ</button>
+                            <button onClick={()=>setOrderType('delivery')} className={`mode-btn ${orderType==='delivery'?'active':''}`}>DOMICILIO</button>
+                            <button onClick={()=>setOrderType('platform')} className={`mode-btn ${orderType==='platform'?'active':''}`}>PLATAFORMA</button>
+                            <button onClick={()=>setModal(null)} className="mt-auto w-full border border-red-200 bg-red-50 text-red-600 py-4 rounded font-bold hover:bg-red-100 transition">CANCELAR (ESC)</button>
                         </div>
-                        <div className="p-4 bg-white overflow-y-auto">
-                            <h3 className="font-black text-xl mb-4">2. DATOS</h3>
-                            {orderType === 'delivery' && (
-                                <div className="space-y-2">
-                                    {/* INPUT DIRECCION CON ESTILO DIDI */}
-                                    <div className="didi-wrapper">
-                                        <input className="didi-input-internal" placeholder="Calle y Número..." value={orderDetails.address} onChange={e=>updateAddress(e.target.value)}/>
-                                        <button className="didi-btn-internal" onClick={()=>navigator.geolocation.getCurrentPosition(p=>updateAddress(`${p.coords.latitude}, ${p.coords.longitude}`))}>UBICACIÓN</button>
+                        
+                        <div className="cockpit-col p-4 bg-white overflow-y-auto">
+                            <h3 className="text-black font-black text-xl uppercase mb-2 border-b-2 border-[var(--gold)] inline-block">2. DATOS</h3>
+                            {orderType !== 'platform' && (
+                                <>
+                                    <input className="input-special h-12 text-lg mb-2" placeholder="Nombre *" value={orderDetails.name} onChange={e=>setOrderDetails({...orderDetails, name:e.target.value})}/>
+                                    <div className="flex gap-2 mb-2">
+                                        <input className="input-special h-12 text-lg flex-1" placeholder="Teléfono (10 dígitos) *" value={orderDetails.phone} maxLength={10} onChange={e=>setOrderDetails({...orderDetails, phone:e.target.value})}/>
+                                        <a href={`https://wa.me/52${orderDetails.phone}?text=HOLA! ${orderDetails.name}, le contacto de EMI BURGER.`} target="_blank" className="bg-[#25D366] text-white rounded p-2 flex items-center justify-center w-12 hover:scale-105 transition shadow"><MessageCircle/></a>
                                     </div>
-                                    {isLocating && <p className="text-[var(--gold)] text-xs font-bold animate-pulse">Buscando...</p>}
-                                    <div className="h-40 rounded border overflow-hidden"><LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:deliveryCoords||STORE_COORDS, emoji:'📍'}]} zoom={15}/></div>
+                                </>
+                            )}
+                            {orderType === 'dinein' && <input className="input-special h-12 text-lg" placeholder="# Mesa" value={orderDetails.table} onChange={e=>setOrderDetails({...orderDetails, table:e.target.value})}/>}
+                            {orderType === 'platform' && (
+                                <>
+                                    <div className="grid grid-cols-2 gap-2 mb-2">{db.settings.platforms.map(p=><button key={p} onClick={()=>setOrderDetails({...orderDetails, platform:p})} className={`p-3 rounded border font-bold transition ${orderDetails.platform===p?'bg-blue-600 text-white shadow-lg':'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>{p}</button>)}</div>
+                                    <input className="input-special h-12 text-lg font-bold border-blue-500" placeholder="ID / NOMBRE PEDIDO *" value={orderDetails.platformOrderId} onChange={e=>setOrderDetails({...orderDetails, platformOrderId:e.target.value})}/>
+                                </>
+                            )}
+                            {orderType === 'delivery' && (
+                                <>
+                                    <div className="flex gap-2 mb-2 relative">
+                                        {/* INPUT DE DIRECCIÓN CON COLOR ESPECIAL #F0EBEB */}
+                                        <input className={`input-special h-12 text-lg flex-1 ${isLocating?'animate-pulse border-[var(--gold)]':''}`} placeholder={isLocating?"📍 Localizando...":"Calle y Número *"} value={orderDetails.address} onChange={e=>updateLocationFromAddress(e.target.value)} list="pos-address-list"/>
+                                        <datalist id="pos-address-list">
+                                            {suggestions.map((s,i) => <option key={i} value={s.display_name} />)}
+                                        </datalist>
+                                        <button onClick={useGPS} className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 shadow"><MapPin/></button>
+                                    </div>
+                                    {isLocating && <p className="text-[var(--gold)] text-xs font-bold mb-2">Buscando dirección...</p>}
+                                    <input className="input-special h-12 text-lg mb-2" placeholder="Referencias / Colonia *" value={orderDetails.references} onChange={e=>setOrderDetails({...orderDetails, references:e.target.value})}/>
+                                    <div className="h-40 rounded border border-gray-300 overflow-hidden relative mb-2 shadow-inner">
+                                        <LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:deliveryCoords||STORE_COORDS, emoji:'📍'}]} onClickMap={handleReverseGeo} zoom={15}/>
+                                    </div>
+                                    <div className="bg-black p-2 rounded text-right text-sm text-white">Envío: <span className="font-bold text-[var(--gold)]">{formatCurrency(deliveryFee)}</span></div>
+                                </>
+                            )}
+                            <div className="flex gap-2 mt-2"><input className="input-special h-10 flex-1" placeholder="CUPÓN" value={couponCode} onChange={e=>setCouponCode(e.target.value)}/><button onClick={applyCoupon} className="btn-gold h-10 px-4 text-xs">APLICAR</button></div>
+                        </div>
+                        
+                        <div className="cockpit-col p-4 bg-gray-50 border-l border-gray-200 relative flex flex-col">
+                            <h3 className="text-black font-black text-xl uppercase mb-4 text-center border-b-2 border-[var(--gold)] inline-block mx-auto">3. PAGO: {formatCurrency(total)}</h3>
+                            <div className="flex gap-2 mb-4"><button onClick={()=>switchPayMethod('cash')} className={`flex-1 py-4 rounded font-bold text-lg shadow transition ${payMethod==='cash'?'bg-green-600 text-white':'bg-white text-gray-400 border border-gray-200'}`}>EFECTIVO</button><button onClick={()=>switchPayMethod('card')} className={`flex-1 py-4 rounded font-bold text-lg shadow transition ${payMethod==='card'?'bg-blue-600 text-white':'bg-white text-gray-400 border border-gray-200'}`}>{orderType==='platform'?'APP':'TARJETA'}</button></div>
+                            
+                            {orderType === 'delivery' && payMethod === 'cash' && (
+                                <div className="flex gap-2 mb-4">
+                                    <button onClick={() => setPaymentStatus('paid')} className={`flex-1 p-2 rounded border-2 font-bold transition ${paymentStatus==='paid'?'bg-green-100 border-green-600 text-green-800':'border-gray-300 text-gray-400 bg-white'}`}>✅ PAGADO EN CAJA</button>
+                                    <button onClick={() => { setPaymentStatus('pending'); setCashReceived(0); }} className={`flex-1 p-2 rounded border-2 font-bold transition ${paymentStatus==='pending'?'bg-yellow-100 border-yellow-600 text-yellow-800':'border-gray-300 text-gray-400 bg-white'}`}>🛵 PAGO AL RECIBIR</button>
                                 </div>
                             )}
-                            <input className="input-std mt-2" placeholder="Nombre Cliente" value={orderDetails.name} onChange={e=>setOrderDetails({...orderDetails,name:e.target.value})}/>
-                        </div>
-                        <div className="p-4 bg-gray-50 border-l flex flex-col">
-                            <h3 className="font-black text-xl mb-4 text-center">TOTAL: {formatCurrency(total)}</h3>
-                            <div className="grid grid-cols-2 gap-2 mb-4"><button onClick={()=>setPayMethod('cash')} className={`p-3 font-bold rounded ${payMethod==='cash'?'bg-green-600 text-white':'bg-white border'}`}>EFECTIVO</button><button onClick={()=>setPayMethod('card')} className={`p-3 font-bold rounded ${payMethod==='card'?'bg-blue-600 text-white':'bg-white border'}`}>TARJETA</button></div>
-                            {payMethod==='cash' && <div className="grid grid-cols-3 gap-2 mb-4">{[50,100,200,500].map(v=><button key={v} onClick={()=>setCashReceived(v)} className="bill-btn bg-white border font-bold">${v}</button>)}</div>}
-                            <button onClick={finalizeOrder} className="mt-auto btn-gold w-full py-4 text-xl shadow-lg">COBRAR</button>
+
+                            {payMethod === 'cash' && (
+                                <div className="flex-1 flex flex-col gap-2">
+                                    {paymentStatus !== 'pending' ? (
+                                        <div className="grid grid-cols-3 gap-2 mb-2">
+                                            {[20, 50, 100, 200, 500].map(v => (
+                                                <button key={v} className="bill-btn hover:scale-105 transition" style={{backgroundImage:`url(./${v}.png)`}} onClick={() => setCashReceived(v)}></button>
+                                            ))}
+                                            <button onClick={() => setCashReceived(total)} className="bg-[var(--gold)] text-black font-black rounded text-sm h-[60px] shadow hover:bg-yellow-400 transition">EXACTO</button>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center text-yellow-800 font-bold p-6 border-2 border-dashed border-yellow-500 bg-yellow-50 rounded mb-4">
+                                            <Bike size={48} className="mx-auto mb-2 opacity-50"/>
+                                            COBRO A CARGO DEL REPARTIDOR
+                                        </div>
+                                    )}
+
+                                    <div className="mt-auto p-4 bg-white rounded border border-gray-300 shadow-lg">
+                                        {paymentStatus !== 'pending' && (
+                                            <>
+                                                <div className="flex justify-between text-gray-600 items-center">
+                                                    <span>Recibido:</span>
+                                                    <input type="number" className={`bg-transparent text-right font-black text-3xl w-40 outline-none ${!cashReceived ? 'animate-pulse text-gray-400 border-b-4 border-gray-300' : 'text-green-600 border-b-4 border-green-500'}`} placeholder="0.00" value={cashReceived || ''} onChange={e=>setCashReceived(parseFloat(e.target.value))}/>
+                                                </div>
+                                                <div className="flex justify-between text-gray-600 mt-2"><span>Cambio:</span><span className={`font-bold text-2xl ${cashReceived>=total?'text-green-600':'text-red-500'}`}>{formatCurrency(cashReceived-total)}</span></div>
+                                            </>
+                                        )}
+                                        {paymentStatus === 'pending' && <p className="text-center text-black font-bold">Saldo a cobrar: {formatCurrency(total)}</p>}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {payMethod === 'card' && orderType !== 'platform' && <div className="flex-1 flex flex-col justify-center items-center"><CreditCard size={80} className="text-blue-500 mb-6 animate-pulse"/><p className="text-gray-500 font-bold mb-2 text-xl">FOLIO DE VOUCHER</p><input className="input-special text-center text-3xl tracking-widest border-2 border-blue-200" placeholder="0000" value={voucher} onChange={e=>setVoucher(e.target.value)} autoFocus/></div>}
+                            <button onClick={finalizeOrder} className="btn-gold py-5 text-2xl mt-4 w-full font-black rounded-xl hover:scale-105 transition shadow-lg">COBRAR AHORA</button>
                         </div>
                     </div>
                 </div>
             )}
             
-            {/* Modal Detalles Web */}
+            {liquidationModal && (
+                <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4 animate-in zoom-in">
+                    <div className="bg-white w-full max-w-lg p-6 rounded-xl shadow-2xl text-black">
+                        <h3 className="text-2xl font-bold text-[var(--gold)] mb-4 bg-black p-2 rounded text-center">LIQUIDACIÓN REPARTIDOR</h3>
+                        {!driverToLiq ? (
+                            <div className="text-center">
+                                 <p className="mb-4 text-gray-600 font-medium">Escanea el QR o Ingresa ID:</p>
+                                 <div className="flex gap-2 justify-center mb-4">
+                                     <input id="liq-input" className="input-special w-48 text-center uppercase font-bold text-lg" placeholder="ID (ej. u4)" onChange={e=>setManualDriverId(e.target.value)}/>
+                                     <button onClick={() => handleScanDriver("LIQ:" + manualDriverId)} className="btn-gold px-4">BUSCAR</button>
+                                 </div>
+                                 <div className="w-full h-32 border-2 border-dashed border-gray-300 rounded flex items-center justify-center text-gray-400 mb-4 bg-gray-50">
+                                     [CÁMARA DE ESCANEO ACTIVA]
+                                 </div>
+                                 <button onClick={()=>setLiquidationModal(false)} className="text-gray-500 hover:text-black font-bold">CANCELAR (ESC)</button>
+                            </div>
+                        ) : (
+                            <div>
+                                <p className="font-bold text-xl text-black mb-4 text-center">{driverToLiq.name}</p>
+                                <div className="bg-gray-50 p-4 rounded mb-4 space-y-2 border border-gray-200">
+                                    <div className="flex justify-between text-gray-600"><span>Pedidos Entregados:</span><span className="text-black font-bold">{liqSummary.deliveredOrders.length}</span></div>
+                                    <div className="flex justify-between text-gray-600"><span>Efectivo en Mano:</span><span className="text-black font-bold">{formatCurrency(liqSummary.totalCash)}</span></div>
+                                    <div className="flex justify-between text-green-600"><span>Ganancias Envíos:</span><span className="font-bold">-{formatCurrency(liqSummary.totalEarnings)}</span></div>
+                                    <div className="border-t border-gray-300 pt-2 flex justify-between text-xl font-black text-black"><span>A ENTREGAR:</span><span>{formatCurrency(liqSummary.netToPay)}</span></div>
+                                </div>
+                                <button onClick={confirmLiquidation} className="btn-gold w-full text-lg py-3 shadow-lg">LIQUIDAR Y CERRAR</button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {corteModal && (
+                <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4">
+                    <div className="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl max-h-screen overflow-y-auto">
+                        <h3 className="text-2xl font-bold text-white bg-red-600 p-2 rounded text-center mb-6 shadow">CORTE DE CAJA (CIEGO)</h3>
+                        
+                        <div className="bg-gray-50 p-4 rounded mb-6 border border-gray-200">
+                            {!cutResult ? (
+                                <div className="space-y-4">
+                                    <p className="text-black font-bold mb-2 text-center text-lg">INGRESE TOTALES CONTADOS:</p>
+                                    <div>
+                                        <label className="text-gray-500 text-xs font-bold uppercase">Total Efectivo en Caja</label>
+                                        <input type="number" className="input-special text-2xl font-bold text-center h-16" value={countedCash} onChange={e=>setCountedCash(e.target.value)} placeholder="$0.00"/>
+                                    </div>
+                                    <div>
+                                        <label className="text-gray-500 text-xs font-bold uppercase">Suma Tickets Tarjeta</label>
+                                        <input type="number" className="input-special text-2xl font-bold text-center h-16" value={countedCard} onChange={e=>setCountedCard(e.target.value)} placeholder="$0.00"/>
+                                    </div>
+                                    <button onClick={performBlindCut} className="btn-gold w-full mt-4 py-3 shadow">CALCULAR DIFERENCIA</button>
+                                </div>
+                            ) : (
+                                <div className="space-y-2 animate-in fade-in">
+                                    <div className="flex justify-between text-gray-600 text-sm"><span>Efectivo Declarado:</span><span className="font-bold">{formatCurrency(cutResult.cCash)}</span></div>
+                                    <div className="flex justify-between text-gray-600 text-sm"><span>Sistema (Calculado):</span><span>{formatCurrency(cutResult.systemCash)}</span></div>
+                                    <div className={`flex justify-between font-black border-t border-gray-300 pt-2 text-lg ${cutResult.diffCash < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                                        <span>Diferencia Efectivo:</span><span>{formatCurrency(cutResult.cCash - cutResult.systemCash)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-gray-600 text-sm mt-4"><span>Tarjeta Declarada:</span><span className="font-bold">{formatCurrency(cutResult.cCard)}</span></div>
+                                    <div className="flex justify-between text-gray-600 text-sm"><span>Sistema Tarjeta:</span><span>{formatCurrency(cutResult.systemCard)}</span></div>
+                                    
+                                    {cutResult.missingOrder && (
+                                        <div className="bg-red-50 border border-red-200 p-2 rounded mt-2 text-xs text-red-700 animate-pulse">
+                                            <p className="font-bold flex items-center gap-1"><AlertTriangle size={12}/> POSIBLE VENTA FALTANTE DETECTADA</p>
+                                            <p>Coincide con Orden #{cutResult.missingOrder.orderNum}</p>
+                                            <p>Total: {formatCurrency(cutResult.missingOrder.total)}</p>
+                                        </div>
+                                    )}
+                                    
+                                    <button onClick={printBlindCut} className="w-full bg-black text-white font-bold py-3 mt-4 rounded shadow-lg flex items-center justify-center gap-2 hover:bg-gray-800"><Printer/> IMPRIMIR CORTE Z</button>
+                                    <button onClick={()=>setCutResult(null)} className="text-blue-500 text-xs mt-2 w-full font-bold hover:underline">RECALCULAR</button>
+                                </div>
+                            )}
+                        </div>
+                        <button onClick={()=>setCorteModal(false)} className="text-gray-400 w-full hover:text-black font-bold">CERRAR (ESC)</button>
+                    </div>
+                </div>
+            )}
+
+            {retiroModal && (
+                <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4">
+                    <div className="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl">
+                        <h3 className="text-2xl font-bold text-white bg-orange-500 p-2 rounded text-center mb-4 shadow">RETIRO DE EFECTIVO</h3>
+                        <div className="bg-gray-50 p-4 rounded mb-4 border border-gray-200">
+                            <p className="text-xs text-gray-500 font-bold mb-2 uppercase">Registrar gasto o pago a proveedor</p>
+                            <input className="input-special mb-2" placeholder="Descripción (ej. Pago Coca-Cola)" value={newExpense.desc} onChange={e=>setNewExpense({...newExpense, desc:e.target.value})}/>
+                            <input className="input-special mb-2 font-bold text-lg" type="number" placeholder="Monto a Retirar" value={newExpense.amount} onChange={e=>setNewExpense({...newExpense, amount:e.target.value})}/>
+                            <button onClick={addExpense} className="w-full bg-orange-600 text-white font-bold py-3 rounded shadow hover:bg-orange-700">CONFIRMAR RETIRO</button>
+                        </div>
+                        <button onClick={()=>setRetiroModal(false)} className="text-gray-400 w-full hover:text-black font-bold">CANCELAR (ESC)</button>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Mapa Global */}
+            {viewGroupMap && (
+                 <div className="fixed inset-0 bg-black/80 z-[6000] flex flex-col p-4 animate-in zoom-in">
+                     <div className="flex justify-between items-center mb-4">
+                         <h2 className="text-2xl font-bold text-[var(--gold)]">RUTA VISUALIZADA</h2>
+                         <button onClick={()=>setViewGroupMap(null)} className="text-white bg-red-600 px-4 py-2 rounded font-bold shadow">CERRAR</button>
+                     </div>
+                     <div className="flex-1 rounded border-2 border-[var(--gold)] overflow-hidden relative bg-white shadow-2xl">
+                         <LeafletMap center={STORE_COORDS} markers={viewGroupMap.markers} route={viewGroupMap.route} zoom={13} />
+                     </div>
+                 </div>
+            )}
+            
+            {/* Modal Web Order Detail (Global) */}
             {selectedWebOrder && (
                 <div className="fixed inset-0 bg-black/80 z-[6000] flex flex-col items-center justify-center p-4">
                     <div className="bg-white w-full max-w-lg p-6 border-l-8 border-blue-500 rounded-r-xl shadow-2xl">
-                         <div className="flex justify-between mb-4"><h3 className="font-bold text-xl text-blue-900">PEDIDO WEB #{selectedWebOrder.orderNum}</h3><button onClick={()=>setSelectedWebOrder(null)}><X/></button></div>
-                         <p className="text-gray-800 font-bold mb-4">{selectedWebOrder.clientName} - <span className="text-gray-500">{selectedWebOrder.address}</span></p>
-                         <div className="flex gap-2"><button onClick={()=>cancelWebOrder(selectedWebOrder.id)} className="flex-1 bg-red-100 text-red-600 py-3 rounded font-bold">RECHAZAR</button><button onClick={()=>{ handleWebOrder(selectedWebOrder); setTab('pos'); setSelectedWebOrder(null); }} className="flex-1 bg-blue-600 text-white py-3 rounded font-bold shadow">ACEPTAR Y PROCESAR</button></div>
+                         <div className="flex justify-between mb-4">
+                             <h3 className="font-bold text-xl text-blue-900">DETALLE PEDIDO WEB</h3>
+                             <button onClick={()=>setSelectedWebOrder(null)}><X className="text-gray-500 hover:text-black"/></button>
+                         </div>
+                         <p className="text-[var(--gold)] text-3xl font-black mb-2">#{selectedWebOrder.orderNum}</p>
+                         <p className="text-gray-800 font-bold mb-4">{selectedWebOrder.clientName} - <span className="text-gray-500 font-normal">{selectedWebOrder.address}</span></p>
+                         <div className="h-48 w-full bg-gray-100 rounded mb-4 overflow-hidden relative border border-gray-300">
+                              <LeafletMap center={selectedWebOrder.clientLoc || STORE_COORDS} markers={[{pos: STORE_COORDS, isStore:true}, {pos: selectedWebOrder.clientLoc || STORE_COORDS, emoji: '📍'}]} route={[STORE_COORDS, selectedWebOrder.clientLoc || STORE_COORDS]} zoom={13} />
+                         </div>
+                         <div className="flex gap-2">
+                             <button onClick={()=>cancelWebOrder(selectedWebOrder.id)} className="flex-1 bg-red-100 text-red-600 py-3 rounded font-bold hover:bg-red-200">CANCELAR</button>
+                             <button onClick={()=>{ handleWebOrder(selectedWebOrder); setTab('pos'); setSelectedWebOrder(null); }} className="flex-1 bg-blue-600 text-white py-3 rounded font-bold hover:bg-blue-700 shadow">PROCESAR</button>
+                         </div>
                     </div>
                 </div>
             )}
-            
-            {/* OTROS MODALES (CORTE, RETIRO, ETC) - Mismos que antes pero con estilo light */}
-            {corteModal && (<div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4"><div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-md"><h3 className="font-bold text-xl mb-4">CORTE DE CAJA</h3>{/* Contenido Corte */}<button onClick={()=>setCorteModal(false)} className="w-full mt-4 text-gray-500">Cerrar</button></div></div>)}
+
         </div>
     );
 };
 const ClientApp = ({ db, updateDB }) => {
+    // --- ESTADOS ---
     const [view, setView] = useState('menu');
     const [cart, setCart] = useState([]);
     const [form, setForm] = useState({name:'', phone:'', type:'delivery', address:'', references:'', pay:'card', payAmount:0});
@@ -1628,135 +1924,426 @@ const ClientApp = ({ db, updateDB }) => {
     const [deliveryCoords, setDeliveryCoords] = useState(null);
     const [isLocating, setIsLocating] = useState(false);
     const [showCashModal, setShowCashModal] = useState(false);
-    const [addressTimer, setAddressTimer] = useState(null);
+    const [showComplements, setShowComplements] = useState(false); 
+    const [tempCashAmount, setTempCashAmount] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const addressTimer = useRef(null);
+    const [clientCatFilter, setClientCatFilter] = useState('Todos'); 
+    const [ingredientsProduct, setIngredientsProduct] = useState(null);
+    const [showLargeMap, setShowLargeMap] = useState(false);
     
-    // 1. Efecto Auto-Tracking (KFC Style)
+    // --- 1. BLOQUEO INMEDIATO SI TIENDA CIERRA ---
+    if(!db.settings.storeOpen) return <div className="closed-store-overlay"></div>;
+
+    // --- 2. EFECTOS DE INICIO Y PERSISTENCIA ---
     useEffect(() => {
-        if(activeOrder) {
-            const fresh = db.orders.find(o => o.id === activeOrder.id);
-            if (fresh && fresh.status !== activeOrder.status) {
-                setActiveOrder(fresh);
-                if (fresh.status !== 'web_pending_payment' && view !== 'track') setView('track');
+        // Asegurar estilos de cliente (pero respetando tema claro general)
+        document.body.classList.add('client-mode'); 
+        
+        // Recuperar pedido activo
+        const storedOrderId = localStorage.getItem('client_active_order_id');
+        if (storedOrderId) {
+            const existingOrder = db.orders.find(o => o.id === storedOrderId);
+            if (existingOrder) {
+                if (existingOrder.status === 'delivered' || existingOrder.status === 'cancelled') {
+                    localStorage.removeItem('client_active_order_id');
+                    if(existingOrder.status === 'delivered') showToast("¡Pedido Entregado! Gracias por su compra.");
+                } else {
+                    setActiveOrder(existingOrder);
+                    setView('track');
+                }
             }
         }
-    }, [db.orders, activeOrder]);
+        
+        // GPS Inicial
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const coords = [pos.coords.latitude, pos.coords.longitude];
+            setClientCoords(coords);
+            if(!deliveryCoords) setDeliveryCoords(coords); 
+            // Intentar obtener dirección textual inicial
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
+                .then(r=>r.json())
+                .then(d=>{
+                    if(d && d.display_name && !form.address){ 
+                        const parts = d.display_name.split(','); 
+                        setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); 
+                    }
+                }).catch(e=>{});
+        }, () => setClientCoords(STORE_COORDS)); 
 
-    const deliveryFee = 0; // Usar logica real
+        return () => { document.body.classList.remove('client-mode'); };
+    }, [db.orders]);
+
+    // --- 3. CÁLCULOS ---
+    const deliveryFee = useMemo(() => {
+        if(form.type==='delivery' && deliveryCoords) {
+            const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]);
+            return getDeliveryPrice(dist, db.settings.deliveryTable);
+        }
+        return 0;
+    }, [deliveryCoords, form.type, db.settings.deliveryTable]);
+
     const total = cart.reduce((a,b)=>a+b.price*b.qty,0) + deliveryFee;
-    const adjustQty = (p,d) => { setCart(prev=>{ const ex=prev.find(i=>i.id===p.id); return ex?prev.map(i=>i.id===p.id?{...i,qty:i.qty+d}:i):[...prev,{...p,qty:1}]}); };
 
-    const updateLocation = async (addr) => {
-        setForm({...form, address: addr});
-        if(addressTimer) clearTimeout(addressTimer);
-        setAddressTimer(setTimeout(async () => {
-            if(addr.length > 5) {
-                setIsLocating(true);
-                try {
-                    const q = `${addr} ${CITY_SUFFIX}`; // Mejora de búsqueda
-                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1&addressdetails=1`);
-                    const data = await res.json();
-                    if(data && data[0]) setDeliveryCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-                } catch(e){}
-                setIsLocating(false);
-            }
-        }, 1000));
+    // --- 4. FUNCIONES ---
+    const adjustQty = (p, delta) => { 
+        const existing = cart.find(i => i.id === p.id); 
+        if (existing) { 
+            const newQty = existing.qty + delta; 
+            if (newQty <= 0) setCart(cart.filter(i => i.id !== p.id)); 
+            else setCart(cart.map(i => i.id === p.id ? {...i, qty: newQty} : i)); 
+        } else if (delta > 0) {
+            setCart([...cart, {...p, qty: 1}]); 
+        }
     };
+    const getQty = (pId) => { const item = cart.find(i => i.id === pId); return item ? item.qty : 0; };
+    const updateItemNote = (idx, note) => { const newCart = [...cart]; newCart[idx].note = note; setCart(newCart); };
 
-    const useGPS = () => {
-        setIsLocating(true);
-        navigator.geolocation.getCurrentPosition(pos => {
-            const c = [pos.coords.latitude, pos.coords.longitude];
-            setDeliveryCoords(c); setClientCoords(c);
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${c[0]}&lon=${c[1]}`).then(r=>r.json()).then(d=>{
-                if(d && d.display_name) setForm(prev=>({...prev, address: d.display_name.split(',')[0]}));
-            });
-            setIsLocating(false);
-        });
+    const preSubmit = () => { 
+        const hasComplements = db.products.some(p => p.isComplement && (p.active !== false)); 
+        if (hasComplements && !showComplements) setShowComplements(true); 
+        else { setView('checkout'); setShowComplements(false); } 
     };
 
     const submit = () => {
+        if(activeOrder) return showToast("Ya tienes un pedido en curso");
+        if(!form.name) return showToast("Falta Nombre");
+        if(!form.phone || form.phone.length !== 10) return showToast("Teléfono inválido (10 dígitos)");
+        if (form.type === 'delivery') {
+            if (!db.settings.deliveryEnabled) return showToast("Servicio a domicilio no disponible");
+            if (!form.address) return showToast("Falta Dirección");
+            if (deliveryCoords) { 
+                const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]); 
+                if (dist > db.settings.deliveryRadius) return showToast("Upss! Dirección fuera de zona de cobertura."); 
+            }
+        }
+        if(form.pay === 'cash' && (!form.payAmount || form.payAmount < total)) return showToast("Monto insuficiente o inválido");
+        
         const order = { 
-            id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, 
-            items: cart, total, status: 'web_pending_payment', method: form.pay, 
-            address: form.address, clientName: form.name, clientLoc: deliveryCoords, source: 'web', createdAt: new Date().toISOString()
+            id: generateId(), 
+            orderNum: Math.floor(Math.random()*9000)+1000, 
+            items: cart, 
+            total, 
+            status: 'web_pending_payment', 
+            method: form.pay, 
+            payAmount: form.payAmount, 
+            createdAt: new Date().toISOString(), 
+            address: form.type==='delivery' ? `${form.address} (${form.references})` : 'RECOGER', 
+            clientName: form.name, 
+            clientPhone: form.phone, 
+            clientLoc: deliveryCoords || clientCoords, 
+            source: 'web',
+            deviceId: localStorage.getItem('device_id')
         };
-        updateDB({...db, orders: [...db.orders, order]});
-        setActiveOrder(order);
-        // La vista cambiará sola gracias al useEffect cuando el status cambie o refresque
+        
+        localStorage.setItem('client_active_order_id', order.id);
+        updateDB({...db, orders: [...db.orders, order]}); 
+        setActiveOrder(order); 
+        setView('track');
     };
 
+    // --- 5. MAPA Y BÚSQUEDA ---
+    const updateLocationFromAddress = (addr) => {
+        setForm(prev => ({...prev, address: addr}));
+        if (addressTimer.current) clearTimeout(addressTimer.current);
+        if(addr.length < 4) { setSuggestions([]); setIsLocating(false); return; }
+        setIsLocating(true);
+        addressTimer.current = setTimeout(async () => {
+            try { 
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + CITY_SUFFIX)}&limit=5&addressdetails=1`); 
+                const data = await res.json(); 
+                setSuggestions(data || []); 
+            } catch(e) {} finally { setIsLocating(false); }
+        }, 1000); 
+    };
+    
+    const selectSuggestion = (s) => {
+        setForm({...form, address: s.display_name.split(',')[0]});
+        setDeliveryCoords([parseFloat(s.lat), parseFloat(s.lon)]);
+        setSuggestions([]);
+    };
+
+    const useGPS = () => { 
+        setIsLocating(true); 
+        navigator.geolocation.getCurrentPosition(pos => { 
+            const coords = [pos.coords.latitude, pos.coords.longitude]; 
+            setDeliveryCoords(coords); 
+            setClientCoords(coords); 
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
+                .then(r=>r.json())
+                .then(d=>{ 
+                    if(d && d.display_name){ 
+                        const parts = d.display_name.split(','); 
+                        setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); 
+                    } 
+                }).catch(e=>{}); 
+            setIsLocating(false); 
+        }, () => setIsLocating(false)); 
+    };
+
+    const handleMapClick = async (coords) => { 
+        setDeliveryCoords(coords); 
+        setIsLocating(true); 
+        try { 
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`); 
+            const data = await res.json(); 
+            if(data && data.display_name) { 
+                const addrParts = data.display_name.split(','); 
+                setForm(prev => ({...prev, address: addrParts[0] + (addrParts[1]||'')})); 
+                setSuggestions([]); 
+            } 
+        } catch(e) {} finally { setIsLocating(false); } 
+    };
+
+    // --- 6. FILTRADO (CON OJITO FIX) ---
+    const groupedProducts = useMemo(() => {
+        const groups = {};
+        if(db && db.products) {
+            // Filtro: No complementos Y activo !== false (para respetar ojito)
+            db.products.filter(p => !p.isComplement && p.active !== false).forEach(p => {
+                const cat = p.cat || 'Otros';
+                if (!groups[cat]) groups[cat] = [];
+                groups[cat].push(p);
+            });
+        }
+        return groups;
+    }, [db.products]);
+    
+    const uniqueClientCategories = ['Todos', ...Object.keys(groupedProducts)];
+    const handleCashSelect = () => setShowCashModal(true);
+    const confirmCash = () => { if(parseFloat(tempCashAmount) < total) return showToast("El monto debe ser mayor al total"); setForm({...form, pay:'cash', payAmount: parseFloat(tempCashAmount)}); setShowCashModal(false); };
+    const cancelCash = () => { setForm({...form, pay:'card', payAmount: 0}); setShowCashModal(false); };
+
+    // --- VISTA 1: MENÚ ---
     if(view === 'menu') return (
-        <div className="h-full flex flex-col bg-white overflow-hidden">
-            <div className="banner-container"><img src={BANNER_URL} className="mobile-banner"/></div>
+        <div className="h-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] relative app-view-mobile">
+            <button className="install-btn" onClick={()=>showToast("Comparte -> Agregar a Inicio")}><img src={LOGO_URL}/></button>
+            {activeOrder && ( 
+                <div onClick={()=>setView('track')} className="fixed top-20 left-4 right-4 bg-red-600 text-white p-6 rounded-2xl shadow-2xl z-[100] animate-pulse cursor-pointer border-4 border-[var(--gold)] text-center">
+                    <h2 className="text-3xl font-brand">🛵 PEDIDO EN CURSO</h2>
+                    <p className="font-bold text-sm mt-2">TOCA PARA VER EL MAPA</p>
+                </div> 
+            )}
             
-            {activeOrder && activeOrder.status === 'web_pending_payment' && (
-                <div className="bg-yellow-400 p-4 text-center font-bold text-black animate-pulse cursor-pointer" onClick={()=>setView('track')}>
-                    ⏳ ESPERANDO CONFIRMACIÓN...
+            {/* Banner Contenido Correctamente */}
+            <div className="banner-container">
+                <img src={BANNER_URL} className="mobile-banner" alt="Banner"/>
+            </div>
+            
+            <div className="p-2 flex gap-2 overflow-x-auto bg-[var(--bg-card)] border-b border-[var(--border)]">
+                {uniqueClientCategories.map(c=><button key={c} onClick={()=>setClientCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${clientCatFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-gray-200 text-gray-700'}`}>{c}</button>)}
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-48">
+                {Object.keys(groupedProducts).length === 0 ? (
+                    <div className="text-center text-gray-500 mt-10"><p>Cargando menú...</p></div>
+                ) : (
+                    Object.entries(groupedProducts).filter(([cat]) => clientCatFilter === 'Todos' || cat === clientCatFilter).map(([cat, prods]) => (
+                        <div key={cat}>
+                            <h3 className="font-brand text-2xl mb-4 text-[var(--accent)] border-b border-gray-300 pb-2">{cat}</h3>
+                            <div className="space-y-4">
+                                {prods.map(p=>{ 
+                                    const qty = getQty(p.id); 
+                                    return (
+                                        <div key={p.id} className="card p-3 shadow flex gap-3 bg-[var(--bg-card)] relative">
+                                            <img src={p.img || LOGO_URL} onError={(e) => e.target.src = LOGO_URL} className="w-24 h-24 rounded object-cover cursor-pointer" onClick={()=>setIngredientsProduct(p)}/>
+                                            <div className="flex-1 flex flex-col justify-between">
+                                                <div>
+                                                    <p className="font-bold text-[var(--text-main)] text-lg leading-tight" onClick={()=>setIngredientsProduct(p)}>{p.name}</p>
+                                                    <p className="text-gray-500 text-xs italic line-clamp-2 mt-1">{p.ingredients}</p>
+                                                </div>
+                                                <div className="flex justify-between items-end mt-2">
+                                                    <span className="font-black text-xl text-[var(--accent)]">{formatCurrency(p.price)}</span>
+                                                    <div className="flex items-center gap-2 bg-gray-100 rounded-full p-1 border border-gray-300">
+                                                        {qty === 0 ? (
+                                                            <button onClick={()=>adjustQty(p, 1)} className="bg-[var(--gold)] text-black font-bold px-4 py-1 rounded-full text-sm shadow">PEDIR</button>
+                                                        ) : (
+                                                            <>
+                                                                <button onClick={()=>adjustQty(p, -1)} className="w-8 h-8 rounded-full bg-gray-300 text-black font-bold flex items-center justify-center">-</button>
+                                                                <span className="w-6 text-center font-bold text-black text-sm">{qty}</span>
+                                                                <button onClick={()=>adjustQty(p, 1)} className="w-8 h-8 rounded-full bg-[var(--gold)] text-black font-bold flex items-center justify-center shadow">+</button>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+            
+            <div className="mobile-video-container"><video src={VIDEO_URL} autoPlay loop muted playsInline></video><div className="mobile-video-overlay"></div></div>
+            <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60]">
+                {activeOrder ? (
+                    <button onClick={()=>setView('track')} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg animate-pulse flex items-center justify-center gap-2">🛵 VER PEDIDO EN CURSO</button>
+                ) : (
+                    cart.length > 0 && <button onClick={preSubmit} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button>
+                )}
+            </div>
+            
+            {showComplements && (
+                <div className="fixed inset-0 bg-black/90 z-[9999] flex flex-col justify-end p-4 animate-in slide-in-from-bottom">
+                    <div className="bg-[var(--bg-card)] rounded-t-2xl p-6 border-t border-[var(--gold)]">
+                        <h3 className="text-xl font-bold text-[var(--gold)] mb-4 text-center">¿ALGO MÁS? 🍟</h3>
+                        <div className="flex gap-4 overflow-x-auto pb-4">
+                            {db.products.filter(p => p.isComplement && p.active !== false).map(p => (
+                                <div key={p.id} className="min-w-[120px] bg-gray-100 p-2 rounded-lg text-center cursor-pointer border hover:border-[var(--gold)]" onClick={()=>{adjustQty(p, 1); showToast("Agregado!");}}>
+                                    <img src={p.img} className="w-20 h-20 mx-auto rounded mb-2 object-cover"/>
+                                    <p className="text-xs font-bold text-black line-clamp-1">{p.name}</p>
+                                    <p className="text-[var(--gold)] font-bold">{formatCurrency(p.price)}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={()=>{setView('checkout'); setShowComplements(false);}} className="w-full bg-black text-white font-bold py-3 rounded-xl mt-4">CONTINUAR</button>
+                    </div>
+                </div>
+            )}
+            {ingredientsProduct && (
+                <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4" onClick={()=>setIngredientsProduct(null)}>
+                    <div className="bg-white p-6 rounded-xl max-w-sm w-full text-center" onClick={e=>e.stopPropagation()}>
+                        <h3 className="text-xl font-bold text-black mb-4">{ingredientsProduct.name}</h3>
+                        <p className="text-gray-700 mb-6">{ingredientsProduct.ingredients || "Sin descripción."}</p>
+                        <button onClick={()=>setIngredientsProduct(null)} className="btn-gold w-full">CERRAR</button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+
+    // --- VISTA 2: CHECKOUT (REORDENADO) ---
+    if(view === 'checkout') return (
+        <div className="h-full bg-[var(--bg-body)] p-4 overflow-y-auto app-view-mobile relative flex flex-col pb-32 text-[var(--text-main)]">
+            <button onClick={()=>setView('menu')} className="mb-4 text-gray-600 flex items-center gap-2 font-bold"><ArrowLeft/> VOLVER AL MENÚ</button>
+            <h2 className="font-bold text-2xl mb-6 text-center text-[var(--text-main)]">FINALIZAR PEDIDO</h2>
+            
+            {/* 1. TUS PRODUCTOS */}
+            <div className="mb-6 space-y-2">
+                <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-300 pb-1 mb-2">1. Tus Productos</h3>
+                {cart.map((item, idx) => ( 
+                    <div key={idx} className="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                        <div className="flex justify-between items-center mb-1">
+                            <div><p className="font-bold text-black">{item.name}</p><p className="text-xs text-[var(--gold)] font-bold">{formatCurrency(item.price)}</p></div>
+                            <div className="flex items-center gap-3">
+                                <button onClick={()=>adjustQty(item, -1)} className="w-8 h-8 bg-gray-200 text-black rounded-full font-bold">-</button>
+                                <span className="font-bold text-black">{item.qty}</span>
+                                <button onClick={()=>adjustQty(item, 1)} className="w-8 h-8 bg-[var(--gold)] text-black rounded-full font-bold">+</button>
+                            </div>
+                        </div>
+                        {!item.isComplement && <input className="w-full bg-transparent border-b border-gray-300 text-xs text-black p-1 outline-none" placeholder="Nota (Sin cebolla...)" value={item.note || ''} onChange={(e)=>updateItemNote(idx, e.target.value)}/>}
+                    </div> 
+                ))}
+            </div>
+
+            {/* 2. TUS DATOS */}
+            <div className="mb-6 space-y-3">
+                <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-300 pb-1 mb-2">2. Tus Datos</h3>
+                <input className="input-std" placeholder="Tu Nombre" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
+                <input className="input-std" type="number" placeholder="Teléfono" value={form.phone} maxLength={10} onChange={e=>setForm({...form,phone:e.target.value})}/>
+            </div>
+
+            {/* 3. ENTREGA */}
+            <div className="mb-6">
+                <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-300 pb-1 mb-2">3. Tipo de Entrega</h3>
+                <div className="flex gap-2">
+                    <button onClick={()=>setForm({...form, type:'delivery'})} className={`flex-1 p-3 rounded font-bold border transition ${form.type==='delivery'?'border-[var(--accent)] bg-[var(--accent)] text-white':'bg-white text-gray-500'}`}>DOMICILIO</button>
+                    {db.settings.pickupEnabled && <button onClick={()=>setForm({...form, type:'pickup'})} className={`flex-1 p-3 rounded font-bold border transition ${form.type==='pickup'?'border-[var(--accent)] bg-[var(--accent)] text-white':'bg-white text-gray-500'}`}>RECOGER</button>}
+                </div>
+            </div>
+
+            {/* 4. DIRECCIÓN (INPUT CLARO #F0EBEB) */}
+            {form.type === 'delivery' && (
+                <div className="mb-6 animate-in fade-in">
+                    <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-300 pb-1 mb-2">4. Dirección</h3>
+                    <div className="didi-search-container border-gray-300">
+                        <div className="text-[var(--accent)]"><MapPin size={24}/></div>
+                        {/* INPUT CLARO COMO SOLICITADO */}
+                        <input className="didi-input input-special p-2 rounded" placeholder="Calle y Número..." value={form.address} onChange={e=>updateLocationFromAddress(e.target.value)}/>
+                        <button className="didi-btn-orange flex items-center gap-1" onClick={useGPS}>
+                            {isLocating ? <span className="animate-spin">↻</span> : <Crosshair size={16}/>}
+                            {isLocating ? 'LOCALIZANDO...' : 'UBICACIÓN'}
+                        </button>
+                    </div>
+                    
+                    {suggestions.length > 0 && (
+                        <div className="didi-suggestions shadow-xl z-50 relative">
+                            {suggestions.map((s,i) => (
+                                <div key={i} className="didi-item hover:bg-gray-100" onClick={() => selectSuggestion(s)}>
+                                    <MapPin className="text-[var(--gold)]" size={16}/>
+                                    <div className="flex flex-col">
+                                        <span className="font-bold text-sm text-black">{s.address.road || s.display_name.split(',')[0]}</span>
+                                        <span className="text-[10px] text-gray-500">{s.display_name}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    <input className="input-std mt-2" placeholder="Referencias (Casa color, portón...)" value={form.references} onChange={e=>setForm({...form,references:e.target.value})}/>
+                    <div className="h-40 w-full rounded border border-gray-400 overflow-hidden relative shadow-lg mt-2">
+                        <LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:clientCoords||STORE_COORDS, emoji:'', isClient:true}, {pos:deliveryCoords||STORE_COORDS, emoji:'🍔', label:'Entrega'}, {pos:STORE_COORDS, emoji:'', isStore:true}]} onClickMap={handleMapClick} zoom={15} />
+                    </div>
                 </div>
             )}
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
-                {db.products.filter(p=>p.active && !p.isComplement).map(p=>(
-                    <div key={p.id} className="card p-3 flex gap-3 shadow-sm bg-white">
-                        <img src={p.img} className="w-24 h-24 rounded object-cover"/>
-                        <div className="flex-1">
-                            <p className="font-bold">{p.name}</p>
-                            <div className="flex justify-between items-center mt-2">
-                                <span className="text-[var(--accent)] font-bold">{formatCurrency(p.price)}</span>
-                                <button onClick={()=>adjustQty(p,1)} className="bg-[var(--gold)] px-4 py-1 rounded-full text-xs font-bold shadow">AGREGAR</button>
-                            </div>
-                        </div>
+            {/* 5. MÉTODO DE PAGO */}
+            <div className="mb-6 card p-4 border border-[var(--gold)] bg-white">
+                <h3 className="text-sm font-bold text-[var(--gold)] uppercase mb-2">5. Método de Pago</h3>
+                <div className="flex gap-2 mb-2">
+                    <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='cash'?'border-green-500 bg-green-50 text-green-600':'border-gray-300 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='cash'} onChange={handleCashSelect}/> Efectivo</label>
+                    <label className={`flex-1 p-3 rounded border text-center font-bold cursor-pointer ${form.pay==='card'?'border-blue-500 bg-blue-50 text-blue-600':'border-gray-300 text-gray-500'}`}><input type="radio" name="pay" hidden checked={form.pay==='card'} onChange={()=>setForm({...form,pay:'card'})}/> Tarjeta</label>
+                </div>
+            </div>
+
+            {/* 6. RESUMEN DE COMPRA */}
+            <div className="bg-white p-4 rounded mb-6 space-y-2 border border-gray-300 shadow-md">
+                <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-300 pb-1 mb-2">6. Resumen</h3>
+                <div className="flex justify-between text-gray-700"><span>Subtotal:</span><span>{formatCurrency(cart.reduce((a,b)=>a+b.price*b.qty,0))}</span></div>
+                <div className="flex justify-between text-[var(--gold)] font-bold"><span>Envío Estimado:</span><span>{formatCurrency(deliveryFee)}</span></div>
+                <div className="border-t border-gray-300 pt-2 flex justify-between text-2xl font-black text-black"><span>TOTAL:</span><span>{formatCurrency(total)}</span></div>
+                
+                {form.pay === 'cash' && form.payAmount > 0 && (
+                    <div className="bg-green-50 p-2 rounded border border-green-200 mt-2 text-center">
+                        <p className="text-sm text-green-800 font-bold">Pagas con: {formatCurrency(form.payAmount)}</p>
+                        <p className="text-lg text-green-600 font-black">Tu Cambio: {formatCurrency(Math.max(0, form.payAmount - total))}</p>
                     </div>
-                ))}
-            </div>
-            {cart.length > 0 && <div className="fixed bottom-0 w-full p-4 bg-white border-t z-50"><button onClick={()=>setView('checkout')} className="btn-gold w-full shadow-lg">IR A PAGAR ({formatCurrency(total)})</button></div>}
-        </div>
-    );
-
-    if(view === 'checkout') return (
-        <div className="h-full bg-white p-4 overflow-y-auto pb-32">
-            <h2 className="font-bold text-xl mb-6">FINALIZAR PEDIDO</h2>
-            <div className="mb-6">
-                <label className="text-xs font-bold text-gray-500 mb-1 block">DIRECCIÓN DE ENTREGA</label>
-                <div className="didi-wrapper mb-2">
-                    <input className="didi-input-internal" placeholder="Calle y Número..." value={form.address} onChange={e=>updateLocation(e.target.value)}/>
-                    <button className="didi-btn-internal" onClick={useGPS}>
-                        {isLocating ? <span className="animate-spin">↻</span> : <Crosshair size={14}/>} UBICACIÓN
-                    </button>
-                </div>
-                <div className="h-40 rounded border overflow-hidden relative shadow-inner">
-                    <LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:deliveryCoords||STORE_COORDS, emoji:'📍', isMyLoc:true}]} zoom={15}/>
-                </div>
-            </div>
-            <input className="input-std mb-2" placeholder="Nombre" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
-            <button onClick={submit} className="btn-gold w-full mt-4 py-3 shadow-lg">ENVIAR PEDIDO</button>
-        </div>
-    );
-
-    if(view === 'track') {
-        const isWaiting = activeOrder.status === 'web_pending_payment';
-        return (
-            <div className="h-full bg-white flex flex-col items-center pt-10 px-4 text-center">
-                <div className="w-32 h-32 rounded-full border-4 border-[var(--gold)] p-1 mb-6 relative">
-                    <img src={LOGO_URL} className={`w-full h-full rounded-full object-cover ${isWaiting?'logo-pulse':''}`}/>
-                    {isWaiting && <div className="absolute inset-0 border-4 border-t-transparent border-[var(--accent)] rounded-full animate-spin"></div>}
-                </div>
-                {isWaiting ? (
-                    <>
-                        <h2 className="text-2xl font-black mb-2">¡ESPERA!</h2>
-                        <p className="font-bold text-red-600 bg-red-50 p-4 rounded mb-4">EL RESTAURANTE ESTÁ CONFIRMANDO...</p>
-                    </>
-                ) : (
-                    <>
-                        <h2 className="text-2xl font-black text-green-600 mb-2">¡PEDIDO ACEPTADO!</h2>
-                        <div className="w-full bg-gray-100 rounded-xl p-4 mb-4 text-left border border-gray-200">
-                            <p className="font-bold">Estado: <span className="text-[var(--accent)]">{activeOrder.status.toUpperCase()}</span></p>
-                        </div>
-                        <div className="h-64 w-full rounded-xl overflow-hidden border shadow-lg relative">
-                             <LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, isStore:true}, {pos:deliveryCoords||STORE_COORDS, emoji:'📍', isClient:true}]} zoom={13}/>
-                        </div>
-                    </>
                 )}
+            </div>
+            
+            <button onClick={submit} className="w-full bg-[var(--accent)] text-white py-4 rounded-lg font-bold shadow-lg text-lg hover:brightness-110 transition">ENVIAR PEDIDO</button>
+            
+            {showCashModal && (<div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4"><div className="bg-white p-6 rounded-xl w-full max-w-sm text-center border-2 border-[var(--gold)]"><h3 className="text-xl font-bold text-black mb-4">¿CON CUÁNTO PAGAS?</h3><p className="text-gray-600 mb-2">Total a pagar: {formatCurrency(total)}</p><input type="number" className="input-std text-center text-2xl font-bold mb-4 bg-gray-100 text-black" placeholder="$0.00" value={tempCashAmount} onChange={e=>setTempCashAmount(e.target.value)} autoFocus/><div className="flex gap-2"><button onClick={cancelCash} className="flex-1 bg-gray-400 text-white py-2 rounded font-bold">CANCELAR</button><button onClick={confirmCash} className="flex-1 btn-gold py-2 rounded font-bold">CONFIRMAR</button></div></div></div>)}
+        </div>
+    );
+
+    // --- VISTA 3: TRACKING ---
+    if(view === 'track') {
+        const assignedDriver = activeOrder.driver ? db.users.find(u => u.username === activeOrder.driver) : null;
+        const driverLoc = assignedDriver && assignedDriver.location ? assignedDriver.location : STORE_COORDS;
+        const trackMarkers = [{ pos: deliveryCoords || clientCoords || STORE_COORDS, emoji: '🍔', isClient: true }, { pos: STORE_COORDS, emoji: '', isStore: true }];
+        if (assignedDriver) trackMarkers.push({ pos: driverLoc, emoji: '🏍️', type: 'driver', label: 'Tu Repartidor' });
+        const isWaitingAccept = activeOrder.status === 'web_pending_payment';
+        const shareOrder = () => { const text = `MI PEDIDO EMI BURGERS:\nOrden #${activeOrder.orderNum}\nTotal: ${formatCurrency(activeOrder.total)}\nEstado: ${activeOrder.status}`; if (navigator.share) navigator.share({ title: 'Mi Pedido', text: text, url: window.location.href }); else { copyToClipboard(text); showToast("Copiado"); } };
+
+        if (isWaitingAccept) return (<div className="waiting-container client-mode flex flex-col items-center justify-center h-full bg-[var(--bg-special)] p-6 text-center"><img src={LOGO_URL} className="w-32 h-32 rounded-full border-4 border-[var(--gold)] animate-pulse mb-6"/><h2 className="text-3xl font-brand text-black mb-2">¡ESPERA!</h2><p className="text-xl font-bold text-red-600 mb-4 bg-white p-4 rounded shadow">NO ACTUALICES LA PÁGINA, ESTAMOS RECIBIENDO TU ORDEN.</p><p className="text-gray-500 text-sm">El restaurante aceptará tu pedido en breve.</p></div>);
+
+        return (
+            <div className="track-grid client-mode p-4 h-full bg-[var(--bg-special)] text-black overflow-y-auto">
+                <div className="track-col-left mb-6">
+                    <div className="text-center md:text-left"><img src={LOGO_URL} className="w-16 h-16 mx-auto md:mx-0 mb-2 rounded-full border-2 border-[var(--gold)]"/><h1 className="text-3xl font-brand text-[var(--accent)] uppercase">¡ORDEN RECIBIDA!</h1><div className="mt-4"><p className="font-bold flex items-center justify-center md:justify-start gap-2 text-black"><Truck size={20}/> {activeOrder.address === 'RECOGER' ? 'PARA RECOGER' : 'A DOMICILIO'}</p><p className="text-xl font-black mt-2 text-black">NÚMERO DE ORDEN <span className="text-[var(--gold)] bg-black px-2 rounded">#{activeOrder.orderNum}</span></p><p className="text-sm text-gray-500 mt-1">FECHA: {new Date(activeOrder.createdAt).toLocaleDateString()}</p></div></div>
+                    <div className="mt-4"><h3 className="font-bold text-black mb-2 uppercase">RASTREA TU PEDIDO</h3><div className={`w-full py-3 rounded text-center font-bold text-white uppercase mb-4 shadow ${activeOrder.status === 'ready' ? 'bg-green-600' : 'bg-[var(--gold)] text-black'}`}>{activeOrder.status === 'pending' ? 'PREPARANDO...' : activeOrder.status === 'preparing' ? 'COCINANDO...' : activeOrder.status === 'ready' ? 'LISTO PARA ENTREGA' : 'EN CAMINO'}</div><div className="relative w-full h-48 bg-white rounded border border-gray-400 overflow-hidden cursor-pointer group shadow-lg" onClick={()=>setShowLargeMap(true)}><LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, deliveryCoords || STORE_COORDS] : null} zoom={13}/><div className="absolute inset-0 bg-black/10 flex items-center justify-center group-hover:bg-black/20 transition"><p className="bg-white/90 text-black px-3 py-1 rounded text-xs font-bold border border-black">VER MAPA COMPLETO</p></div></div></div>
+                </div>
+                <div className="track-col-right bg-white p-4 rounded shadow-md border border-gray-200">
+                    <div className="flex justify-between items-start mb-4 border-b border-gray-200 pb-2"><div><p className="font-bold text-black">EMI BURGERS</p><p className="text-[10px] text-gray-500">Calle Miguel Aleman 123</p></div><div className="text-right"><p className="text-xs text-gray-500">ORDEN #{activeOrder.orderNum}</p></div></div>
+                    <div className="grid grid-cols-2 gap-4 mb-4 text-xs"><div><p className="font-bold text-gray-500">Pago</p><p className="text-black font-bold">{activeOrder.method === 'cash' ? 'Efectivo' : 'Tarjeta'}</p></div><div><p className="font-bold text-gray-500">Estimado</p><p className="text-black font-bold">30-45 min</p></div></div>
+                    <div className="mb-4"><p className="font-bold text-black mb-2 border-b border-gray-200 pb-1">MI PEDIDO</p>{activeOrder.items.map((i, idx) => (<div key={idx} className="flex justify-between text-sm text-gray-700 mb-1"><span><span className="text-[var(--accent)] font-bold">{i.qty}x</span> {i.name}</span><span>{formatCurrency(i.price * i.qty)}</span></div>))}</div>
+                    <div className="border-t border-gray-200 pt-2 mt-auto"><div className="flex justify-between text-black font-black text-xl"><span>Total</span><span>{formatCurrency(activeOrder.total)}</span></div></div>
+                    <button onClick={shareOrder} className="w-full mt-6 bg-red-600 text-white py-3 rounded font-bold flex items-center justify-center gap-2 hover:bg-red-700 transition"><Share2 size={18}/> COMPARTE</button>
+                </div>
+                {showLargeMap && (<div className="fixed inset-0 bg-white z-[6000] flex flex-col p-4 animate-in zoom-in"><button onClick={()=>setShowLargeMap(false)} className="absolute top-4 right-4 bg-black text-white rounded-full p-2 z-[7000] shadow-lg"><X size={24}/></button><div className="flex-1 rounded border border-[var(--gold)] overflow-hidden relative shadow-2xl"><LeafletMap center={STORE_COORDS} markers={trackMarkers} route={assignedDriver ? [driverLoc, deliveryCoords || STORE_COORDS] : null} zoom={14}/></div></div>)}
             </div>
         );
     }
