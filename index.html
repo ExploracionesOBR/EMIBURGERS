@@ -1389,15 +1389,12 @@ const POS = ({ db, updateDB, user }) => {
                 setSelectedReady([]);
             };
 
-            const generateGroupQR = () => {
-        if(selectedReady.length < 2) return showToast("Selecciona al menos 2 pedidos");
-        const newGroupId = generateId(); 
-        const updatedOrders = db.orders.map(o => selectedReady.includes(o.id) ? {...o, groupId: newGroupId} : o);
-        updateDB({...db, orders: updatedOrders});
-        const qrData = `GROUP:${selectedReady.join(',')}`;
-        const url = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}`;
-        // ... (resto logica modal qr)
-    };
+            const undoGroup = (groupId) => {
+                const updatedOrders = db.orders.map(o => o.groupId === groupId ? {...o, groupId: null} : o);
+                updateDB({...db, orders: updatedOrders});
+                showToast("Grupo deshecho.");
+                if(selectedGroup && selectedGroup.id === groupId) setSelectedGroup(null);
+            };
 
             const handleManualDispatch = (orders) => {
                 if(confirm(`¿Despachar ${orders.length} pedidos?`)) {
