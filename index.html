@@ -23,14 +23,14 @@
         :root {
             --gold: #FFD700; 
             --accent: #FF4500; 
-            --bg-special: #F0EBEB; /* Tono solicitado */
+            --bg-special: #F0EBEB; /* COLOR DE FONDO ESPECIAL */
             --text-main: #000000;
-            
             --z-map: 0; --z-ui: 10; --z-fab: 2000; --z-modal: 5000; --z-toast: 6000; --z-loader: 10000;
         }
         
+        /* RESET GENERAL Y TEMA */
         body { 
-            background-color: white; 
+            background-color: var(--bg-special); 
             color: var(--text-main); 
             font-family: 'Roboto', sans-serif; 
             margin: 0; overflow: hidden; height: 100vh; width: 100vw; 
@@ -39,17 +39,42 @@
         #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
         .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
         
+        /* ARREGLO DE IMÁGENES GIGANTES */
+        .banner-container {
+            width: 100%;
+            height: 25vh; /* Altura controlada (25% de pantalla) */
+            min-height: 180px;
+            max-height: 300px;
+            overflow: hidden;
+            position: relative;
+            background-color: black;
+        }
+        
+        .mobile-banner { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; /* Ajuste inteligente sin deformar */
+            display: block; 
+            opacity: 0.9;
+        }
+
+        /* En modo escritorio, banner más discreto */
+        @media (min-width: 768px) {
+            .banner-container { height: 200px; }
+        }
+
+        /* COMPONENTES UI */
         .card { 
             background-color: white; 
-            border: 1px solid #e5e7eb; 
+            border: 1px solid #d1d5db; 
             border-radius: 0.75rem; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
         }
         
-        /* INPUTS CON EL COLOR ESPECIAL #F0EBEB */
+        /* INPUTS CON COLOR #F0EBEB */
         .input-std, .input-special { 
             background-color: var(--bg-special) !important; 
-            border: 1px solid #d1d5db !important; 
+            border: 1px solid #ccc !important; 
             color: black !important; 
             padding: 0.75rem; 
             width: 100%; 
@@ -57,41 +82,48 @@
             border-radius: 0.5rem; 
             font-weight: 500;
         }
-        .input-std::placeholder, .input-special::placeholder { color: #666; }
+        
+        /* INPUT NEGRO PARA DIRECCIÓN (SOLICITADO) */
+        .input-dark-force {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border: 1px solid #333 !important;
+        }
+        .input-dark-force::placeholder { color: #888; }
 
         .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
 
-        /* --- UTILS --- */
-        .theme-toggle, .gods-eye, .share-btn, .dash-map-btn, .logout-ghost { position: fixed; z-index: var(--z-fab); cursor: pointer; }
-        .theme-toggle { display: none; } /* Oculto en este diseño */
-        .gods-eye { bottom: 20px; left: 20px; opacity: 0.8; transform: scale(0.9); }
-        .logout-ghost { top: 10px; left: 10px; opacity: 0.8; }
-        .share-btn { top: 15px; right: 15px; background: var(--gold); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        
-        body.client-mode .theme-toggle, body.client-mode .share-btn, body.client-mode .gods-eye, body.client-mode .dash-map-btn, body.client-mode .logout-ghost { display: none !important; }
-
-        /* --- POS UI --- */
-        .gestion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-        .grid-cockpit { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1rem; height: 90vh; }
-        @media (max-width: 1024px) { .grid-cockpit { grid-template-columns: 1fr; overflow-y: auto; display: flex; flex-direction: column; height: auto; } }
-        
-        .mode-btn { padding: 1rem; border-radius: 0.5rem; font-weight: bold; margin-bottom: 0.5rem; border: 1px solid #ccc; background: white; color: black; transition: all 0.2s; width: 100%; text-align: left; }
-        .mode-btn.active { background-color: var(--gold); color: black; border-color: black; transform: scale(1.02); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
-        .bill-btn { background-size: cover; background-position: center; border-radius: 4px; height: 60px; width: 100%; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; background-color: white; }
-        
+        /* BOTONES FLOTANTES */
         .admin-fab { position: fixed; bottom: 20px; right: 20px; z-index: var(--z-fab); display: flex; flex-direction: column; align-items: end; gap: 10px; }
         .admin-fab-menu { display: flex; flex-direction: column; align-items: end; gap: 10px; margin-bottom: 10px; animation: slide-up 0.3s ease-out; }
-        @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .logout-ghost { position: fixed; top: 10px; left: 10px; opacity: 0.8; z-index: var(--z-fab); }
+        .gods-eye { position: fixed; bottom: 20px; left: 20px; z-index: var(--z-fab); opacity: 0.8; transform: scale(0.9); }
+        
+        /* OCULTAR EN MODO CLIENTE */
+        body.client-mode .logout-ghost, body.client-mode .gods-eye, body.client-mode .admin-fab { display: none !important; }
 
-        /* Loader & Map */
-        .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
-        .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
+        /* ANIMACIONES Y EXTRAS */
         @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
-        .leaflet-container { background: #f0f0f0; width: 100%; height: 100%; z-index: 0; }
+        @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-special); z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
+        .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
+        
+        .install-btn { position: fixed; bottom: 20px !important; left: 20px !important; top: auto !important; z-index: 9999 !important; background: black; border: 2px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; animation: bounce 2s infinite; }
+        .install-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        
+        /* VIDEO MÓVIL */
+        .mobile-video-container { position: fixed; bottom: 70px; left: 0; width: 100%; height: 100px; z-index: 50; pointer-events: none; background: black; overflow: hidden; border-top: 2px solid var(--gold); }
+        .mobile-video-container video { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .mobile-video-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); }
+        
+        /* LEAFLET MAP */
+        .leaflet-container { background: #e5e5e5; width: 100%; height: 100%; z-index: 0; }
         .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
         
-        /* Driver Nav */
+        /* UI DRIVER */
         .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; }
         .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #999; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
         .driver-nav-btn.active { color: var(--gold); }
@@ -1883,6 +1915,7 @@ const POS = ({ db, updateDB, user }) => {
     );
 };
 const ClientApp = ({ db, updateDB }) => {
+    // --- ESTADOS ---
     const [view, setView] = useState('menu');
     const [cart, setCart] = useState([]);
     const [form, setForm] = useState({name:'', phone:'', type:'delivery', address:'', references:'', pay:'card', payAmount:0});
@@ -1904,7 +1937,8 @@ const ClientApp = ({ db, updateDB }) => {
 
     // --- 2. EFECTOS DE INICIO Y PERSISTENCIA ---
     useEffect(() => {
-        document.body.classList.add('client-mode'); // Forzar estilos cliente
+        // Asegurar estilos de cliente (pero respetando tema claro general)
+        document.body.classList.add('client-mode'); 
         
         // Recuperar pedido activo
         const storedOrderId = localStorage.getItem('client_active_order_id');
@@ -1921,10 +1955,20 @@ const ClientApp = ({ db, updateDB }) => {
             }
         }
         
+        // GPS Inicial
         navigator.geolocation.getCurrentPosition((pos) => {
             const coords = [pos.coords.latitude, pos.coords.longitude];
             setClientCoords(coords);
             if(!deliveryCoords) setDeliveryCoords(coords); 
+            // Intentar obtener dirección textual inicial
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`)
+                .then(r=>r.json())
+                .then(d=>{
+                    if(d && d.display_name && !form.address){ 
+                        const parts = d.display_name.split(','); 
+                        setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); 
+                    }
+                }).catch(e=>{});
         }, () => setClientCoords(STORE_COORDS)); 
 
         return () => { document.body.classList.remove('client-mode'); };
@@ -1998,7 +2042,7 @@ const ClientApp = ({ db, updateDB }) => {
         setView('track');
     };
 
-    // --- MAPA Y BÚSQUEDA ---
+    // --- 5. MAPA Y BÚSQUEDA ---
     const updateLocationFromAddress = (addr) => {
         setForm(prev => ({...prev, address: addr}));
         if (addressTimer.current) clearTimeout(addressTimer.current);
@@ -2006,8 +2050,7 @@ const ClientApp = ({ db, updateDB }) => {
         setIsLocating(true);
         addressTimer.current = setTimeout(async () => {
             try { 
-                // Añadimos 'extratags=1' y 'addressdetails=1' para intentar obtener calle y número
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + " " + CITY_SUFFIX)}&limit=5&addressdetails=1&extratags=1`); 
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + CITY_SUFFIX)}&limit=5&addressdetails=1`); 
                 const data = await res.json(); 
                 setSuggestions(data || []); 
             } catch(e) {} finally { setIsLocating(false); }
@@ -2015,12 +2058,7 @@ const ClientApp = ({ db, updateDB }) => {
     };
     
     const selectSuggestion = (s) => {
-        // Intento de construir "Calle + Número" si está disponible en address
-        let street = s.address.road || s.address.pedestrian || s.display_name.split(',')[0];
-        let number = s.address.house_number || '';
-        let finalAddr = number ? `${street} #${number}` : street;
-        
-        setForm({...form, address: finalAddr});
+        setForm({...form, address: s.display_name.split(',')[0]});
         setDeliveryCoords([parseFloat(s.lat), parseFloat(s.lon)]);
         setSuggestions([]);
     };
@@ -2035,8 +2073,8 @@ const ClientApp = ({ db, updateDB }) => {
                 .then(r=>r.json())
                 .then(d=>{ 
                     if(d && d.display_name){ 
-                         let parts = d.display_name.split(','); 
-                         setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); 
+                        const parts = d.display_name.split(','); 
+                        setForm(prev => ({...prev, address: parts[0] + (parts[1]||'')})); 
                     } 
                 }).catch(e=>{}); 
             setIsLocating(false); 
@@ -2057,11 +2095,11 @@ const ClientApp = ({ db, updateDB }) => {
         } catch(e) {} finally { setIsLocating(false); } 
     };
 
-    // --- FILTRADO DE PRODUCTOS (CORRECCIÓN "OJITO") ---
+    // --- 6. FILTRADO (CON OJITO FIX) ---
     const groupedProducts = useMemo(() => {
         const groups = {};
         if(db && db.products) {
-            // AHORA SI RESPETA EL OJITO (p.active !== false)
+            // Filtro: No complementos Y activo !== false (para respetar ojito)
             db.products.filter(p => !p.isComplement && p.active !== false).forEach(p => {
                 const cat = p.cat || 'Otros';
                 if (!groups[cat]) groups[cat] = [];
@@ -2074,6 +2112,7 @@ const ClientApp = ({ db, updateDB }) => {
     const uniqueClientCategories = ['Todos', ...Object.keys(groupedProducts)];
     const handleCashSelect = () => setShowCashModal(true);
     const confirmCash = () => { if(parseFloat(tempCashAmount) < total) return showToast("El monto debe ser mayor al total"); setForm({...form, pay:'cash', payAmount: parseFloat(tempCashAmount)}); setShowCashModal(false); };
+    const cancelCash = () => { setForm({...form, pay:'card', payAmount: 0}); setShowCashModal(false); };
 
     // --- VISTA 1: MENÚ ---
     if(view === 'menu') return (
@@ -2085,7 +2124,11 @@ const ClientApp = ({ db, updateDB }) => {
                     <p className="font-bold text-sm mt-2">TOCA PARA VER EL MAPA</p>
                 </div> 
             )}
-            <div className="banner-container"><img src={BANNER_URL} className="mobile-banner" alt="Banner"/></div>
+            
+            {/* Banner Contenido Correctamente */}
+            <div className="banner-container">
+                <img src={BANNER_URL} className="mobile-banner" alt="Banner"/>
+            </div>
             
             <div className="p-2 flex gap-2 overflow-x-auto bg-[var(--bg-card)] border-b border-[var(--border)]">
                 {uniqueClientCategories.map(c=><button key={c} onClick={()=>setClientCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${clientCatFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-gray-200 text-gray-700'}`}>{c}</button>)}
@@ -2093,7 +2136,7 @@ const ClientApp = ({ db, updateDB }) => {
             
             <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-48">
                 {Object.keys(groupedProducts).length === 0 ? (
-                    <div className="text-center text-gray-500 mt-10"><p>Menú Vacío o Cargando...</p></div>
+                    <div className="text-center text-gray-500 mt-10"><p>Cargando menú...</p></div>
                 ) : (
                     Object.entries(groupedProducts).filter(([cat]) => clientCatFilter === 'Todos' || cat === clientCatFilter).map(([cat, prods]) => (
                         <div key={cat}>
@@ -2136,7 +2179,7 @@ const ClientApp = ({ db, updateDB }) => {
             <div className="mobile-video-container"><video src={VIDEO_URL} autoPlay loop muted playsInline></video><div className="mobile-video-overlay"></div></div>
             <div className="fixed bottom-0 w-full p-4 bg-[var(--bg-card)] border-t border-[var(--border)] z-[60]">
                 {activeOrder ? (
-                    <button onClick={()=>setView('track')} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg animate-pulse">🛵 VER PEDIDO EN CURSO</button>
+                    <button onClick={()=>setView('track')} className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-lg animate-pulse flex items-center justify-center gap-2">🛵 VER PEDIDO EN CURSO</button>
                 ) : (
                     cart.length > 0 && <button onClick={preSubmit} className="w-full bg-[var(--accent)] text-white py-3 rounded-lg font-bold shadow-lg">IR A PAGAR ({formatCurrency(total)})</button>
                 )}
@@ -2211,14 +2254,14 @@ const ClientApp = ({ db, updateDB }) => {
                 </div>
             </div>
 
-            {/* 4. DIRECCIÓN (INPUT NEGRO FORZADO) */}
+            {/* 4. DIRECCIÓN (INPUT CLARO #F0EBEB) */}
             {form.type === 'delivery' && (
                 <div className="mb-6 animate-in fade-in">
                     <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-300 pb-1 mb-2">4. Dirección</h3>
-                    <div className="didi-search-container border-black/20">
+                    <div className="didi-search-container border-gray-300">
                         <div className="text-[var(--accent)]"><MapPin size={24}/></div>
-                        {/* INPUT FORZADO A NEGRO CON CLASE input-dark-force */}
-                        <input className="didi-input input-dark-force p-2 rounded" placeholder="Calle y Número..." value={form.address} onChange={e=>updateLocationFromAddress(e.target.value)}/>
+                        {/* INPUT CLARO COMO SOLICITADO */}
+                        <input className="didi-input input-special p-2 rounded" placeholder="Calle y Número..." value={form.address} onChange={e=>updateLocationFromAddress(e.target.value)}/>
                         <button className="didi-btn-orange flex items-center gap-1" onClick={useGPS}>
                             {isLocating ? <span className="animate-spin">↻</span> : <Crosshair size={16}/>}
                             {isLocating ? 'LOCALIZANDO...' : 'UBICACIÓN'}
@@ -2255,14 +2298,13 @@ const ClientApp = ({ db, updateDB }) => {
                 </div>
             </div>
 
-            {/* 6. RESUMEN DE COMPRA (TOTALES Y CAMBIO) */}
+            {/* 6. RESUMEN DE COMPRA */}
             <div className="bg-white p-4 rounded mb-6 space-y-2 border border-gray-300 shadow-md">
                 <h3 className="text-sm font-bold text-gray-500 uppercase border-b border-gray-300 pb-1 mb-2">6. Resumen</h3>
                 <div className="flex justify-between text-gray-700"><span>Subtotal:</span><span>{formatCurrency(cart.reduce((a,b)=>a+b.price*b.qty,0))}</span></div>
                 <div className="flex justify-between text-[var(--gold)] font-bold"><span>Envío Estimado:</span><span>{formatCurrency(deliveryFee)}</span></div>
                 <div className="border-t border-gray-300 pt-2 flex justify-between text-2xl font-black text-black"><span>TOTAL:</span><span>{formatCurrency(total)}</span></div>
                 
-                {/* MOSTRAR CAMBIO AQUÍ */}
                 {form.pay === 'cash' && form.payAmount > 0 && (
                     <div className="bg-green-50 p-2 rounded border border-green-200 mt-2 text-center">
                         <p className="text-sm text-green-800 font-bold">Pagas con: {formatCurrency(form.payAmount)}</p>
@@ -2273,7 +2315,7 @@ const ClientApp = ({ db, updateDB }) => {
             
             <button onClick={submit} className="w-full bg-[var(--accent)] text-white py-4 rounded-lg font-bold shadow-lg text-lg hover:brightness-110 transition">ENVIAR PEDIDO</button>
             
-            {showCashModal && (<div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4"><div className="bg-white p-6 rounded-xl w-full max-w-sm text-center border-2 border-[var(--gold)]"><h3 className="text-xl font-bold text-black mb-4">¿CON CUÁNTO PAGAS?</h3><p className="text-gray-600 mb-2">Total a pagar: {formatCurrency(total)}</p><input type="number" className="input-std text-center text-2xl font-bold mb-4 bg-gray-100 text-black" placeholder="$0.00" value={tempCashAmount} onChange={e=>setTempCashAmount(e.target.value)} autoFocus/><div className="flex gap-2"><button onClick={()=>setShowCashModal(false)} className="flex-1 bg-gray-400 text-white py-2 rounded font-bold">CANCELAR</button><button onClick={confirmCash} className="flex-1 btn-gold py-2 rounded font-bold">CONFIRMAR</button></div></div></div>)}
+            {showCashModal && (<div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4"><div className="bg-white p-6 rounded-xl w-full max-w-sm text-center border-2 border-[var(--gold)]"><h3 className="text-xl font-bold text-black mb-4">¿CON CUÁNTO PAGAS?</h3><p className="text-gray-600 mb-2">Total a pagar: {formatCurrency(total)}</p><input type="number" className="input-std text-center text-2xl font-bold mb-4 bg-gray-100 text-black" placeholder="$0.00" value={tempCashAmount} onChange={e=>setTempCashAmount(e.target.value)} autoFocus/><div className="flex gap-2"><button onClick={cancelCash} className="flex-1 bg-gray-400 text-white py-2 rounded font-bold">CANCELAR</button><button onClick={confirmCash} className="flex-1 btn-gold py-2 rounded font-bold">CONFIRMAR</button></div></div></div>)}
         </div>
     );
 
@@ -2537,8 +2579,7 @@ const Kitchen = ({ db, updateDB }) => {
             );
         };
 const App = () => {
-    // ESTADO INICIAL: Arranca vacio (o con estructura base) para forzar carga de Nube
-    const [theme, setTheme] = useState('light');
+    // INICIO LIMPIO (Sin LocalStorage para evitar datos viejos corruptos)
     const [db, setDB] = useState(initialDB);
     const [user, setUser] = useState(null);
     const [loginData, setLoginData] = useState({u:'', p:''});
@@ -2546,16 +2587,14 @@ const App = () => {
     const [centerNotification, setCenterNotification] = useState(null);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-    // REFERENCIAS CRÍTICAS PARA SINCRONIZACIÓN
     const prevOrdersRef = useRef(db.orders || []);
-    const lastWriteTime = useRef(0); // Marca de tiempo de la última acción del usuario
+    const lastWriteTime = useRef(0); 
     const saveTimeout = useRef(null);
     
-    // Contadores UI
     const onlineStaff = db.users ? db.users.filter(u => u.online && u.role !== 'viewer').length : 0;
     const activeViewers = db.users ? db.users.filter(u => u.role === 'viewer' && (Date.now() - (u.lastActive || 0) < 300000)).length : 0;
 
-    // --- 1. SISTEMA DE AUDIO Y VOZ IA ---
+    // --- SONIDOS & VOZ ---
     const speak = (text) => {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
@@ -2573,7 +2612,6 @@ const App = () => {
             const gain = ctx.createGain();
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1046.5, ctx.currentTime + 0.1);
             gain.gain.setValueAtTime(0.3, ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
             osc.connect(gain);
@@ -2583,167 +2621,97 @@ const App = () => {
         } catch(e){}
     };
 
-    // Efecto de Monitoreo (Voz y Sonidos)
+    // --- MONITOREO DE PEDIDOS ---
     useEffect(() => {
         const prevOrders = prevOrdersRef.current;
         const currentOrders = db.orders;
 
         if (currentOrders.length > prevOrders.length) {
-            // NUEVO PEDIDO ENTRANTE
             const newOrder = currentOrders.find(o => !prevOrders.find(p => p.id === o.id));
-            if (newOrder) {
-                // Solo suena si NO fuimos nosotros los que acabamos de escribir (evita eco al crear pedido local)
-                if (Date.now() - lastWriteTime.current > 2000) {
-                    if (newOrder.source === 'web' && newOrder.status === 'web_pending_payment') {
-                        if (user && (user.role === 'cajero' || user.role === 'admin')) {
-                            speak("Tienes un nuevo pedido por aceptar");
-                        }
-                    }
+            if (newOrder && Date.now() - lastWriteTime.current > 2000) {
+                if (newOrder.source === 'web' && newOrder.status === 'web_pending_payment') {
+                    if (user && (user.role === 'cajero' || user.role === 'admin')) speak("Tienes un nuevo pedido por aceptar");
                 }
             }
         } else {
-            // CAMBIO DE ESTADO
             currentOrders.forEach(curr => {
                 const old = prevOrders.find(p => p.id === curr.id);
                 if (old && old.status !== curr.status) {
-                    // Solo notificar si no fue una acción inmediata nuestra (opcional, pero mejor para feedback)
-                    if (curr.status === 'preparing') {
-                        if (user && (user.role === 'cocina' || user.role === 'admin')) {
-                            speak("Nueva orden para preparar, revisa ahora");
-                        }
-                    }
-                    if (curr.status === 'ready') {
-                        if (user && (user.role === 'cajero' || user.role === 'admin')) {
-                            playBell();
-                            speak("Nueva orden lista para enviar");
-                        }
-                    }
+                    if (curr.status === 'preparing' && (user?.role === 'cocina' || user?.role === 'admin')) speak("Nueva orden para preparar, revisa ahora");
+                    if (curr.status === 'ready' && (user?.role === 'cajero' || user?.role === 'admin')) { playBell(); speak("Nueva orden lista para enviar"); }
                 }
             });
         }
         prevOrdersRef.current = currentOrders;
     }, [db.orders, user]);
 
-    // --- 2. GESTIÓN DE DATOS (DATA MANAGER) ---
-    
-    // Función Central de Actualización (Optimistic Update)
+    // --- SINCRONIZACIÓN DATOS ---
     const updateDB = (newDataOrFn) => { 
         let newData;
         if (typeof newDataOrFn === 'function') { newData = newDataOrFn(db); } else { newData = newDataOrFn; }
-        
-        newData._ver = Date.now(); // Marcar versión local
-        setDB(newData); // Actualizar UI Inmediato
-        
-        // MARCAR TIEMPO DE ESCRITURA:
-        // Esto le dice al loop de sincronización: "¡Hey! Acabo de editar algo."
-        // "No me sobrescribas con datos viejos de la nube por al menos 2 segundos".
+        newData._ver = Date.now();
+        setDB(newData);
         lastWriteTime.current = Date.now();
-
-        // Enviar a Nube
         if (saveTimeout.current) clearTimeout(saveTimeout.current);
-        saveTimeout.current = setTimeout(() => { saveCloudDB(newData); }, 500); // Debounce de 0.5s para no saturar
+        saveTimeout.current = setTimeout(() => { saveCloudDB(newData); }, 500);
     };
 
-    // Inicialización y Loop de Sincronización "Vivo"
     useEffect(() => {
-        // ID de Dispositivo
         if(!localStorage.getItem('device_id')) localStorage.setItem('device_id', 'DEV_' + Math.random().toString(36).substr(2, 9));
         
         const init = async () => {
             setIsInitialLoading(true);
             try {
-                // 1. CARGA FORZADA DE NUBE AL INICIO (Ignoramos LocalStorage para datos maestros)
-                // Esto soluciona el error de "Tienda Abierta" cuando en realidad está cerrada
                 const cloudResp = await fetchCloudDB();
                 const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
-                
                 if(remoteData && remoteData.products) {
                     setDB(remoteData);
-                    console.log("Sincronizado con Nube (Inicio)");
                 } else {
-                    // Solo si la nube falla o está vacía, usamos initialDB y guardamos
                     await saveCloudDB(initialDB);
                 }
-            } catch(e) { 
-                console.error("Error conectando a nube inicial", e);
-                // Fallback de emergencia a localStorage solo si no hay internet
-                const localBackup = localStorage.getItem('emi_v87_supreme_3_data');
-                if(localBackup) setDB(JSON.parse(localBackup));
-            } finally { 
-                setIsInitialLoading(false); 
-            }
+            } catch(e) { console.error(e); } 
+            finally { setIsInitialLoading(false); }
         };
         init();
 
-        // 2. LOOP DE SINCRONIZACIÓN INTELIGENTE (1.5 Segundos)
         const interval = setInterval(async () => {
-            // REGLA DE ORO: SI EL USUARIO ACABA DE ESCRIBIR, NO LEER DE LA NUBE
-            // Esto evita que el item desaparezca y reaparezca
-            if (Date.now() - lastWriteTime.current < 2500) {
-                // Estamos en "Periodo de Gracia", confiamos en lo Local, ignoramos Nube temporalmente
-                return;
-            }
-
+            if (Date.now() - lastWriteTime.current < 2500) return;
             try {
                 const cloudResp = await fetchCloudDB();
                 const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
-                
-                if(remoteData && remoteData._ver) {
-                    // Solo actualizamos si la versión de la nube es distinta o más nueva
-                    // (En un sistema simple, reemplazamos si no estamos editando)
-                    setDB(prev => {
-                        // Doble chequeo: Si el usuario editó MIENTRAS bajaba el fetch
-                        if (Date.now() - lastWriteTime.current < 2500) return prev;
-                        
-                        // Si todo está tranquilo, sincronizamos lo de la nube
-                        // Guardamos backup en local por si se refresca la pagina sin internet
-                        localStorage.setItem('emi_v87_supreme_3_data', JSON.stringify(remoteData));
-                        return remoteData;
-                    });
+                if(remoteData && remoteData._ver && remoteData._ver > (db._ver || 0)) {
+                    setDB(remoteData);
                 }
-            } catch (e) {
-                // Silencioso si falla el poll
-            }
-        }, 1500); // 1.5 Segundos de refresco
-
+            } catch (e) {}
+        }, 1500);
         return () => clearInterval(interval);
     }, []);
 
-    // Auto-login Cliente y Registro Fantasma "Viewer"
+    // --- AUTO-LOGIN CORREGIDO (SOLO SI URL TIENE ?menu=true) ---
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const devId = localStorage.getItem('device_id');
-        const hasActiveOrder = localStorage.getItem('client_active_order_id');
-
-        if (params.get('menu') === 'true' || params.get('take_order') || hasActiveOrder) {
+        
+        // CORRECCIÓN IMPORTANTE: Eliminamos 'hasActiveOrder' de la condición de entrada forzada
+        if (params.get('menu') === 'true' || params.get('take_order')) {
             if(!user) setUser({role:'cliente', name:'Invitado', id: devId});
             
-            // Registrar "Viewer" en DB sin causar loops infinitos
-            // Usamos un chequeo de tiempo para no enviar updateDB a cada segundo
+            // Registro silencioso de viewer
             const now = Date.now();
             setDB(prevDB => {
                 if(!prevDB.users) return prevDB;
                 const me = prevDB.users.find(u => u.id === devId);
-                
-                // Solo actualizamos si no existo O si mi ultima actividad fue hace mas de 30seg
                 if(!me || (now - (me.lastActive||0) > 30000)) {
                      const newUsers = prevDB.users.filter(u => u.id !== devId);
                      newUsers.push({ id: devId, name: 'Cliente Web', role: 'viewer', online: true, lastActive: now });
-                     
-                     // IMPORTANTE: Esto dispara updateDB internamente en el próximo ciclo si usáramos updateDB,
-                     // pero aquí estamos dentro de setDB.
-                     // Para persistir esto a la nube, necesitamos disparar el efecto secundario.
-                     // Lo haremos "lazy" en el próximo poll de sincronización o acción manual.
                      return { ...prevDB, users: newUsers };
                 }
                 return prevDB;
             });
-            // Nota: Para forzar que este registro suba a la nube, el cliente debe interactuar (crear pedido)
-            // o esperar que el Admin sobrescriba. Para ser "Viewer" pasivo basta con memoria local temporal.
         }
     }, [user]);
 
-    // Notificaciones Globales
+    // Notificaciones
     useEffect(() => {
         if(db.settings.notification && db.settings.notification.id !== localStorage.getItem('last_notif_id')) {
             const target = db.settings.notification.target;
@@ -2765,8 +2733,7 @@ const App = () => {
     if (isInitialLoading) return (
         <div className="app-loader">
             <img src={LOGO_URL} className="loader-logo"/>
-            <h2 className="text-xl animate-pulse">SINCRONIZANDO TPV...</h2>
-            <p className="text-xs text-gray-500 mt-2">Conectando con Servidor Central</p>
+            <h2 className="text-xl animate-pulse">CARGANDO EMI BURGERS...</h2>
         </div>
     );
 
@@ -2774,8 +2741,8 @@ const App = () => {
         <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
             <div className="absolute inset-0 z-0" style={{backgroundImage: `url(${BANNER_URL})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'brightness(0.4)'}}></div>
             <div className="card p-8 w-full max-w-sm text-center z-10 shadow-2xl bg-white/90 backdrop-blur">
-                <img src={LOGO_URL} className="w-32 mx-auto mb-6" onError={(e) => e.target.style.display='none'} />
-                <h1 className="text-4xl font-brand text-[var(--text-main)] mb-8">EMI Burgers</h1>
+                <img src={LOGO_URL} className="w-32 mx-auto mb-6 rounded-full border-4 border-[var(--gold)]" onError={(e) => e.target.style.display='none'} />
+                <h1 className="text-4xl font-brand text-black mb-8">EMI Burgers</h1>
                 <input className="input-std text-center mb-2" placeholder="Usuario" value={loginData.u} onChange={e=>setLoginData({...loginData, u:e.target.value})}/>
                 <input className="input-std text-center mb-4" type="password" placeholder="Contraseña" value={loginData.p} onChange={e=>setLoginData({...loginData, p:e.target.value})}/>
                 <button onClick={handleLogin} className="btn-gold w-full text-xl shadow-lg">ENTRAR</button>
@@ -2815,7 +2782,7 @@ const App = () => {
         </div>
     );
 };
-        const root = ReactDOM.createRoot(document.getElementById('root'));
+     const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
 </body>
