@@ -19,18 +19,17 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
+ <style>
     :root {
         --gold: #FFD700; 
-        --accent: #FF6600; /* CAMBIO A NARANJA */
-        --bg-special: #F0EBEB; /* FONDO CLARO */
+        --accent: #FF6600; /* Naranja */
+        --bg-special: #F0EBEB;
         --text-main: #000000;
         --border: #d1d5db;
-        
         --z-map: 0; --z-ui: 10; --z-fab: 2000; --z-modal: 5000; --z-toast: 6000; --z-loader: 10000;
     }
     
-    /* --- TEMA BLANCO FORZADO --- */
+    /* RESET - TEMA CLARO */
     body { 
         background-color: var(--bg-special); 
         background-image: url('FONDO_APP.png'); /* IMAGEN DE FONDO */
@@ -40,17 +39,17 @@
         font-family: 'Roboto', sans-serif; 
         margin: 0; overflow: hidden; height: 100vh; width: 100vw; 
     }
-
-    /* MALLA DECORATIVA SOBRE EL FONDO */
+    
+    /* MALLA DECORATIVA */
     .mesh-bg {
         background-image: radial-gradient(#ccc 1px, transparent 1px);
         background-size: 20px 20px;
     }
 
-    #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; background: rgba(255,255,255,0.6); backdrop-filter: blur(2px); }
+    #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; background: rgba(255,255,255,0.7); backdrop-filter: blur(3px); }
     .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
     
-    /* --- COMPONENTES UI --- */
+    /* TARJETAS Y CONTENEDORES */
     .card { 
         background-color: white; 
         border: 1px solid var(--border); 
@@ -58,7 +57,7 @@
         box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
     }
     
-    /* INPUTS CLAROS */
+    /* INPUTS */
     .input-std, .input-special { 
         background-color: #ffffff !important; 
         border: 1px solid #ccc !important; 
@@ -67,75 +66,62 @@
     }
     .input-std::placeholder { color: #888; }
     
-    /* INPUT OSCURO PARA CASOS ESPECÍFICOS (IMAGEN 1) */
+    /* INPUT ESPECIFICO OSCURO (Si se requiere en alguna vista especial) */
     .input-dark-force {
         background-color: #222 !important; color: white !important; border: 1px solid #444 !important;
     }
 
     /* BOTONES */
     .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
-    .btn-orange { background: var(--accent); color: white; font-weight: bold; border-radius: 0.5rem; padding: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+    .btn-orange { background: var(--accent); color: white; font-weight: bold; border-radius: 0.5rem; padding: 0.8rem; border: none; cursor: pointer; }
 
-    /* --- BANNERS Y VIDEO (15% ALTURA + FIT) --- */
+    /* MEDIA */
     .banner-container { width: 100%; height: 15vh; min-height: 120px; background-color: #000; position: relative; overflow: hidden; }
     .mobile-banner { width: 100%; height: 100%; object-fit: contain; display: block; }
-    
     .mobile-video-container { position: fixed; bottom: 70px; left: 0; width: 100%; height: 15vh; z-index: 50; pointer-events: none; background: black; border-top: 2px solid var(--gold); }
     .mobile-video-container video { width: 100%; height: 100%; object-fit: contain; opacity: 0.9; }
 
-    /* --- MAPA Y GPS --- */
+    /* MAPA */
     .leaflet-container { background: #e5e3df; width: 100%; height: 100%; z-index: 0; }
     
-    /* GPS AZUL PULSANTE */
-    .user-gps-dot {
-        width: 18px; height: 18px; background-color: #4285F4;
-        border: 3px solid white; border-radius: 50%;
-        box-shadow: 0 0 5px rgba(0,0,0,0.3); position: relative;
-    }
-    .user-gps-dot::after {
-        content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        width: 40px; height: 40px; background-color: rgba(66, 133, 244, 0.4);
-        border-radius: 50%; animation: gps-pulse 2s infinite; z-index: -1;
-    }
+    /* PUNTOS MAPA */
+    .user-gps-dot { width: 18px; height: 18px; background-color: #4285F4; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.3); position: relative; }
+    .user-gps-dot::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 40px; height: 40px; background-color: rgba(66, 133, 244, 0.4); border-radius: 50%; animation: gps-pulse 2s infinite; z-index: -1; }
     @keyframes gps-pulse { 0% {transform: translate(-50%, -50%) scale(0.5); opacity: 1;} 100% {transform: translate(-50%, -50%) scale(1.5); opacity: 0;} }
 
-    /* --- INPUT DIDI (CLIENTE) --- */
-    .didi-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
-    .didi-input-internal { width: 100%; background: white; border: 1px solid #ccc; padding: 12px 140px 12px 12px; border-radius: 8px; outline: none; font-size: 16px; color: black; }
-    .didi-btn-internal { position: absolute; right: 0; top: 0; bottom: 0; background: #FF6600; color: white; font-weight: bold; font-size: 11px; border: none; border-radius: 0 8px 8px 0; padding: 0 15px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-
-    /* --- UTILS & ADMIN --- */
+    /* UTILIDADES */
     .admin-fab { position: fixed; bottom: 20px; right: 20px; z-index: var(--z-fab); display: flex; flex-direction: column; align-items: end; gap: 10px; }
     .admin-fab-menu { display: flex; flex-direction: column; align-items: end; gap: 10px; margin-bottom: 10px; }
     .gods-eye { position: fixed; bottom: 100px; left: 20px; opacity: 0.8; transform: scale(0.9); z-index: var(--z-fab); }
     .logout-ghost { position: fixed; top: 10px; left: 10px; opacity: 0.8; z-index: var(--z-fab); }
     
-    /* BOTONES LATERALES CLIENTE */
-    .side-share-btn { position: fixed; top: 80px; right: 0; background: var(--gold); color: black; padding: 8px 12px 8px 15px; border-radius: 20px 0 0 20px; font-weight: bold; font-size: 11px; z-index: 100; cursor: pointer; box-shadow: -2px 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 5px; }
+    body.client-mode .gods-eye, body.client-mode .admin-fab, body.client-mode .logout-ghost { display: none !important; }
 
-    /* Ocultar en modo cliente */
-    body.client-mode .gods-eye, body.client-mode .admin-fab, body.client-mode .logout-ghost, body.client-mode .theme-toggle { display: none !important; }
-
-    /* MODAL DRIVER & TICKET */
+    /* MODALES Y PANELES */
     .driver-modal { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 6000; animation: slide-up 0.3s; padding-bottom: 80px; }
-    .ticket-logo-lg { width: 85px !important; display: block; margin: 0 auto 10px; } /* Logo ticket +20% */
+    .ticket-logo-lg { width: 85px !important; display: block; margin: 0 auto 10px; } 
     
-    /* EXTRAS */
+    /* ANIMACIONES */
     @keyframes slide-up { from {transform: translateY(100%);} to {transform: translateY(0);} }
+    @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
     .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
     .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
-    @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
-
+    
+    /* LAYOUTS */
+    .grid-cockpit { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1rem; height: 90vh; }
+    @media (max-width: 1024px) { .grid-cockpit { grid-template-columns: 1fr; overflow-y: auto; display: flex; flex-direction: column; height: auto; } }
+    .gestion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    
+    /* UI ELEMENTS */
+    .mode-btn { padding: 1rem; border-radius: 0.5rem; font-weight: bold; margin-bottom: 0.5rem; border: 1px solid #ccc; background: white; color: black; width: 100%; text-align: left; }
+    .mode-btn.active { background-color: var(--gold); border-color: black; transform: scale(1.02); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .bill-btn { background-size: cover; background-position: center; border-radius: 4px; height: 60px; width: 100%; border: 1px solid #ddd; cursor: pointer; background-color: white; }
     .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
     
     .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; }
     .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #999; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
     .driver-nav-btn.active { color: var(--accent); }
-    
-    /* POS GRID */
-    .grid-cockpit { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1rem; height: 90vh; }
-    @media (max-width: 1024px) { .grid-cockpit { grid-template-columns: 1fr; overflow-y: auto; display: flex; flex-direction: column; height: auto; } }
-    .gestion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .logo-pulse { animation: pulse-load 1.5s infinite; object-fit: cover !important; }
 </style>
 </head>
 <body class="white">
@@ -334,6 +320,7 @@
             </div>
         );
 
+/* --- MAPA AVANZADO: RUTA OSRM Y COBERTURA --- */
 const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route, radius, onMarkerClick }) => {
     const containerRef = useRef(null);
     const mapInstance = useRef(null);
@@ -342,8 +329,6 @@ const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route
         if (!containerRef.current || typeof L === 'undefined') return;
 
         const safeCenter = (center && center[0]) ? center : STORE_COORDS;
-        
-        // ESTILO RELIEVE (GOOGLE STYLE)
         const reliefUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
 
         if (!mapInstance.current) {
@@ -355,65 +340,67 @@ const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route
             setTimeout(() => mapInstance.current.invalidateSize(), 200);
         }
 
-        // Limpiar capas
         mapInstance.current.eachLayer(layer => {
             if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline || layer instanceof L.Polygon) mapInstance.current.removeLayer(layer);
         });
 
-        // --- ZONA DE COBERTURA GRIS (DONA) ---
+        // --- ZONA DE COBERTURA (DONA GRIS) ---
         if (radius) {
-            // Polígono mundial gigante
             const world = [[90, -360], [90, 360], [-90, 360], [-90, -360]];
-            // Círculo permitido (agujero)
-            const hole = getCirclePoints(STORE_COORDS, radius); 
-            
-            // Capa oscura exterior
-            L.polygon([world, hole], { 
-                color: 'transparent', 
-                fillColor: '#333', 
-                fillOpacity: 0.5 
-            }).addTo(mapInstance.current);
-
-            // Borde verde del área permitida
-            L.circle(STORE_COORDS, { 
-                color: '#00e676', 
-                fillColor: 'transparent', 
-                weight: 2, 
-                radius: radius * 1000 
-            }).addTo(mapInstance.current);
+            const hole = getCirclePoints(STORE_COORDS, radius);
+            L.polygon([world, hole], { color: 'transparent', fillColor: '#333', fillOpacity: 0.5 }).addTo(mapInstance.current);
+            L.circle(STORE_COORDS, { color: '#00e676', fillColor: 'transparent', weight: 2, radius: radius * 1000 }).addTo(mapInstance.current);
         }
 
-        // Marcadores
+        // --- MARCADORES ---
         markers.forEach((m) => {
             if(m.pos && m.pos[0]) {
                 const el = document.createElement('div');
-                // GPS AZUL
-                if (m.isMyLoc) {
-                    el.className = 'user-gps-dot'; 
-                } else if (m.isStore) {
+                if (m.isMyLoc) el.className = 'user-gps-dot';
+                else if (m.isStore) {
                     el.className = 'custom-pin';
                     el.innerHTML = `<img src="${LOGO_URL}" style="width:40px;height:40px;border-radius:50%;border:2px solid gold;background:white;">`;
                 } else if (m.type === 'driver') {
                     el.className = 'driver-pin';
                     el.innerHTML = '🏍️';
+                } else if (showHeatmap) {
+                     // ZONAS CALIENTES (PUNTOS ROJOS)
+                     return L.circleMarker(m.pos, { radius: 10, color: 'red', fillColor: '#f00', fillOpacity: 0.5 }).addTo(mapInstance.current).bindPopup("Venta registrada aquí");
                 } else {
                     el.className = 'custom-pin';
                     el.innerHTML = m.emoji || '📍';
                 }
 
-                const iconSize = m.isMyLoc ? [20,20] : [40,40];
-                const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: iconSize, iconAnchor: [iconSize[0]/2, iconSize[1]/2] });
-                const marker = L.marker(m.pos, { icon }).addTo(mapInstance.current);
-                
-                if(m.data && onMarkerClick) marker.on('click', () => onMarkerClick(m.data));
-                else if(m.popup) marker.bindPopup(m.popup);
+                if (!showHeatmap) {
+                    const iconSize = m.isMyLoc ? [20,20] : [40,40];
+                    const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: iconSize, iconAnchor: [iconSize[0]/2, iconSize[1]/2] });
+                    const marker = L.marker(m.pos, { icon }).addTo(mapInstance.current);
+                    if(m.data && onMarkerClick) marker.on('click', () => onMarkerClick(m.data));
+                    else if(m.popup) marker.bindPopup(m.popup);
+                }
             }
         });
 
-        // Ruta
+        // --- RUTA REAL POR CALLES (OSRM) ---
         if(route && route.length >= 2) {
-             const validRoute = route.filter(p => p && p[0]);
-             if(validRoute.length >= 2) L.polyline(validRoute, {color: '#4285F4', weight: 6, opacity: 0.8}).addTo(mapInstance.current);
+             const start = route[0];
+             const end = route[route.length-1];
+             if(start && end && start[0] && end[0]) {
+                 // Fetch a OSRM para ruta de manejo
+                 fetch(`https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`)
+                 .then(r => r.json())
+                 .then(d => {
+                     if(d.routes && d.routes[0]) {
+                         const coords = d.routes[0].geometry.coordinates.map(c => [c[1], c[0]]); // Invertir a LatLng
+                         L.polyline(coords, {color: '#4285F4', weight: 6, opacity: 0.8}).addTo(mapInstance.current);
+                     } else {
+                         // Fallback linea recta si falla
+                         L.polyline([start, end], {color: '#4285F4', weight: 6, opacity: 0.8, dashArray:'5,5'}).addTo(mapInstance.current);
+                     }
+                 }).catch(() => {
+                     L.polyline([start, end], {color: '#4285F4', weight: 6, opacity: 0.8, dashArray:'5,5'}).addTo(mapInstance.current);
+                 });
+             }
         }
     }, [center, markers, route, radius]);
 
@@ -1145,639 +1132,246 @@ const Dashboard = ({ db }) => {
             );
         };
 
+/* --- POS: CAJA, GESTIÓN Y ENTREGAS --- */
 const POS = ({ db, updateDB, user }) => {
-            const [cart, setCart] = useState([]);
-            const [modal, setModal] = useState(null); 
-            const [catFilter, setCatFilter] = useState('Todos');
-            const [orderType, setOrderType] = useState('takeaway'); 
-            const [orderDetails, setOrderDetails] = useState({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
-            const [payMethod, setPayMethod] = useState('cash');
-            const [cashReceived, setCashReceived] = useState(0);
-            const [voucher, setVoucher] = useState('');
-            const [deliveryCoords, setDeliveryCoords] = useState(null);
-            const [couponCode, setCouponCode] = useState('');
-            const [discount, setDiscount] = useState(0);
-            const [addressTimer, setAddressTimer] = useState(null);
-            const [isLocating, setIsLocating] = useState(false);
-            const [bottomMenuOpen, setBottomMenuOpen] = useState(false);
-            
-            // Modales
-            const [liquidationModal, setLiquidationModal] = useState(false);
-            const [corteModal, setCorteModal] = useState(false);
-            const [retiroModal, setRetiroModal] = useState(false);
-            
-            const [driverToLiq, setDriverToLiq] = useState(null);
-            const [liqSummary, setLiqSummary] = useState(null);
-            const [newExpense, setNewExpense] = useState({desc:'', amount:''});
-            const [suggestions, setSuggestions] = useState([]);
-            const [manualDriverId, setManualDriverId] = useState('');
-            const [viewMap, setViewMap] = useState(false); 
-            const [viewReadyOrders, setViewReadyOrders] = useState(false); 
-            const [ingredientsProduct, setIngredientsProduct] = useState(null);
-            const [paymentStatus, setPaymentStatus] = useState(''); 
-            
-            const [selectedReady, setSelectedReady] = useState([]);
-            const [viewGroupMap, setViewGroupMap] = useState(null);
-            const [selectedWebOrder, setSelectedWebOrder] = useState(null); 
-            // 2. NUEVO ESTADO PARA VER GRUPO EN GRANDE
-            const [selectedGroup, setSelectedGroup] = useState(null);
+    const [tab, setTab] = useState('pos'); 
+    const [cart, setCart] = useState([]);
+    const [modal, setModal] = useState(null); 
+    const [catFilter, setCatFilter] = useState('Todos');
+    const [searchQuery, setSearchQuery] = useState(''); 
+    
+    // --- ESTADOS COCKPIT ---
+    const [orderType, setOrderType] = useState('takeaway'); 
+    const [orderDetails, setOrderDetails] = useState({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
+    const [payMethod, setPayMethod] = useState('cash');
+    const [cashReceived, setCashReceived] = useState(0);
+    const [voucher, setVoucher] = useState('');
+    const [deliveryCoords, setDeliveryCoords] = useState(null);
+    const [couponCode, setCouponCode] = useState('');
+    const [discount, setDiscount] = useState(0);
+    const [isLocating, setIsLocating] = useState(false);
+    const [bottomMenuOpen, setBottomMenuOpen] = useState(false);
+    
+    // Modales de Administración
+    const [liquidationModal, setLiquidationModal] = useState(false);
+    const [corteModal, setCorteModal] = useState(false);
+    const [retiroModal, setRetiroModal] = useState(false);
+    const [driverToLiq, setDriverToLiq] = useState(null);
+    const [liqSummary, setLiqSummary] = useState(null);
+    const [newExpense, setNewExpense] = useState({desc:'', amount:''});
+    const [manualDriverId, setManualDriverId] = useState('');
+    const [viewMap, setViewMap] = useState(false);
+    const [selectedWebOrder, setSelectedWebOrder] = useState(null);
+    const [selectedGroup, setSelectedGroup] = useState(null);
+    const [selectedReady, setSelectedReady] = useState([]);
+    const [viewGroupMap, setViewGroupMap] = useState(null);
+    const [countedCash, setCountedCash] = useState('');
+    const [countedCard, setCountedCard] = useState('');
+    const [cutResult, setCutResult] = useState(null);
+    const [deliveryFilter, setDeliveryFilter] = useState('all');
+    const [ingredientsProduct, setIngredientsProduct] = useState(null);
 
-            const [countedCash, setCountedCash] = useState('');
-            const [countedCard, setCountedCard] = useState('');
-            const [cutResult, setCutResult] = useState(null);
-            
-            const [deliveryFilter, setDeliveryFilter] = useState('all');
-            const [typeFilter, setTypeFilter] = useState('all');
+    const uniqueCategories = ['Todos', ...new Set(db.products.filter(p=>p.active).map(p => p.cat).filter(Boolean))];
+    const webOrders = db.orders.filter(o => o.source === 'web' && o.status === 'web_pending_payment');
+    const readyOrders = db.orders.filter(o => o.status === 'ready' && o.address !== 'RECOGER' && !o.groupId);
+    const uniqueGroups = [...new Set(db.orders.filter(o => o.groupId && o.status === 'ready').map(o => o.groupId))];
+    const activeOrders = db.orders.filter(o => o.status === 'delivering' || o.status === 'pending');
+    const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
+    
+    const liveMarkers = [{ pos: STORE_COORDS, emoji: '🏪' }, ...activeOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔' })), ...drivers.map(d => ({ pos: d.location || STORE_COORDS, emoji: '🏍️' }))];
+    const subtotal = cart.reduce((a,b)=>a+b.price*b.qty,0);
+    const total = subtotal - discount;
 
-            const uniqueCategories = ['Todos', ...new Set(db.products.filter(p=>p.active).map(p => p.cat).filter(Boolean))];
+    const addToCart = (p) => setCart(prev => { const ex = prev.find(i=>i.id===p.id); return ex ? prev.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i) : [...prev,{...p,qty:1}]; });
+    const removeFromCart = (idx) => { const n = [...cart]; n.splice(idx,1); setCart(n); };
+    const updateCartNote = (idx, note) => { const n = [...cart]; n[idx].note = note; setCart(n); };
+    const switchPayMethod = (method) => { setPayMethod(method); setPaymentStatus(''); };
 
-            const webOrders = db.orders.filter(o => o.source === 'web' && o.status === 'web_pending_payment');
-            const readyOrders = db.orders.filter(o => o.status === 'ready' && o.address !== 'RECOGER' && !o.groupId);
-            const uniqueGroups = [...new Set(db.orders.filter(o => o.groupId && o.status === 'ready').map(o => o.groupId))];
+    // --- COCKPIT LOGIC ---
+    const updateAddress = async (addr) => {
+        setOrderDetails(prev => ({...prev, address: addr}));
+        if(addr.length > 5) {
+            setIsLocating(true);
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr + CITY_SUFFIX)}&limit=1&addressdetails=1`);
+                const data = await res.json();
+                if(data && data[0]) setDeliveryCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+            } catch(e){}
+            setIsLocating(false);
+        }
+    };
 
-            const activeOrders = db.orders.filter(o => o.status === 'delivering' || o.status === 'pending');
-            const drivers = db.users.filter(u => u.role === 'repartidor' && u.online);
-            const liveMarkers = [
-                { pos: STORE_COORDS, emoji: '🏪' },
-                ...activeOrders.map(o => ({ pos: o.clientLoc || STORE_COORDS, emoji: '🍔', popup: `Pedido #${o.orderNum}` })),
-                ...drivers.map(d => ({ pos: d.location || STORE_COORDS, emoji: '🏍️', label: d.name, type: 'driver' }))
-            ];
-
-            const handleWebOrder = (order) => {
-                setCart(order.items);
-                setOrderDetails({
-                    name: order.clientName, 
-                    phone: order.clientPhone || '', 
-                    address: order.address.split('(')[0].trim(), 
-                    references: order.address.split('(')[1]?.replace(')', '') || '', 
-                    table: '', platform: '', platformOrderId: '', refs: ''
-                });
-                setOrderType(order.address === 'RECOGER' ? 'takeaway' : 'delivery');
-                setDeliveryCoords(order.clientLoc);
-                setModal('cockpit');
-                updateDB({...db, orders: db.orders.filter(o=>o.id!==order.id)}); 
-            };
-            
-            const cancelWebOrder = (id) => { 
-                updateDB({...db, orders: db.orders.map(o => o.id === id ? {...o, status: 'cancelled'} : o)});
-                showToast("Pedido Cancelado");
-                setSelectedWebOrder(null);
-            };
-
-            const deliveryFee = useMemo(() => {
-                if(orderType !== 'delivery' || !deliveryCoords) return 0;
-                const dist = calculateDistance(STORE_COORDS[0], STORE_COORDS[1], deliveryCoords[0], deliveryCoords[1]);
-                return getDeliveryPrice(dist, db.settings.deliveryTable);
-            }, [orderType, deliveryCoords, db.settings.deliveryTable]);
-
-            const subtotal = cart.reduce((a,b)=>a+b.price*b.qty,0);
-            const total = subtotal + deliveryFee - discount;
-
-            const updateLocationFromAddress = (addr) => {
-                setOrderDetails(prev => ({...prev, address: addr}));
-                if (addressTimer) clearTimeout(addressTimer);
-                setAddressTimer(setTimeout(async () => {
-                    if(addr.length > 3) {
-                        setIsLocating(true);
-                        try {
-                            const query = `${addr} ${CITY_SUFFIX}`;
-                            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`);
-                            const data = await res.json();
-                            setSuggestions(data);
-                            if(data && data.length > 0) {
-                                setDeliveryCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-                            }
-                        } catch(e) { console.error("Geocoding error", e); }
-                        setIsLocating(false);
-                    } else { setSuggestions([]); }
-                }, 800)); 
-            };
-            
-            const handleReverseGeo = async (coords) => {
-                setDeliveryCoords(coords);
-                setIsLocating(true);
-                try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords[0]}&lon=${coords[1]}`);
-                    const data = await res.json();
-                    if(data && data.display_name) {
-                        const addrParts = data.display_name.split(',');
-                        setOrderDetails(prev => ({...prev, address: addrParts[0] + (addrParts[1]||'')}));
-                        setSuggestions([]);
-                    }
-                } catch(e) {}
-                setIsLocating(false);
-            };
-
-            const useGPS = () => {
-                setIsLocating(true);
-                navigator.geolocation.getCurrentPosition(pos => {
-                    handleReverseGeo([pos.coords.latitude, pos.coords.longitude]);
-                }, () => setIsLocating(false));
-            };
-
-            const applyCoupon = () => {
-                const c = db.coupons.find(x => x.code.trim().toUpperCase() === couponCode.trim().toUpperCase());
-                if(c && c.limit > (c.used || 0)) { 
-                    if(c.type === 'shipping') setDiscount(deliveryFee);
-                    else if(c.type === 'percent') setDiscount(subtotal * c.val / 100);
-                    else setDiscount(c.val);
-                    showToast("Cupón Aplicado");
-                } else showToast("Cupón Inválido o Agotado");
-            };
-
-            const addToCart = (p) => setCart(prev => {
-                const ex = prev.find(i => i.id === p.id);
-                return ex ? prev.map(i => i.id === p.id ? {...i, qty: i.qty + 1} : i) : [...prev, {...p, qty: 1}];
-            });
-
-            const removeFromCart = (idx) => { const newCart = [...cart]; newCart.splice(idx, 1); setCart(newCart); };
-            const updateCartNote = (idx, note) => { const newCart = [...cart]; newCart[idx].note = note; setCart(newCart); };
-            const switchPayMethod = (method) => { setPayMethod(method); setPaymentStatus(''); };
-            
-            const handleScanDriver = (scannedData) => {
-                if(scannedData.startsWith("LIQ:")) {
-                    const driverId = scannedData.split(':')[1];
-                    const driver = db.users.find(u => u.id === driverId);
-                    if(driver) {
-                        const deliveredOrders = db.orders.filter(o => o.driver === driver.username && o.status === 'delivered' && !o.settled);
-                        const totalCash = driver.cashOnHand || 0;
-                        const totalEarnings = deliveredOrders.reduce((acc, o) => acc + (o.driverFee || 0), 0);
-                        const netToPay = totalCash - totalEarnings;
-                        setDriverToLiq(driver);
-                        setLiqSummary({ deliveredOrders, totalCash, totalEarnings, netToPay });
-                    } else showToast("Repartidor no encontrado");
-                }
-            };
-
-            const confirmLiquidation = () => {
-                if(!driverToLiq || !liqSummary) return;
-                updateDB({
-                    ...db,
-                    users: db.users.map(u => u.id === driverToLiq.id ? {...u, cashOnHand: 0} : u),
-                    orders: db.orders.map(o => liqSummary.deliveredOrders.find(do_ => do_.id === o.id) ? {...o, settled: true} : o),
-                    cashDrawer: {...db.cashDrawer, current: db.cashDrawer.current + liqSummary.netToPay}
-                });
-                showToast("Liquidación Exitosa.");
-                setLiquidationModal(false); setDriverToLiq(null);
-            };
-
-            const performBlindCut = () => {
-                const cCash = parseFloat(countedCash) || 0;
-                const cCard = parseFloat(countedCard) || 0;
-                const systemCash = db.cashDrawer.current;
-                const systemCard = db.orders.filter(o => o.method === 'card' && o.status !== 'cancelled').reduce((a,b)=>a+b.total,0);
-                const diffCash = systemCash - cCash; 
-                setCutResult({ systemCash, systemCard, cCash, cCard, diffCash });
-            };
-
-            const finalizeOrder = () => {
-                const isPayOnDelivery = orderType === 'delivery' && payMethod === 'cash' && paymentStatus === 'pending';
-                if(orderType === 'delivery' && payMethod === 'cash' && paymentStatus === '') return showToast("⚠️ Selecciona: PAGADO EN CAJA o PAGO AL RECIBIR");
-                if(payMethod === 'cash' && !isPayOnDelivery && (!cashReceived || parseFloat(cashReceived) < total)) return showToast("Monto insuficiente");
-                
-                if(orderType === 'delivery') {
-                     if(!orderDetails.phone || orderDetails.phone.length !== 10) return showToast("Teléfono debe ser de 10 dígitos");
-                     if(!orderDetails.address) return showToast("Falta Dirección");
-                }
-                
-                const order = {
-                    id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000,
-                    items: cart, total, method: payMethod, status: 'pending', createdAt: new Date().toISOString(),
-                    address: orderType === 'delivery' ? `${orderDetails.address} (Ref: ${orderDetails.references})` : orderType.toUpperCase(),
-                    clientName: orderDetails.name || 'Cliente', clientPhone: orderDetails.phone,
-                    clientLoc: orderType === 'delivery' ? deliveryCoords : null, 
-                    source: orderType === 'platform' ? 'platform' : 'store',
-                    platformName: orderDetails.platform, platformOrderId: orderDetails.platformOrderId,
-                    driverAssignMode: db.settings.driverAssign, deliveryFee: orderType === 'delivery' ? deliveryFee : 0,
-                    driver: null, settled: false,
-                    paymentStatus: isPayOnDelivery ? 'pending' : 'paid' 
-                };
-
-                let newCashDrawer = db.cashDrawer.current;
-                if(payMethod==='cash' && !isPayOnDelivery) newCashDrawer += total;
-
-                updateDB({ ...db, orders: [...db.orders, order], cashDrawer: {...db.cashDrawer, current: newCashDrawer} });
-                setCart([]); setModal(null); setCashReceived(0); setVoucher(''); setPaymentStatus('');
-                setOrderDetails({ name:'', phone:'', address:'', references:'', table:'', platform:'', platformOrderId:'', refs:'' });
-                if(isPayOnDelivery) showToast("Pedido creado. Cobro pendiente por Repartidor.");
-                else showToast("Pedido creado y cobrado.");
-            };
-            
-            const generateGroupQR = () => {
-                if(selectedReady.length < 2) return showToast("Selecciona al menos 2 pedidos");
-                const newGroupId = generateId(); 
-                const updatedOrders = db.orders.map(o => selectedReady.includes(o.id) ? {...o, groupId: newGroupId} : o);
-                updateDB({...db, orders: updatedOrders});
-                setSelectedReady([]);
-            };
-
-            const undoGroup = (groupId) => {
-                const updatedOrders = db.orders.map(o => o.groupId === groupId ? {...o, groupId: null} : o);
-                updateDB({...db, orders: updatedOrders});
-                showToast("Grupo deshecho.");
-                if(selectedGroup && selectedGroup.id === groupId) setSelectedGroup(null);
-            };
-
-            const handleManualDispatch = (orders) => {
-                if(confirm(`¿Despachar ${orders.length} pedidos?`)) {
-                     const updatedOrders = db.orders.map(o => orders.find(x => x.id === o.id) ? {...o, status: 'delivering'} : o);
-                     updateDB({...db, orders: updatedOrders});
-                     showToast("Pedidos marcados en reparto.");
-                     setSelectedGroup(null);
-                }
-            };
-            
-            // --- GESTIÓN / ENTREGA VISTA ---
-            if (viewReadyOrders) {
-                const filteredReadyOrders = readyOrders.filter(o => {
-                    if (typeFilter === 'all') return true;
-                    if (typeFilter === 'delivery' && o.address !== 'RECOGER' && o.source !== 'platform') return true;
-                    if (typeFilter === 'pickup' && o.address === 'RECOGER') return true;
-                    if (typeFilter === 'platform' && o.source === 'platform') return true;
-                    return false;
-                });
-
-                return (
-                    // 1. SCROLL FIX: 'overflow-hidden' en padre, 'overflow-y-auto' en hijo directo sin padding padre
-                    <div className="h-full flex flex-col bg-[var(--bg-body)] overflow-hidden relative">
-                         {/* Header Fixed */}
-                         <div className="p-4 border-b border-[#333] flex flex-col gap-2 bg-[var(--bg-card)] shrink-0 z-10">
-                             <div className="flex justify-between items-center">
-                                 <h2 className="text-2xl font-bold text-[var(--gold)]">GESTIÓN / ENTREGA</h2>
-                                 <button onClick={()=>setViewReadyOrders(false)} className="text-gray-500 hover:text-white">Volver a Caja</button>
-                             </div>
-                             
-                             <div className="flex flex-wrap gap-2 items-center">
-                                <div className="flex bg-[#222] rounded p-1">
-                                    <button onClick={()=>setDeliveryFilter('all')} className={`px-3 py-1 rounded text-[10px] font-bold ${deliveryFilter==='all'?'bg-[var(--gold)] text-black':'text-gray-400'}`}>VER TODO</button>
-                                    <button onClick={()=>setDeliveryFilter('ready')} className={`px-3 py-1 rounded text-[10px] font-bold ${deliveryFilter==='ready'?'bg-green-600 text-white':'text-gray-400'}`}>LISTOS</button>
-                                    <button onClick={()=>setDeliveryFilter('groups')} className={`px-3 py-1 rounded text-[10px] font-bold ${deliveryFilter==='groups'?'bg-purple-600 text-white':'text-gray-400'}`}>RUTAS</button>
-                                </div>
-                                <div className="w-[1px] h-6 bg-[#444]"></div>
-                                <div className="flex bg-[#222] rounded p-1">
-                                    <button onClick={()=>setTypeFilter('all')} className={`px-3 py-1 rounded text-[10px] font-bold ${typeFilter==='all'?'bg-blue-600 text-white':'text-gray-400'}`}>TIPOS</button>
-                                    <button onClick={()=>setTypeFilter('delivery')} className={`px-3 py-1 rounded text-[10px] font-bold ${typeFilter==='delivery'?'bg-[var(--gold)] text-black':'text-gray-400'}`}>DOMICILIO</button>
-                                    <button onClick={()=>setTypeFilter('pickup')} className={`px-3 py-1 rounded text-[10px] font-bold ${typeFilter==='pickup'?'bg-[var(--gold)] text-black':'text-gray-400'}`}>RECOGER</button>
-                                    <button onClick={()=>setTypeFilter('platform')} className={`px-3 py-1 rounded text-[10px] font-bold ${typeFilter==='platform'?'bg-[var(--gold)] text-black':'text-gray-400'}`}>APPS</button>
-                                </div>
-                             </div>
-                         </div>
-                         
-                         <div className="bg-[#222] p-3 mx-4 mt-2 rounded flex justify-between items-center shadow-lg border border-[#333] shrink-0">
-                            <div><p className="text-white font-bold text-sm">Crear Ruta</p><p className="text-[10px] text-gray-400">{selectedReady.length} pedidos seleccionados</p></div>
-                            <button onClick={generateGroupQR} className="bg-blue-600 text-white px-4 py-2 rounded font-bold text-xs shadow-lg animate-pulse disabled:opacity-50" disabled={selectedReady.length < 2}>GENERAR RUTA</button>
-                        </div>
-
-                         {/* SCROLL AREA (Padding interno para que scrollbar quede al borde) */}
-                         <div className="flex-1 overflow-y-auto">
-                             <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-32">
-                               {/* GRUPOS */}
-                               {(deliveryFilter === 'all' || deliveryFilter === 'groups') && uniqueGroups.map(groupId => {
-                                   const groupOrders = db.orders.filter(o => o.groupId === groupId);
-                                   const qrData = `GROUP:${groupOrders.map(o=>o.id).join(',')}`;
-                                   // 2. Click en la tarjeta abre Modal Detalles (selectedGroup)
-                                   return (
-                                       <div key={groupId} className="card p-4 border-l-4 border-purple-500 bg-[#2a1a2e] cursor-pointer hover:bg-[#3a2a3e] transition" onClick={() => setSelectedGroup({id: groupId, orders: groupOrders, qr: qrData})}>
-                                           <div className="flex justify-between mb-2">
-                                               <h3 className="font-black text-xl text-white">RUTA MAESTRA</h3>
-                                               <span className="text-xs bg-purple-900 text-purple-200 px-2 rounded flex items-center">VER DETALLES</span>
-                                           </div>
-                                           <div className="flex gap-2 mb-2">
-                                                <div className="bg-white p-1 rounded"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`} className="w-20 h-20"/></div>
-                                                <div className="text-xs text-gray-400 flex-1 overflow-hidden">
-                                                    {groupOrders.map(o => <p key={o.id} className="truncate">#{o.orderNum} - {o.address}</p>)}
-                                                </div>
-                                           </div>
-                                           <div className="text-center text-[10px] text-gray-500">Click para ver Mapa Grande y QR</div>
-                                       </div>
-                                   );
-                               })}
-
-                               {/* INDIVIDUALES */}
-                               {(deliveryFilter === 'all' || deliveryFilter === 'ready') && filteredReadyOrders.map(o => (
-                                       <div key={o.id} onClick={()=>toggleSelect(o.id)} className={`card p-4 border-l-4 ${selectedReady.includes(o.id) ? 'border-[var(--gold)] bg-[#2a2a1a]' : 'border-green-500 bg-[#222]'} cursor-pointer`}>
-                                               <div className="flex justify-between items-start mb-2">
-                                                   <div><h3 className="font-black text-xl text-white">#{o.orderNum}</h3><p className="text-sm text-gray-300 font-bold">{o.clientName}</p></div>
-                                                   {selectedReady.includes(o.id) ? <CheckCircle className="text-[var(--gold)]"/> : <span className="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">LISTO</span>}
-                                               </div>
-                                               <div className="text-xs text-gray-400 mb-2">
-                                                   <p className="truncate">{o.address}</p>
-                                                   <p className="font-bold mt-1 text-[var(--accent)]">{o.address === 'RECOGER' ? 'TIENDA' : 'DOMICILIO'}</p>
-                                               </div>
-                                               <div className="h-32 w-full bg-gray-800 rounded mb-2 overflow-hidden relative border border-[#444] mt-2 cursor-pointer" 
-                                                    onClick={(e) => { e.stopPropagation(); setViewGroupMap({route: [STORE_COORDS, o.clientLoc || STORE_COORDS], markers: [{pos: STORE_COORDS, isStore:true}, {pos: o.clientLoc || STORE_COORDS, emoji: '📍'}]}) }}>
-                                                    <LeafletMap center={o.clientLoc || STORE_COORDS} markers={[{pos: STORE_COORDS, isStore:true}, {pos: o.clientLoc || STORE_COORDS, emoji: '📍'}]} route={[STORE_COORDS, o.clientLoc || STORE_COORDS]} zoom={13} />
-                                               </div>
-                                               <div className="bg-white p-2 rounded mb-2 w-fit mx-auto"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(`ORDER:${o.id}`)}`} className="w-24 h-24"/></div>
-                                               <button onClick={(e) => { e.stopPropagation(); handleManualDispatch([o]); }} className="w-full bg-[#444] hover:bg-green-600 text-white py-2 rounded font-bold text-sm">DAR SALIDA</button>
-                                       </div>
-                                   ))
-                               }
-                             </div>
-                         </div>
-                         
-                         {/* MODALES */}
-                         {viewGroupMap && (<div className="fixed inset-0 bg-black/95 z-[6000] flex flex-col p-4 animate-in zoom-in"><div className="flex justify-between items-center mb-4"><h2 className="text-2xl font-bold text-[var(--gold)]">RUTA VISUALIZADA</h2><button onClick={()=>setViewGroupMap(null)} className="text-white bg-red-600 px-4 py-2 rounded font-bold">CERRAR</button></div><div className="flex-1 rounded border border-[var(--gold)] overflow-hidden relative"><LeafletMap center={STORE_COORDS} markers={viewGroupMap.markers} route={viewGroupMap.route} zoom={13} /></div></div>)}
-                         {selectedWebOrder && (<div className="fixed inset-0 bg-black/90 z-[6000] flex flex-col items-center justify-center p-4"><div className="card w-full max-w-lg bg-[#222] p-6 border-l-4 border-blue-500"><div className="flex justify-between mb-4"><h3 className="font-bold text-xl text-white">DETALLE PEDIDO WEB</h3><button onClick={()=>setSelectedWebOrder(null)}><X className="text-white"/></button></div><p className="text-[var(--gold)] text-2xl font-bold mb-2">#{selectedWebOrder.orderNum}</p><p className="text-white mb-4">{selectedWebOrder.clientName} - {selectedWebOrder.address}</p><div className="h-48 w-full bg-gray-800 rounded mb-4 overflow-hidden relative border border-[#444]"><LeafletMap center={selectedWebOrder.clientLoc || STORE_COORDS} markers={[{pos: STORE_COORDS, isStore:true}, {pos: selectedWebOrder.clientLoc || STORE_COORDS, emoji: '📍'}]} route={[STORE_COORDS, selectedWebOrder.clientLoc || STORE_COORDS]} zoom={13} /></div><div className="flex gap-2"><button onClick={()=>cancelWebOrder(selectedWebOrder.id)} className="flex-1 bg-red-900 text-red-300 py-3 rounded font-bold">CANCELAR</button><button onClick={()=>{ handleWebOrder(selectedWebOrder); setViewReadyOrders(false); setSelectedWebOrder(null); }} className="flex-1 bg-blue-600 text-white py-3 rounded font-bold">PROCESAR</button></div></div></div>)}
-                         {webOrders.length > 0 && <div className="col-span-full mt-4 p-4"><h3 className="text-white font-bold mb-2 text-xl border-b border-blue-500 pb-1">SOLICITUDES WEB PENDIENTES</h3></div>}
-                         <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4 pb-20">{webOrders.map(o => (<div key={o.id} className="card p-4 border-l-4 border-blue-500 bg-[#1a1a2e] cursor-pointer hover:bg-[#2a2a3e]" onClick={()=>handleWebOrder(o)}><div className="flex justify-between"><div><p className="font-bold text-white">WEB #{o.orderNum}</p><p className="text-sm text-gray-400">{o.clientName}</p></div><p className="text-[var(--gold)] font-bold">{formatCurrency(o.total)}</p></div><div className="mt-2 text-xs text-gray-400 max-h-24 overflow-y-auto mb-2 bg-black/20 p-2 rounded">{o.items.map((i,idx) => <div key={idx}>{i.qty}x {i.name}</div>)}<div className="mt-1 text-[10px] text-yellow-500">📍 {o.address}</div></div><p className="text-center text-[10px] text-blue-300 mt-1">Tocame para ver detalles</p></div>))}</div>
-                         
-                         {/* 2. MODAL DETALLES DE GRUPO */}
-                         {selectedGroup && (
-                             <div className="fixed inset-0 bg-black/95 z-[7000] flex flex-col items-center justify-center p-4 animate-in zoom-in">
-                                <div className="w-full max-w-2xl bg-[#222] border-2 border-[var(--gold)] rounded-xl overflow-hidden shadow-2xl flex flex-col h-full max-h-[80vh]">
-                                    <div className="p-4 bg-[#111] flex justify-between items-center border-b border-[#333]">
-                                        <h2 className="text-2xl font-black text-white">RUTA MAESTRA</h2>
-                                        <button onClick={()=>{undoGroup(selectedGroup.id); setSelectedGroup(null);}} className="border border-red-500 text-red-500 px-3 py-1 rounded text-xs font-bold hover:bg-red-900/30">DESHACER</button>
-                                    </div>
-                                    <div className="flex-1 overflow-y-auto p-4">
-                                        <div className="flex flex-col md:flex-row gap-6 mb-4">
-                                            <div className="flex-shrink-0 bg-white p-2 rounded mx-auto md:mx-0">
-                                                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(selectedGroup.qr)}`} className="w-48 h-48"/>
-                                            </div>
-                                            <div className="flex-1 space-y-2">
-                                                {selectedGroup.orders.map(o => (
-                                                    <div key={o.id} className="bg-black/30 p-2 rounded border-l-2 border-[var(--gold)]">
-                                                        <p className="text-[var(--gold)] font-bold text-sm">#{o.orderNum}</p>
-                                                        <p className="text-white text-xs">{o.address}</p>
-                                                        {o.address!=='RECOGER' && <p className="text-gray-500 text-[10px]">{o.references}</p>}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="h-48 w-full bg-gray-800 rounded mb-4 overflow-hidden relative border border-[#444]">
-                                            <LeafletMap 
-                                                center={STORE_COORDS} 
-                                                markers={[{pos: STORE_COORDS, isStore: true}, ...selectedGroup.orders.map(o => ({pos: o.clientLoc || STORE_COORDS, emoji: '🍔'}))]} 
-                                                route={[STORE_COORDS, ...selectedGroup.orders.map(o => o.clientLoc || STORE_COORDS)]} 
-                                                zoom={12} 
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="p-4 bg-[#111] border-t border-[#333] flex gap-2">
-                                        <button onClick={() => handleManualDispatch(selectedGroup.orders)} className="flex-1 bg-green-600 text-white py-3 rounded font-bold text-lg hover:bg-green-500">DAR SALIDA (GRUPO)</button>
-                                        <button onClick={() => setSelectedGroup(null)} className="flex-1 bg-[#333] text-white py-3 rounded font-bold text-lg hover:bg-[#444]">CERRAR</button>
-                                    </div>
-                                </div>
-                             </div>
-                         )}
-                    </div>
-                );
-            }
-            
-            // --- VISTA CAJA PRINCIPAL ---
-             return (
-                <div className="h-full flex flex-col bg-[var(--bg-body)]">
-                    <div className="flex bg-[var(--bg-card)] border-b border-[var(--border)]">
-                        <button className="flex-1 p-3 font-bold bg-[var(--gold)] text-black">PUNTO DE VENTA</button>
-                        <button onClick={()=>setViewReadyOrders(true)} className={`flex-1 p-3 font-bold ${readyOrders.length>0 || webOrders.length>0 ? 'bg-green-600 text-white animate-pulse' : 'text-gray-500'}`}>GESTIÓN / ENTREGA ({readyOrders.length}) {webOrders.length>0?`+ ${webOrders.length} WEB`:''}</button>
-                    </div>
-                    
-                    <div className="flex-1 flex overflow-hidden">
-                        <div className="flex-1 flex flex-col">
-                            <div className="p-2 border-b border-[var(--border)] flex gap-2 overflow-x-auto">
-                                {uniqueCategories.map(c=><button key={c} onClick={()=>setCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${catFilter===c ? 'bg-[var(--gold)] text-black' : 'bg-[#222] text-white'}`}>{c}</button>)}
-                            </div>
-                            <div className="flex-1 p-4 grid grid-cols-5 gap-3 overflow-y-auto content-start">
-                                {db.products.filter(p=>p.active && (catFilter==='Todos' || p.cat===catFilter)).map(p=>(
-                                    <div key={p.id} onClick={()=>addToCart(p)} className="card h-28 relative overflow-hidden cursor-pointer group border-0 hover:ring-2 ring-[var(--gold)]">
-                                            <img src={p.img} className="absolute inset-0 w-full h-full object-cover opacity-60"/>
-                                            <div className="absolute top-1 right-1 z-20 bg-black/50 rounded-full p-1 hover:bg-[var(--gold)] hover:text-black text-white" onClick={(e)=>{e.stopPropagation(); setIngredientsProduct(p);}}><Info size={16}/></div>
-                                            <div className="absolute bottom-0 p-1 w-full bg-gradient-to-t from-black to-transparent">
-                                                <p className="text-white font-bold text-xs leading-tight">{p.name}</p>
-                                                <p className="text-[var(--gold)] font-black text-xs">{formatCurrency(p.price)}</p>
-                                            </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <div className="w-96 bg-[var(--bg-card)] border-l border-[var(--border)] flex flex-col z-10 shadow-2xl relative">
-                            <div className="flex-1 p-3 overflow-y-auto space-y-2">
-                                {cart.map((item,idx)=>(
-                                    <div key={idx} className="bg-[#222] p-2 rounded border border-[#333] relative group">
-                                            <button onClick={()=>removeFromCart(idx)} className="absolute -top-2 -right-2 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center shadow-lg z-10 font-bold">x</button>
-                                            <div className="flex justify-between items-center text-white text-sm mb-1">
-                                                <div><span className="font-bold">{item.qty}x</span> {item.name}</div>
-                                                <div>{formatCurrency(item.price*item.qty)}</div>
-                                            </div>
-                                            <input className="bg-transparent text-xs text-gray-400 w-full border-b border-gray-700 outline-none placeholder-gray-600" placeholder="Nota (Sin cebolla...)" value={item.note || ''} onChange={(e)=>updateCartNote(idx, e.target.value)}/>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="p-4 bg-black border-t border-[#333]">
-                                <div className="flex justify-between text-2xl font-black text-white mb-4"><span>TOTAL</span><span>{formatCurrency(subtotal)}</span></div>
-                                <button onClick={()=>setModal('cockpit')} disabled={cart.length===0} className="btn-gold w-full text-xl py-4 shadow-lg disabled:opacity-50">COBRAR</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="admin-fab">
-                        {bottomMenuOpen && (
-                            <div className="admin-fab-menu">
-                                <button onClick={()=>setViewMap(true)} className="bg-blue-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">RASTREO GPS <MapPin size={16}/></button>
-                                <button onClick={()=>copyToClipboard(window.location.href)} className="bg-purple-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">COPIAR MENU <Share2 size={16}/></button>
-                                <button onClick={()=>{setCorteModal(true); setCutResult(null); setCountedCash(''); setCountedCard('');}} className="bg-red-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">CORTE DE CAJA <DollarSign size={16}/></button>
-                                <button onClick={()=>{setRetiroModal(true); setNewExpense({desc:'', amount:''});}} className="bg-orange-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">RETIRO DE EFECTIVO <Minus size={16}/></button>
-                                <button onClick={()=>setLiquidationModal(true)} className="bg-green-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">LIQUIDAR DRIVER <UserCheck size={16}/></button>
-                            </div>
-                        )}
-                        <button className="bg-[var(--gold)] text-black p-4 rounded-full shadow-[0_0_15px_var(--gold)]" onClick={()=>setBottomMenuOpen(!bottomMenuOpen)}><Plus size={24} className={`transition ${bottomMenuOpen?'rotate-45':''}`}/></button>
-                    </div>
-                    
-                    {ingredientsProduct && (
-                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4" onClick={()=>setIngredientsProduct(null)}>
-                            <div className="bg-[var(--bg-card)] p-6 rounded-xl max-w-sm w-full text-center border border-[var(--gold)]" onClick={e=>e.stopPropagation()}>
-                                <h3 className="text-xl font-bold text-[var(--gold)] mb-4">{ingredientsProduct.name}</h3>
-                                <p className="text-[var(--text-main)] mb-6">{ingredientsProduct.ingredients || "No se especificaron ingredientes."}</p>
-                                <button onClick={()=>setIngredientsProduct(null)} className="btn-gold w-full">CERRAR</button>
-                            </div>
-                        </div>
-                    )}
-
-                    {modal === 'cockpit' && (
-                        <div className="fixed inset-0 bg-black/95 z-50 p-4 animate-in fade-in zoom-in duration-200 text-white">
-                            <div className="h-full w-full max-w-7xl mx-auto grid-cockpit">
-                                <div className="cockpit-col">
-                                    <h3 className="text-[var(--gold)] font-bold text-xl uppercase mb-2">1. TIPO</h3>
-                                    <button onClick={()=>setOrderType('takeaway')} className={`mode-btn ${orderType==='takeaway'?'active':''}`}>PARA LLEVAR</button>
-                                    <button onClick={()=>setOrderType('dinein')} className={`mode-btn ${orderType==='dinein'?'active':''}`}>COMER AQUÍ</button>
-                                    <button onClick={()=>setOrderType('delivery')} className={`mode-btn ${orderType==='delivery'?'active':''}`}>DOMICILIO</button>
-                                    <button onClick={()=>setOrderType('platform')} className={`mode-btn ${orderType==='platform'?'active':''}`}>PLATAFORMA</button>
-                                    <button onClick={()=>setModal(null)} className="mt-auto bg-red-900/20 text-red-500 py-4 rounded font-bold border-2 border-red-900">CANCELAR (ESC)</button>
-                                </div>
-                                <div className="cockpit-col overflow-y-auto">
-                                    <h3 className="text-[var(--gold)] font-bold text-xl uppercase mb-2">2. DATOS</h3>
-                                    {orderType !== 'platform' && <><input className="input-std h-10 text-lg mb-2" placeholder="Nombre *" value={orderDetails.name} onChange={e=>setOrderDetails({...orderDetails, name:e.target.value})}/><div className="flex gap-2 mb-2"><input className="input-std h-10 text-lg flex-1" placeholder="Teléfono (10 dígitos) *" value={orderDetails.phone} maxLength={10} onChange={e=>setOrderDetails({...orderDetails, phone:e.target.value})}/><a href={`https://wa.me/52${orderDetails.phone}`} target="_blank" className="bg-green-600 text-white rounded p-2 flex items-center justify-center w-12"><MessageCircle/></a></div></>}
-                                    {orderType === 'dinein' && <input className="input-std h-10 text-lg" placeholder="# Mesa" value={orderDetails.table} onChange={e=>setOrderDetails({...orderDetails, table:e.target.value})}/>}
-                                    {orderType === 'platform' && (
-                                        <>
-                                            <div className="grid grid-cols-2 gap-2 mb-2">{db.settings.platforms.map(p=><button key={p} onClick={()=>setOrderDetails({...orderDetails, platform:p})} className={`p-3 rounded border font-bold ${orderDetails.platform===p?'bg-blue-600 text-white':'bg-[#222] text-gray-400'}`}>{p}</button>)}</div>
-                                            <input className="input-std h-12 text-lg font-bold border-blue-500" placeholder="ID / NOMBRE PEDIDO *" value={orderDetails.platformOrderId} onChange={e=>setOrderDetails({...orderDetails, platformOrderId:e.target.value})}/>
-                                        </>
-                                    )}
-                                    {orderType === 'delivery' && (
-                                        <>
-                                            <div className="flex gap-2 mb-2 relative">
-                                                <input className={`input-std h-10 text-lg flex-1 ${isLocating?'locating':''}`} placeholder={isLocating?"📍 Localizando...":"Calle y Número *"} value={orderDetails.address} onChange={e=>updateLocationFromAddress(e.target.value)} list="pos-address-list"/>
-                                                <datalist id="pos-address-list">
-                                                    {suggestions.map((s,i) => <option key={i} value={s.display_name} />)}
-                                                </datalist>
-                                                <button onClick={useGPS} className="bg-blue-600 text-white p-2 rounded gps-btn"><MapPin/></button>
-                                            </div>
-                                            {isLocating && <p className="text-[var(--gold)] text-xs animate-pulse mb-2">Buscando...</p>}
-                                            <input className="input-std h-10 text-lg mb-2" placeholder="Referencias / Colonia *" value={orderDetails.references} onChange={e=>setOrderDetails({...orderDetails, references:e.target.value})}/>
-                                            <div className="h-40 rounded border border-[var(--gold)] overflow-hidden relative mb-2">
-                                                <LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:deliveryCoords||STORE_COORDS, emoji:'📍'}]} onClickMap={handleReverseGeo} zoom={15}/>
-                                            </div>
-                                            <div className="bg-[#222] p-2 rounded text-right text-sm text-white">Envío: <span className="font-bold text-[var(--gold)]">{formatCurrency(deliveryFee)}</span></div>
-                                        </>
-                                    )}
-                                    <div className="flex gap-2 mt-2"><input className="input-std h-10 flex-1" placeholder="CUPÓN" value={couponCode} onChange={e=>setCouponCode(e.target.value)}/><button onClick={applyCoupon} className="btn-gold h-10 px-4">APLICAR</button></div>
-                                </div>
-                                <div className="cockpit-col relative">
-                                    <h3 className="text-[var(--gold)] font-bold text-xl uppercase mb-4 text-center">3. PAGO: {formatCurrency(total)}</h3>
-                                    <div className="flex gap-2 mb-4"><button onClick={()=>switchPayMethod('cash')} className={`flex-1 py-4 rounded font-bold text-lg ${payMethod==='cash'?'bg-green-600 text-white':'bg-[#222] text-gray-500'}`}>EFECTIVO</button><button onClick={()=>switchPayMethod('card')} className={`flex-1 py-4 rounded font-bold text-lg ${payMethod==='card'?'bg-blue-600 text-white':'bg-[#222] text-gray-500'}`}>{orderType==='platform'?'APP':'TARJETA'}</button></div>
-                                    
-                                    {orderType === 'delivery' && payMethod === 'cash' && (
-                                        <div className="flex gap-2 mb-4">
-                                            <button onClick={() => setPaymentStatus('paid')} className={`flex-1 p-2 rounded border-2 font-bold ${paymentStatus==='paid'?'bg-green-900 border-green-500 text-green-300':'border-gray-600 text-gray-500'}`}>✅ PAGADO EN CAJA</button>
-                                            <button onClick={() => { setPaymentStatus('pending'); setCashReceived(0); }} className={`flex-1 p-2 rounded border-2 font-bold ${paymentStatus==='pending'?'bg-yellow-900 border-yellow-500 text-yellow-300':'border-gray-600 text-gray-500'}`}>🛵 PAGO AL RECIBIR</button>
-                                        </div>
-                                    )}
-
-                                    {payMethod === 'cash' && (
-                                        <div className="flex-1 flex flex-col gap-2">
-                                            {paymentStatus !== 'pending' ? (
-                                                <div className="grid grid-cols-3 gap-2 mb-2">
-                                                    {[20, 50, 100, 200, 500].map(v => (
-                                                        <button key={v} className="bill-btn" style={{backgroundImage:`url(./${v}.png)`}} onClick={() => setCashReceived(v)}></button>
-                                                    ))}
-                                                    <button onClick={() => setCashReceived(total)} className="bg-[var(--gold)] text-black font-black rounded text-sm h-[60px]">EXACTO</button>
-                                                </div>
-                                            ) : (
-                                                <div className="text-center text-yellow-400 font-bold p-4 border border-yellow-600 bg-yellow-900/20 rounded">
-                                                    COBRO A CARGO DEL REPARTIDOR
-                                                </div>
-                                            )}
-
-                                            <div className="mt-4 p-4 bg-black rounded border border-[#333]">
-                                                {paymentStatus !== 'pending' && (
-                                                    <>
-                                                        <div className="flex justify-between text-gray-400 items-center">
-                                                            <span>Recibido:</span>
-                                                            <input type="number" className={`bg-transparent text-right font-black text-3xl w-40 outline-none ${!cashReceived ? 'animate-pulse text-gray-600 border-b-4 border-gray-600' : 'text-green-500 border-b-4 border-green-500'}`} placeholder="0.00" value={cashReceived || ''} onChange={e=>setCashReceived(parseFloat(e.target.value))}/>
-                                                        </div>
-                                                        <div className="flex justify-between text-gray-400 mt-2"><span>Cambio:</span><span className={`font-bold text-2xl ${cashReceived>=total?'text-green-500':'text-red-500'}`}>{formatCurrency(cashReceived-total)}</span></div>
-                                                    </>
-                                                )}
-                                                {paymentStatus === 'pending' && <p className="text-center text-white font-bold">Saldo a cobrar: {formatCurrency(total)}</p>}
-                                            </div>
-                                        </div>
-                                    )}
-                                    
-                                    {payMethod === 'card' && orderType !== 'platform' && <div className="flex-1 flex flex-col justify-center items-center"><CreditCard size={80} className="text-blue-500 mb-6 animate-pulse"/><p className="text-white font-bold mb-2 text-xl">FOLIO DE VOUCHER</p><input className="input-std text-center text-3xl tracking-widest" placeholder="0000" value={voucher} onChange={e=>setVoucher(e.target.value)} autoFocus/></div>}
-                                    <button onClick={finalizeOrder} className="btn-gold py-5 text-2xl mt-4 w-full font-black rounded-xl">COBRAR AHORA</button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    
-                    {liquidationModal && (
-                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
-                            <div className="card w-full max-w-lg bg-[var(--bg-card)] p-6">
-                                <h3 className="text-2xl font-bold text-[var(--gold)] mb-4">LIQUIDACIÓN REPARTIDOR</h3>
-                                {!driverToLiq ? (
-                                    <div className="text-center">
-                                         <p className="mb-4 text-gray-400">Escanea el QR o Ingresa ID:</p>
-                                         <div className="flex gap-2 justify-center mb-4">
-                                             <input id="liq-input" className="input-std w-48 text-center uppercase" placeholder="ID (ej. u4)" onChange={e=>setManualDriverId(e.target.value)}/>
-                                             <button onClick={() => handleScanDriver("LIQ:" + manualDriverId)} className="btn-gold px-4">BUSCAR</button>
-                                         </div>
-                                         <div className="w-full h-32 border border-gray-600 rounded flex items-center justify-center text-gray-500 mb-4">
-                                            [CÁMARA DE ESCANEO ACTIVA]
-                                         </div>
-                                         <button onClick={()=>setLiquidationModal(false)} className="text-gray-500">CANCELAR (ESC)</button>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p className="font-bold text-xl text-white mb-4">{driverToLiq.name}</p>
-                                        <div className="bg-[#222] p-4 rounded mb-4 space-y-2">
-                                            <div className="flex justify-between text-gray-400"><span>Pedidos Entregados (No Liq):</span><span className="text-white font-bold">{liqSummary.deliveredOrders.length}</span></div>
-                                            <div className="flex justify-between text-gray-400"><span>Efectivo en Mano:</span><span className="text-white font-bold">{formatCurrency(liqSummary.totalCash)}</span></div>
-                                            <div className="flex justify-between text-green-500"><span>Ganancias Envíos:</span><span className="font-bold">-{formatCurrency(liqSummary.totalEarnings)}</span></div>
-                                            <div className="border-t border-[#444] pt-2 flex justify-between text-xl font-black text-[var(--gold)]"><span>A ENTREGAR:</span><span>{formatCurrency(liqSummary.netToPay)}</span></div>
-                                        </div>
-                                        <button onClick={confirmLiquidation} className="btn-gold w-full text-lg py-3">LIQUIDAR Y CERRAR</button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {corteModal && (
-                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
-                            <div className="card w-full max-w-md bg-[var(--bg-card)] p-6 max-h-screen overflow-y-auto">
-                                <h3 className="text-2xl font-bold text-red-500 mb-4">CORTE DE CAJA (CIEGO)</h3>
-                                <div className="bg-[#111] p-4 rounded mb-6 border border-[#333]">
-                                    {!cutResult ? (
-                                        <div className="space-y-4">
-                                            <p className="text-white font-bold mb-2">INGRESE TOTALES CONTADOS:</p>
-                                            <div>
-                                                <label className="text-gray-400 text-xs">Total Efectivo en Caja</label>
-                                                <input type="number" className="input-std text-xl" value={countedCash} onChange={e=>setCountedCash(e.target.value)} placeholder="$0.00"/>
-                                            </div>
-                                            <div>
-                                                <label className="text-gray-400 text-xs">Suma Tickets Tarjeta</label>
-                                                <input type="number" className="input-std text-xl" value={countedCard} onChange={e=>setCountedCard(e.target.value)} placeholder="$0.00"/>
-                                            </div>
-                                            <button onClick={performBlindCut} className="btn-gold w-full mt-2">CALCULAR DIFERENCIA</button>
-                                        </div>
-                                    ) : (
-                                        <div className="space-y-2 animate-in fade-in">
-                                            <div className="flex justify-between text-gray-400 text-sm"><span>Efectivo Declarado:</span><span>{formatCurrency(cutResult.cCash)}</span></div>
-                                            <div className="flex justify-between text-gray-400 text-sm"><span>Sistema (Calculado):</span><span>{formatCurrency(cutResult.systemCash)}</span></div>
-                                            <div className={`flex justify-between font-bold border-t border-[#333] pt-2 ${cutResult.diffCash < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                                <span>Diferencia Efectivo:</span><span>{formatCurrency(cutResult.cCash - cutResult.systemCash)}</span>
-                                            </div>
-                                            
-                                            <div className="flex justify-between text-gray-400 text-sm mt-4"><span>Tarjeta Declarada:</span><span>{formatCurrency(cutResult.cCard)}</span></div>
-                                            <div className="flex justify-between text-gray-400 text-sm"><span>Sistema Tarjeta:</span><span>{formatCurrency(cutResult.systemCard)}</span></div>
-                                            
-                                            {cutResult.missingOrder && (
-                                                <div className="bg-red-900/30 border border-red-500 p-2 rounded mt-2 text-xs text-red-300">
-                                                    <p className="font-bold">⚠️ POSIBLE VENTA FALTANTE DETECTADA</p>
-                                                    <p>La diferencia coincide con la Orden #{cutResult.missingOrder.orderNum}</p>
-                                                    <p>Total: {formatCurrency(cutResult.missingOrder.total)}</p>
-                                                </div>
-                                            )}
-                                            
-                                            <button onClick={printBlindCut} className="w-full bg-[var(--gold)] text-black font-bold py-3 mt-4 rounded shadow-lg flex items-center justify-center gap-2"><Printer/> IMPRIMIR CORTE Z</button>
-                                            <button onClick={()=>setCutResult(null)} className="text-gray-500 text-xs mt-2 w-full">RECALCULAR</button>
-                                        </div>
-                                    )}
-                                </div>
-                                <button onClick={()=>setCorteModal(false)} className="text-gray-500 w-full">CERRAR (ESC)</button>
-                            </div>
-                        </div>
-                    )}
-
-                    {retiroModal && (
-                        <div className="fixed inset-0 bg-black/90 z-[9999] flex items-center justify-center p-4">
-                            <div className="card w-full max-w-md bg-[var(--bg-card)] p-6">
-                                <h3 className="text-2xl font-bold text-orange-500 mb-4">RETIRO DE EFECTIVO</h3>
-                                <div className="bg-[#222] p-4 rounded mb-4">
-                                    <p className="text-xs text-white font-bold mb-2">Registrar gasto o pago a proveedor</p>
-                                    <input className="input-std mb-2" placeholder="Descripción (ej. Pago Coca-Cola)" value={newExpense.desc} onChange={e=>setNewExpense({...newExpense, desc:e.target.value})}/>
-                                    <input className="input-std mb-2" type="number" placeholder="Monto a Retirar" value={newExpense.amount} onChange={e=>setNewExpense({...newExpense, amount:e.target.value})}/>
-                                    <button onClick={addExpense} className="w-full bg-orange-600 text-white font-bold py-2 rounded">CONFIRMAR RETIRO</button>
-                                </div>
-                                <button onClick={()=>setRetiroModal(false)} className="text-gray-500 w-full">CANCELAR (ESC)</button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
+    const finalizeOrder = () => {
+        if(payMethod==='cash' && (!cashReceived || cashReceived < total)) return showToast("Monto insuficiente");
+        const order = {
+            id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000,
+            items: cart, total, method: payMethod, status: 'pending', createdAt: new Date().toISOString(),
+            address: orderType==='delivery' ? `${orderDetails.address} (${orderDetails.references})` : orderType.toUpperCase(),
+            clientName: orderDetails.name || 'Cliente', clientLoc: deliveryCoords, source: orderType==='platform'?'platform':'store', 
+            paymentStatus: 'paid'
         };
+        updateDB({...db, orders: [...db.orders, order], cashDrawer: {...db.cashDrawer, current: db.cashDrawer.current + (payMethod==='cash'?total:0)}});
+        setCart([]); setModal(null); setCashReceived(0); showToast("Venta registrada");
+    };
+    
+    // --- GESTIÓN WEB LOGIC ---
+    const handleWebOrder = (o) => setSelectedWebOrder(o);
+    const cancelWebOrder = (id) => { updateDB({...db, orders: db.orders.map(o => o.id === id ? {...o, status: 'cancelled'} : o)}); setSelectedWebOrder(null); };
+    const acceptWebOrder = () => { 
+        if(!selectedWebOrder) return;
+        // Convertir orden web a orden activa y pasar a POS para procesar o auto-aceptar
+        // Aquí asumimos auto-aceptar y mandar a cocina (pending)
+        updateDB({...db, orders: db.orders.map(o => o.id === selectedWebOrder.id ? {...o, status: 'pending'} : o)}); 
+        setSelectedWebOrder(null);
+        showToast("Pedido Aceptado");
+    };
+
+    // --- ENTREGA LOGIC ---
+    const generateGroupQR = () => { const gid = generateId(); updateDB({...db, orders: db.orders.map(o=>selectedReady.includes(o.id)?{...o, groupId:gid}:o)}); setSelectedReady([]); };
+    const undoGroup = (gid) => updateDB({...db, orders: db.orders.map(o=>o.groupId===gid?{...o, groupId:null}:o)});
+    const handleManualDispatch = (orders) => { if(confirm("¿Despachar?")) updateDB({...db, orders: db.orders.map(o=>orders.find(x=>x.id===o.id)?{...o, status:'delivering'}:o)}); };
+    const toggleSelect = (id) => setSelectedReady(prev => prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id]);
+
+    // Admin Modals Logic
+    const performBlindCut = () => {
+        const cCash = parseFloat(countedCash) || 0; const cCard = parseFloat(countedCard) || 0;
+        const systemCash = db.cashDrawer.current;
+        const systemCard = db.orders.filter(o => o.method === 'card' && o.status !== 'cancelled').reduce((a,b)=>a+b.total,0);
+        setCutResult({ systemCash, systemCard, cCash, cCard, diffCash: systemCash - cCash, diffCard: systemCard - cCard });
+    };
+    const printBlindCut = () => { printTicket(`<div class="center bold">CORTE CAJA</div><hr><div>EFECTIVO: ${formatCurrency(cutResult.cCash)}</div><div>DIF: ${formatCurrency(cutResult.diffCash)}</div>`); };
+    const confirmLiquidation = () => {
+        if(!driverToLiq || !liqSummary) return;
+        updateDB({...db, users: db.users.map(u => u.id === driverToLiq.id ? {...u, cashOnHand: 0} : u), orders: db.orders.map(o => liqSummary.deliveredOrders.find(do_ => do_.id === o.id) ? {...o, settled: true} : o), cashDrawer: {...db.cashDrawer, current: db.cashDrawer.current + liqSummary.netToPay}});
+        setLiquidationModal(false); setDriverToLiq(null);
+    };
+    const handleScanDriver = (txt) => {
+        const did = txt.replace("LIQ:", "");
+        const drv = db.users.find(u => u.id === did);
+        if(drv) {
+            const dels = db.orders.filter(o => o.driver === drv.username && o.status === 'delivered' && !o.settled);
+            const totalC = drv.cashOnHand || 0;
+            const totalE = dels.reduce((a,b)=>a+(b.deliveryFee||0), 0);
+            setDriverToLiq(drv); setLiqSummary({ deliveredOrders: dels, totalCash: totalC, totalEarnings: totalE, netToPay: totalC - totalE });
+        }
+    };
+    const addExpense = () => { updateDB({...db, expenses: [...db.expenses, {id:generateId(), desc:newExpense.desc, amount:parseFloat(newExpense.amount)}], cashDrawer:{...db.cashDrawer, current: db.cashDrawer.current - parseFloat(newExpense.amount)}}); setRetiroModal(false); };
+
+    return (
+        <div className="h-full flex flex-col bg-[var(--bg-body)] mesh-bg">
+            <div className="flex bg-white border-b border-gray-300 shadow-sm shrink-0 sticky top-0 z-20">
+                <button onClick={()=>setTab('pos')} className={`flex-1 p-3 font-bold border-r border-gray-200 transition ${tab==='pos'?'bg-[var(--gold)] text-black shadow-inner':'text-gray-500 hover:bg-gray-100'}`}>PUNTO DE VENTA</button>
+                <button onClick={()=>setTab('gestion')} className={`flex-1 p-3 font-bold border-r border-gray-200 transition flex items-center justify-center gap-2 ${tab==='gestion'?'bg-blue-600 text-white shadow-inner':'text-gray-500 hover:bg-gray-100'}`}>GESTIÓN (WEB) {webOrders.length>0 && <span className="bg-red-500 text-white text-[10px] px-2 rounded-full animate-pulse">{webOrders.length}</span>}</button>
+                <button onClick={()=>setTab('entrega')} className={`flex-1 p-3 font-bold transition flex items-center justify-center gap-2 ${tab==='entrega'?'bg-green-600 text-white shadow-inner':'text-gray-500 hover:bg-gray-100'}`}>ENTREGA</button>
+            </div>
+
+            <div className="flex-1 flex overflow-hidden relative">
+                {/* TAB POS */}
+                {tab === 'pos' && (
+                    <div className="w-full flex h-full">
+                        <div className="flex-1 flex flex-col relative">
+                            <div className="p-2 border-b bg-white flex gap-2"><input className="input-std pl-2" placeholder="Buscar..." value={searchQuery} onChange={e=>setSearchQuery(e.target.value)}/><div className="flex-1 flex gap-2 overflow-x-auto">{uniqueCategories.map(c=><button key={c} onClick={()=>setCatFilter(c)} className={`px-4 py-1 rounded-full text-xs font-bold whitespace-nowrap ${catFilter===c?'bg-black text-white':'bg-gray-100 text-black'}`}>{c}</button>)}</div></div>
+                            <div className="flex-1 p-4 grid grid-cols-4 gap-3 overflow-y-auto content-start">{db.products.filter(p=>p.active && (catFilter==='Todos'||p.cat===catFilter) && p.name.toLowerCase().includes(searchQuery.toLowerCase())).map(p=>(<div key={p.id} onClick={()=>addToCart(p)} className="card h-32 relative overflow-hidden cursor-pointer group hover:shadow-lg transition"><img src={p.img} className="absolute inset-0 w-full h-full object-cover opacity-80"/><div className="absolute bottom-0 p-2 w-full bg-gradient-to-t from-black to-transparent"><p className="text-white font-bold text-sm">{p.name}</p><p className="text-[var(--gold)] font-bold text-xs">{formatCurrency(p.price)}</p></div></div>))}</div>
+                        </div>
+                        <div className="w-96 bg-white border-l shadow-xl flex flex-col z-10">
+                            <div className="flex-1 p-4 overflow-y-auto space-y-2">{cart.map((item,idx)=>(<div key={idx} className="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200"><div><span className="font-bold">{item.qty}x</span> {item.name}</div><button onClick={()=>removeFromCart(idx)} className="text-red-500">x</button></div>))}</div>
+                            <div className="p-4 border-t bg-gray-50"><div className="flex justify-between text-2xl font-black mb-4"><span>TOTAL</span><span>{formatCurrency(total)}</span></div><button onClick={()=>setModal('cockpit')} className="btn-gold w-full text-xl py-4 shadow-lg">COBRAR</button></div>
+                        </div>
+                    </div>
+                )}
+                
+                {/* TAB GESTIÓN WEB */}
+                {tab === 'gestion' && <div className="h-full w-full overflow-y-auto p-4">{webOrders.map(o=>(<div key={o.id} className="card p-4 border-l-4 border-blue-500 mb-2 cursor-pointer" onClick={()=>setSelectedWebOrder(o)}><div className="flex justify-between font-bold"><span>WEB #{o.orderNum}</span><span>{formatCurrency(o.total)}</span></div><p className="text-sm">{o.clientName}</p></div>))}</div>}
+                
+                {/* TAB ENTREGA */}
+                {tab === 'entrega' && (
+                    <div className="h-full w-full overflow-y-auto p-4">
+                        <div className="flex gap-2 mb-4"><button className="btn-gold text-xs" onClick={generateGroupQR} disabled={selectedReady.length<2}>CREAR RUTA</button></div>
+                        <div className="gestion-grid">
+                            {uniqueGroups.map(gid=>(<div key={gid} className="card p-4 border-l-4 border-purple-500 bg-purple-50 cursor-pointer" onClick={()=>setSelectedGroup({id:gid, orders:db.orders.filter(o=>o.groupId===gid), qr:`GROUP:${db.orders.filter(o=>o.groupId===gid).map(x=>x.id).join(',')}`})}><h3 className="font-bold">RUTA {gid.substring(0,4)}</h3></div>))}
+                            {readyOrders.map(o=>(<div key={o.id} className={`card p-4 border-l-4 cursor-pointer ${selectedReady.includes(o.id)?'border-gold bg-yellow-50':'border-green-500'}`} onClick={()=>toggleSelect(o.id)}><h3 className="font-bold">#{o.orderNum}</h3><p>{o.address}</p><button onClick={(e)=>{e.stopPropagation(); handleManualDispatch([o]);}} className="bg-gray-800 text-white text-xs px-2 py-1 rounded mt-2">DESPACHAR</button></div>))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* BOTONES FLOTANTES */}
+            <div className="admin-fab">
+                {bottomMenuOpen && (
+                    <div className="admin-fab-menu">
+                        <button onClick={()=>setCorteModal(true)} className="bg-red-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">CORTE</button>
+                        <button onClick={()=>setRetiroModal(true)} className="bg-orange-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">RETIRO</button>
+                        <button onClick={()=>setLiquidationModal(true)} className="bg-green-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">LIQUIDAR</button>
+                        <button onClick={()=>setViewMap(true)} className="bg-blue-600 text-white p-3 rounded-full font-bold shadow-lg flex items-center gap-2">GPS</button>
+                    </div>
+                )}
+                <button className="bg-[var(--gold)] text-black p-4 rounded-full shadow-xl border-2 border-white" onClick={()=>setBottomMenuOpen(!bottomMenuOpen)}><Plus size={24}/></button>
+            </div>
+
+            {/* MODAL COBRO (COCKPIT) */}
+            {modal === 'cockpit' && (
+                <div className="fixed inset-0 bg-black/90 z-50 p-6 flex items-center justify-center animate-in zoom-in">
+                    <div className="bg-white w-full max-w-7xl h-[90vh] rounded-xl shadow-2xl grid grid-cols-3 overflow-hidden">
+                        <div className="p-6 bg-gray-50 border-r border-gray-200">
+                            <h3 className="font-black text-2xl mb-6 text-black">1. TIPO</h3>
+                            <div className="space-y-3">
+                                {['TAKEAWAY','DINEIN','DELIVERY','PLATFORM'].map(t => (
+                                    <button key={t} onClick={()=>setOrderType(t.toLowerCase())} className={`w-full p-4 text-left font-bold border rounded ${orderType===t.toLowerCase()?'bg-[var(--gold)] border-black shadow-md text-black':'bg-white border-gray-300 text-gray-500'}`}>{t}</button>
+                                ))}
+                            </div>
+                            <button onClick={()=>setModal(null)} className="mt-8 w-full border-2 border-red-500 text-red-500 font-bold py-3 rounded hover:bg-red-50">CANCELAR</button>
+                        </div>
+
+                        <div className="p-6 bg-white overflow-y-auto">
+                            <h3 className="font-black text-2xl mb-6 text-black">2. DATOS</h3>
+                            <input className="input-std mb-4 text-lg bg-[#F0EBEB]" placeholder="Nombre Cliente" value={orderDetails.name} onChange={e=>setOrderDetails({...orderDetails, name:e.target.value})}/>
+                            {orderType === 'delivery' && (
+                                <div className="space-y-4">
+                                    <div className="flex gap-2">
+                                        <input className="input-std flex-1 bg-[#F0EBEB]" placeholder="Calle y Número" value={orderDetails.address} onChange={e=>updateAddress(e.target.value)}/>
+                                        <button className="bg-orange-500 text-white font-bold px-4 rounded shadow">UBICACIÓN</button>
+                                    </div>
+                                    <div className="h-48 rounded-lg border-2 border-gray-300 overflow-hidden shadow-inner">
+                                        <LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:deliveryCoords||STORE_COORDS}]} zoom={15}/> 
+                                    </div>
+                                    <input className="input-std bg-[#F0EBEB]" placeholder="Referencias..."/>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-6 bg-gray-50 border-l border-gray-200 flex flex-col">
+                            <h3 className="font-black text-2xl mb-2 text-center text-black">TOTAL: {formatCurrency(total)}</h3>
+                            <div className="flex gap-2 mb-4">
+                                <button onClick={()=>setPayMethod('cash')} className={`flex-1 py-3 rounded font-bold ${payMethod==='cash'?'bg-green-600 text-white':'bg-white border text-gray-500'}`}>EFECTIVO</button>
+                                <button onClick={()=>setPayMethod('card')} className={`flex-1 py-3 rounded font-bold ${payMethod==='card'?'bg-blue-600 text-white':'bg-white border text-gray-500'}`}>TARJETA</button>
+                            </div>
+                            {payMethod==='cash' && <div className="grid grid-cols-3 gap-2 mb-auto">{[50,100,200,500].map(v=><button key={v} onClick={()=>setCashReceived(v)} className="bg-white border py-4 font-bold rounded shadow-sm text-black hover:bg-gray-100">${v}</button>)}</div>}
+                            <button onClick={finalizeOrder} className="btn-gold w-full py-5 text-2xl shadow-xl mt-auto">COBRAR</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            {/* Modal Detalles Web */}
+            {selectedWebOrder && (
+                <div className="fixed inset-0 bg-black/80 z-[6000] flex flex-col items-center justify-center p-4">
+                    <div className="bg-white w-full max-w-lg p-6 border-l-8 border-blue-500 rounded-r-xl shadow-2xl">
+                         <div className="flex justify-between mb-4"><h3 className="font-bold text-xl text-blue-900">PEDIDO WEB #{selectedWebOrder.orderNum}</h3><button onClick={()=>setSelectedWebOrder(null)}><X/></button></div>
+                         <p className="text-gray-800 font-bold mb-4">{selectedWebOrder.clientName} - <span className="text-gray-500">{selectedWebOrder.address}</span></p>
+                         <div className="h-64 rounded mb-4 overflow-hidden"><LeafletMap center={selectedWebOrder.clientLoc||STORE_COORDS} markers={[{pos:selectedWebOrder.clientLoc||STORE_COORDS, emoji:'📍'}]} route={[STORE_COORDS, selectedWebOrder.clientLoc||STORE_COORDS]}/></div>
+                         <div className="flex gap-2"><button onClick={()=>cancelWebOrder(selectedWebOrder.id)} className="flex-1 bg-red-100 text-red-600 py-3 rounded font-bold">RECHAZAR</button><button onClick={acceptWebOrder} className="flex-1 bg-blue-600 text-white py-3 rounded font-bold shadow">ACEPTAR</button></div>
+                    </div>
+                </div>
+            )}
+            
+            {/* MODALES ADICIONALES (Corte, Retiro, Liq) REUTILIZADOS */}
+            {corteModal && <div className="fixed inset-0 bg-black/90 flex items-center justify-center p-4"><div className="bg-white p-6 rounded-xl w-full max-w-md"><h3 className="text-red-600 font-bold text-2xl mb-4">CORTE CAJA</h3><input className="input-special mb-2 text-center text-xl" placeholder="Efectivo" value={countedCash} onChange={e=>setCountedCash(e.target.value)}/><button onClick={performBlindCut} className="btn-gold w-full">CALCULAR</button>{cutResult && <div className="mt-4"><p>DIF: {formatCurrency(cutResult.diffCash)}</p><button onClick={printBlindCut} className="bg-black text-white w-full p-2 mt-2 rounded">IMPRIMIR</button></div>}<button onClick={()=>setCorteModal(false)} className="w-full text-gray-500 mt-4">CERRAR</button></div></div>}
+            {liquidationModal && <div className="fixed inset-0 bg-black/90 flex items-center justify-center p-4"><div className="bg-white p-6 rounded-xl w-full max-w-md"><h3 className="text-black font-bold mb-4">LIQUIDACIÓN</h3><input className="input-special mb-2 text-center" placeholder="ID DRIVER" onChange={e=>setManualDriverId(e.target.value)}/><button onClick={()=>handleScanDriver("LIQ:"+manualDriverId)} className="btn-gold w-full mb-4">BUSCAR</button>{driverToLiq && <div><p className="font-bold">{driverToLiq.name}</p><p>A Pagar: {formatCurrency(liqSummary.netToPay)}</p><button onClick={confirmLiquidation} className="btn-gold w-full mt-2">CONFIRMAR</button></div>}<button onClick={()=>setLiquidationModal(false)} className="w-full text-gray-500 mt-4">CERRAR</button></div></div>}
+            {viewMap && <div className="fixed inset-0 bg-white z-[6000] p-4"><button onClick={()=>setViewMap(false)} className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded font-bold z-[7000]">CERRAR</button><LeafletMap center={STORE_COORDS} markers={liveMarkers} zoom={13}/></div>}
+        </div>
+    );
+};
+/* --- CLIENT APP CORREGIDA --- */
 const ClientApp = ({ db, updateDB }) => {
     const [view, setView] = useState('menu');
     const [cart, setCart] = useState([]);
@@ -1786,86 +1380,41 @@ const ClientApp = ({ db, updateDB }) => {
     const [clientCoords, setClientCoords] = useState(null);
     const [deliveryCoords, setDeliveryCoords] = useState(null);
     const [isLocating, setIsLocating] = useState(false);
-    const [showCashModal, setShowCashModal] = useState(false);
-    const [addressTimer, setAddressTimer] = useState(null);
     
-    // --- EFECTO: AUTO-REDIRECT A TRACKING (KFC Style) ---
+    // --- EFECTO: AUTO-REDIRECT TRACKING ---
     useEffect(() => {
         if(activeOrder) {
             const fresh = db.orders.find(o => o.id === activeOrder.id);
             if (fresh && fresh.status !== activeOrder.status) {
                 setActiveOrder(fresh);
-                // Si el pedido ya no es 'pending' (fue aceptado o rechazado) y no estoy en track, ir a track
+                // Si ya no es pending web, ir a track
                 if (fresh.status !== 'web_pending_payment' && view !== 'track') setView('track');
             }
         }
     }, [db.orders, activeOrder]);
 
-    // ... (Mantener useEffect de geolocalizacion inicial y calculos fee/total) ... 
-    const deliveryFee = 0; // Simplificado en este bloque, usar lógica real
-    const total = cart.reduce((a,b)=>a+b.price*b.qty,0) + deliveryFee;
-    
-    // Función Update Location (Calle y Numero)
-    const updateLocation = (addr) => {
-        setForm({...form, address: addr});
-        if(addressTimer) clearTimeout(addressTimer);
-        setAddressTimer(setTimeout(async () => {
-            if(addr.length > 5) {
-                setIsLocating(true);
-                try {
-                    const q = `${addr} ${CITY_SUFFIX}`; // Buscar con sufijo ciudad
-                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1&addressdetails=1`);
-                    const data = await res.json();
-                    if(data && data[0]) setDeliveryCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-                } catch(e){}
-                setIsLocating(false);
-            }
-        }, 1000));
-    };
-
-    const useGPS = () => {
-        setIsLocating(true);
-        navigator.geolocation.getCurrentPosition(pos => {
-            const c = [pos.coords.latitude, pos.coords.longitude];
-            setDeliveryCoords(c); setClientCoords(c);
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${c[0]}&lon=${c[1]}`).then(r=>r.json()).then(d=>{
-                if(d && d.display_name) setForm(prev=>({...prev, address: d.display_name.split(',')[0]}));
-            });
-            setIsLocating(false);
-        });
-    };
-
     const submit = () => {
-        const order = { 
-            id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, 
-            items: cart, total, status: 'web_pending_payment', method: form.pay, 
-            address: form.address, clientName: form.name, clientLoc: deliveryCoords, source: 'web', createdAt: new Date().toISOString()
-        };
+        const order = { id: generateId(), orderNum: Math.floor(Math.random()*9000)+1000, items: cart, total: cart.reduce((a,b)=>a+b.price*b.qty,0), status: 'web_pending_payment', method: form.pay, address: form.address, clientName: form.name, clientLoc: deliveryCoords, source: 'web', createdAt: new Date().toISOString() };
         updateDB({...db, orders: [...db.orders, order]});
         setActiveOrder(order);
-        // NO CAMBIAR VISTA MANUALMENTE. El useEffect lo hará.
     };
+
+    const updateLocation = (addr) => { setForm({...form, address: addr}); };
+    const useGPS = () => { navigator.geolocation.getCurrentPosition(pos => { const c=[pos.coords.latitude, pos.coords.longitude]; setDeliveryCoords(c); setClientCoords(c); }); };
 
     if(view === 'menu') return (
         <div className="h-full flex flex-col bg-white overflow-hidden">
             <div className="banner-container"><img src={BANNER_URL} className="mobile-banner"/></div>
             
-            {activeOrder && activeOrder.status === 'web_pending_payment' && (
-                <div className="bg-yellow-400 p-4 text-center font-bold text-black animate-pulse cursor-pointer" onClick={()=>setView('track')}>
-                    ⏳ ESPERANDO CONFIRMACIÓN...
-                </div>
-            )}
+            {/* BOTÓN LATERAL FLOTANTE */}
+            <div className="side-share-btn" onClick={()=>copyToClipboard(window.location.href)}>COMPARTIR <Share2 size={16}/></div>
+
+            {activeOrder && activeOrder.status === 'web_pending_payment' && <div className="bg-yellow-400 p-4 text-center font-bold text-black animate-pulse cursor-pointer" onClick={()=>setView('track')}>⏳ ESPERANDO CONFIRMACIÓN...</div>}
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
-                {/* Lista Productos */}
-                {db.products.filter(p=>p.active).map(p=>(
-                    <div key={p.id} className="card p-3 flex gap-3 shadow-sm bg-white">
-                        <img src={p.img} className="w-24 h-24 rounded object-cover"/>
-                        <div className="flex-1"><p className="font-bold">{p.name}</p><div className="flex justify-between items-center mt-2"><span className="text-[var(--accent)] font-bold">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart, {...p, qty:1}])} className="bg-[var(--gold)] px-4 py-1 rounded-full text-xs font-bold shadow">AGREGAR</button></div></div>
-                    </div>
-                ))}
+                {db.products.filter(p=>p.active).map(p=>(<div key={p.id} className="card p-3 flex gap-3 shadow-sm bg-white"><img src={p.img} className="w-24 h-24 rounded object-cover"/><div className="flex-1"><p className="font-bold">{p.name}</p><div className="flex justify-between items-center mt-2"><span className="text-[var(--accent)] font-bold">{formatCurrency(p.price)}</span><button onClick={()=>setCart([...cart, {...p, qty:1}])} className="bg-[var(--gold)] px-4 py-1 rounded-full text-xs font-bold shadow">AGREGAR</button></div></div></div>))}
             </div>
-            {cart.length > 0 && <div className="fixed bottom-0 w-full p-4 bg-white border-t z-50"><button onClick={()=>setView('checkout')} className="btn-gold w-full shadow-lg">IR A PAGAR ({formatCurrency(total)})</button></div>}
+            {cart.length > 0 && <div className="fixed bottom-0 w-full p-4 bg-white border-t z-50"><button onClick={()=>setView('checkout')} className="btn-gold w-full shadow-lg">IR A PAGAR</button></div>}
         </div>
     );
 
@@ -1877,13 +1426,9 @@ const ClientApp = ({ db, updateDB }) => {
                 {/* INPUT DIDI STYLE */}
                 <div className="didi-wrapper mb-2">
                     <input className="didi-input-internal" placeholder="Calle y Número..." value={form.address} onChange={e=>updateLocation(e.target.value)}/>
-                    <button className="didi-btn-internal" onClick={useGPS}>
-                        {isLocating ? <span className="animate-spin">↻</span> : <Crosshair size={14}/>} UBICACIÓN
-                    </button>
+                    <button className="didi-btn-internal" onClick={useGPS}>UBICACIÓN</button>
                 </div>
-                <div className="h-40 rounded border overflow-hidden relative shadow-inner">
-                    <LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:deliveryCoords||STORE_COORDS, emoji:'📍', isMyLoc:true}]} zoom={15}/>
-                </div>
+                <div className="h-40 rounded border overflow-hidden relative shadow-inner"><LeafletMap center={deliveryCoords || STORE_COORDS} markers={[{pos:deliveryCoords||STORE_COORDS, emoji:'📍', isMyLoc:true}]} zoom={15}/></div>
             </div>
             <input className="input-std mb-2" placeholder="Nombre" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
             <button onClick={submit} className="btn-gold w-full mt-4 py-3 shadow-lg">ENVIAR PEDIDO</button>
@@ -1894,32 +1439,13 @@ const ClientApp = ({ db, updateDB }) => {
         const isWaiting = activeOrder.status === 'web_pending_payment';
         return (
             <div className="h-full bg-white flex flex-col items-center pt-10 px-4 text-center">
-                <div className="w-32 h-32 rounded-full border-4 border-[var(--gold)] p-1 mb-6 relative">
-                    {/* LOGO NO APLASTADO (object-cover) */}
-                    <img src={LOGO_URL} className={`w-full h-full rounded-full object-cover ${isWaiting?'logo-pulse':''}`}/>
-                    {isWaiting && <div className="absolute inset-0 border-4 border-t-transparent border-[var(--accent)] rounded-full animate-spin"></div>}
-                </div>
-                {isWaiting ? (
-                    <>
-                        <h2 className="text-2xl font-black mb-2">¡ESPERA!</h2>
-                        <p className="font-bold text-red-600 bg-red-50 p-4 rounded mb-4">EL RESTAURANTE ESTÁ CONFIRMANDO...</p>
-                    </>
-                ) : (
-                    <>
-                        <h2 className="text-2xl font-black text-green-600 mb-2">¡PEDIDO ACEPTADO!</h2>
-                        <div className="w-full bg-gray-100 rounded-xl p-4 mb-4 text-left border border-gray-200">
-                            <p className="font-bold">Estado: <span className="text-[var(--accent)]">{activeOrder.status.toUpperCase()}</span></p>
-                        </div>
-                        <div className="h-64 w-full rounded-xl overflow-hidden border shadow-lg relative">
-                             <LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, isStore:true}, {pos:deliveryCoords||STORE_COORDS, emoji:'📍', isClient:true}]} zoom={13}/>
-                        </div>
-                    </>
-                )}
+                <div className="w-32 h-32 rounded-full border-4 border-[var(--gold)] p-1 mb-6 relative"><img src={LOGO_URL} className={`w-full h-full rounded-full object-cover ${isWaiting?'logo-pulse':''}`}/></div>
+                {isWaiting ? <><h2 className="text-2xl font-black mb-2">¡ESPERA!</h2><p className="font-bold text-red-600 bg-red-50 p-4 rounded mb-4">CONFIRMANDO...</p></> : <><h2 className="text-2xl font-black text-green-600 mb-2">¡ACEPTADO!</h2><div className="h-64 w-full rounded-xl overflow-hidden border shadow-lg relative"><LeafletMap center={STORE_COORDS} markers={[{pos:STORE_COORDS, isStore:true}, {pos:deliveryCoords||STORE_COORDS, emoji:'📍', isClient:true}]} zoom={13}/></div></>}
             </div>
         );
     }
 };
-/* --- DRIVER APP CORREGIDA --- */
+/* --- DRIVER APP FINAL --- */
 const DriverApp = ({ db, updateDB, user }) => {
     const [tab, setTab] = useState('map'); 
     const [showScanner, setShowScanner] = useState(false);
@@ -1929,10 +1455,8 @@ const DriverApp = ({ db, updateDB, user }) => {
     const [paymentConfirm, setPaymentConfirm] = useState(null); 
 
     const myOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivering');
-    const deliveredToday = db.orders.filter(o => o.driver === user.username && o.status === 'delivered');
-    const cashDebt = deliveredToday.filter(o => o.method === 'cash' && !o.settled).reduce((a,b)=>a+b.total,0);
 
-    // CRONÓMETRO BLOQUEO
+    // Cronómetro Bloqueo
     useEffect(() => {
         const check = setInterval(() => {
             const blockedUntil = localStorage.getItem(`driver_block_${user.id}`);
@@ -1946,8 +1470,7 @@ const DriverApp = ({ db, updateDB, user }) => {
     }, [user.id]);
 
     useEffect(() => {
-        const watch = navigator.geolocation.watchPosition(p => setDriverLoc([p.coords.latitude, p.coords.longitude]));
-        return () => navigator.geolocation.clearWatch(watch);
+        navigator.geolocation.watchPosition(p => setDriverLoc([p.coords.latitude, p.coords.longitude]));
     }, []);
 
     const onScan = (text) => {
@@ -1955,82 +1478,52 @@ const DriverApp = ({ db, updateDB, user }) => {
         const target = db.orders.find(o => o.id === code || o.groupId === code);
         if (target && target.status === 'ready') {
             updateDB({...db, orders: db.orders.map(o => (o.id === target.id || o.groupId === target.groupId) ? {...o, status: 'delivering', driver: user.username} : o)});
-            showToast("¡Pedido Asignado!");
+            showToast("Asignado");
             setShowScanner(false);
-        } else {
-            showToast("QR Inválido o no listo");
-        }
+        } else showToast("QR Inválido");
     };
 
     const handleDelivery = (success) => {
-        if (!selectedOrder) return;
         if (success) {
-            if (selectedOrder.method === 'cash' && selectedOrder.paymentStatus !== 'paid') {
-                setPaymentConfirm(selectedOrder); 
-            } else {
-                finalizeDelivery(selectedOrder, 0);
-            }
+            if (selectedOrder.method === 'cash' && selectedOrder.paymentStatus !== 'paid') setPaymentConfirm(selectedOrder);
+            else finalizeDelivery(selectedOrder, 0);
         } else {
-            if(confirm("¿No pudiste entregar? Se bloqueará tu app por 3 min.")) {
+            if(confirm("¿Fallo de entrega? Se bloqueará 3 min.")) {
                 localStorage.setItem(`driver_block_${user.id}`, Date.now() + 180000);
-                const note = { id: Date.now(), target: 'cajero', message: `⚠️ FALLO ENTREGA: #${selectedOrder.orderNum} - ${user.name}` };
+                const note = { id: Date.now(), target: 'cajero', message: `⚠️ FALLO ENTREGA: #${selectedOrder.orderNum}` };
                 updateDB({...db, settings: {...db.settings, notification: note}});
                 setSelectedOrder(null);
             }
         }
     };
 
-    const finalizeDelivery = (order, cash) => {
-        updateDB({
-            ...db,
-            orders: db.orders.map(o => o.id === order.id ? {...o, status: 'delivered', deliveredAt: new Date().toISOString(), paymentStatus: 'paid'} : o),
-            users: db.users.map(u => u.id === user.id ? {...u, cashOnHand: (u.cashOnHand||0) + (order.method==='cash'?order.total:0)} : u)
-        });
-        showToast("Entrega Registrada ✅");
-        setPaymentConfirm(null);
-        setSelectedOrder(null);
+    const finalizeDelivery = (order, amount) => {
+        updateDB({...db, orders: db.orders.map(o => o.id === order.id ? {...o, status: 'delivered', paymentStatus: 'paid'} : o), users: db.users.map(u => u.id === user.id ? {...u, cashOnHand: (u.cashOnHand||0) + (order.method==='cash'?order.total:0)} : u)});
+        showToast("Entregado"); setPaymentConfirm(null); setSelectedOrder(null);
     };
 
-    if(blockTime > 0) return (<div className="driver-timer-overlay"><h1 className="text-6xl font-mono text-red-500 mb-4">{Math.floor(blockTime/60)}:{(blockTime%60).toString().padStart(2,'0')}</h1><h2 className="text-2xl font-bold">BLOQUEADO</h2><p>Espera en la ubicación...</p></div>);
+    if(blockTime > 0) return (<div className="driver-timer-overlay"><h1 className="text-6xl text-red-500 mb-4">{Math.floor(blockTime/60)}:{blockTime%60}</h1><h2>BLOQUEADO</h2></div>);
 
     return (
         <div className="h-full bg-white relative">
-            {tab === 'map' && (
-                <div className="h-full relative">
-                    <LeafletMap center={driverLoc} markers={[{pos:STORE_COORDS, isStore:true}, ...myOrders.map(o=>({pos:o.clientLoc||STORE_COORDS, emoji:'🍔', data:o}))]} onMarkerClick={setSelectedOrder} zoom={15}/>
-                    <button onClick={()=>setShowScanner(true)} className="absolute bottom-24 right-4 bg-[var(--gold)] w-16 h-16 rounded-full flex items-center justify-center shadow-xl border-4 border-black z-[500]"><QrCode size={32}/></button>
-                </div>
-            )}
+            {tab === 'map' && <div className="h-full relative"><LeafletMap center={driverLoc} markers={[{pos:STORE_COORDS, isStore:true}, ...myOrders.map(o=>({pos:o.clientLoc||STORE_COORDS, emoji:'🍔', data:o}))]} onMarkerClick={setSelectedOrder} zoom={15}/><button onClick={()=>setShowScanner(true)} className="absolute bottom-24 right-4 bg-[var(--gold)] w-16 h-16 rounded-full flex items-center justify-center shadow-xl border-4 border-black z-[500]"><QrCode size={32}/></button></div>}
             
             {selectedOrder && (
                 <div className="driver-modal">
-                    <div className="flex justify-between items-center mb-2 border-b pb-2"><div><h3 className="font-black text-2xl">#{selectedOrder.orderNum}</h3><p className="font-bold">{selectedOrder.clientName}</p></div><div className="text-right"><p className="text-xl font-bold">{formatCurrency(selectedOrder.total)}</p><span className="bg-gray-200 text-xs px-2 rounded">{selectedOrder.method}</span></div></div>
+                    <div className="flex justify-between items-center mb-2 border-b pb-2"><div><h3 className="font-black text-2xl">#{selectedOrder.orderNum}</h3><p className="font-bold">{selectedOrder.clientName}</p></div><p className="text-xl font-bold">{formatCurrency(selectedOrder.total)}</p></div>
                     <p className="text-sm text-gray-600 mb-4">{selectedOrder.address}</p>
-                    <div className="grid grid-cols-3 gap-2 mb-4">
-                        <a href={`tel:${selectedOrder.clientPhone}`} className="bg-gray-100 p-3 rounded flex flex-col items-center text-xs font-bold"><Phone size={20}/> LLAMAR</a>
-                        <a href={`https://wa.me/52${selectedOrder.clientPhone}?text=Hola, soy su repartidor.`} target="_blank" className="bg-green-100 text-green-700 p-3 rounded flex flex-col items-center text-xs font-bold"><MessageCircle size={20}/> WHATS</a>
-                        <a href={`https://www.google.com/maps/dir/?api=1&destination=${selectedOrder.clientLoc?.[0]},${selectedOrder.clientLoc?.[1]}`} target="_blank" className="bg-blue-100 text-blue-700 p-3 rounded flex flex-col items-center text-xs font-bold"><Navigation size={20}/> IR</a>
-                    </div>
+                    <div className="grid grid-cols-3 gap-2 mb-4"><a href={`tel:${selectedOrder.clientPhone}`} className="bg-gray-100 p-3 rounded flex flex-col items-center font-bold text-xs"><Phone/> LLAMAR</a><a href={`https://wa.me/52${selectedOrder.clientPhone}`} className="bg-green-100 text-green-700 p-3 rounded flex flex-col items-center font-bold text-xs"><MessageCircle/> WHATS</a><a href={`http://maps.google.com/?q=${selectedOrder.clientLoc?.[0]},${selectedOrder.clientLoc?.[1]}`} className="bg-blue-100 text-blue-700 p-3 rounded flex flex-col items-center font-bold text-xs"><Navigation/> IR</a></div>
                     <div className="flex gap-2"><button onClick={()=>handleDelivery(false)} className="flex-1 bg-red-100 text-red-600 py-3 rounded font-bold">NO PUDE ❌</button><button onClick={()=>handleDelivery(true)} className="flex-1 bg-green-600 text-white py-3 rounded font-bold shadow">ENTREGAR ✅</button></div>
                 </div>
             )}
 
             {paymentConfirm && (
-                <div className="fixed inset-0 bg-black/90 z-[8000] flex items-center justify-center p-6">
-                    <div className="bg-white w-full rounded-xl p-6 text-center">
-                        <h3 className="text-xl font-bold mb-2">COBRAR: {formatCurrency(paymentConfirm.total)}</h3>
-                        <input id="payInput" type="number" className="input-std text-center text-2xl mb-4" placeholder="$ Recibido"/>
-                        <div className="flex gap-2"><button onClick={()=>setPaymentConfirm(null)} className="flex-1 bg-gray-200 py-3 rounded">CANCELAR</button><button onClick={()=>{const v=parseFloat(document.getElementById('payInput').value)||0; if(v<paymentConfirm.total)return showToast("Falta"); finalizeDelivery(paymentConfirm,v);}} className="flex-1 btn-gold py-3 rounded">CONFIRMAR</button></div>
-                    </div>
-                </div>
+                <div className="fixed inset-0 bg-black/90 z-[8000] flex items-center justify-center p-6"><div className="bg-white w-full rounded-xl p-6 text-center"><h3 className="text-xl font-bold mb-2">COBRAR: {formatCurrency(paymentConfirm.total)}</h3><input id="payInput" type="number" className="input-std text-center text-2xl mb-4" placeholder="$ Recibido"/><div className="flex gap-2"><button onClick={()=>setPaymentConfirm(null)} className="flex-1 bg-gray-200 py-3 rounded">CANCELAR</button><button onClick={()=>{const v=parseFloat(document.getElementById('payInput').value)||0; if(v<paymentConfirm.total)return showToast("Falta"); finalizeDelivery(paymentConfirm,v);}} className="flex-1 btn-gold py-3 rounded">CONFIRMAR</button></div></div></div>
             )}
 
             {showScanner && <div className="fixed inset-0 bg-black z-[9000]"><QRScanner onScan={onScan}/><button onClick={()=>setShowScanner(false)} className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded">CERRAR</button></div>}
 
-            <div className="driver-nav">
-                <button onClick={()=>setTab('map')} className={`driver-nav-btn ${tab==='map'?'active':''}`}><Map size={20}/>MAPA</button>
-                <button onClick={()=>setTab('wallet')} className={`driver-nav-btn ${tab==='wallet'?'active':''}`}><Wallet size={20}/>CARTERA</button>
-            </div>
+            <div className="driver-nav"><button onClick={()=>setTab('map')} className={`driver-nav-btn ${tab==='map'?'active':''}`}><Map size={20}/>MAPA</button><button onClick={()=>setTab('wallet')} className={`driver-nav-btn ${tab==='wallet'?'active':''}`}><Wallet size={20}/>CARTERA</button></div>
         </div>
     );
 };
@@ -2105,7 +1598,7 @@ const Kitchen = ({ db, updateDB }) => {
             );
         };
 const App = () => {
-    // INICIO LIMPIO (Sin LocalStorage para evitar datos viejos corruptos)
+    // --- ESTADO PRINCIPAL ---
     const [db, setDB] = useState(initialDB);
     const [user, setUser] = useState(null);
     const [loginData, setLoginData] = useState({u:'', p:''});
@@ -2113,75 +1606,65 @@ const App = () => {
     const [centerNotification, setCenterNotification] = useState(null);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
 
+    // --- REFERENCIAS PARA SINCRONIZACIÓN INTELIGENTE ---
     const prevOrdersRef = useRef(db.orders || []);
-    const lastWriteTime = useRef(0); 
+    const lastWriteTime = useRef(0); // Última vez que editamos localmente
     const saveTimeout = useRef(null);
-    
-    const onlineStaff = db.users ? db.users.filter(u => u.online && u.role !== 'viewer').length : 0;
-    const activeViewers = db.users ? db.users.filter(u => u.role === 'viewer' && (Date.now() - (u.lastActive || 0) < 300000)).length : 0;
 
-    // --- SONIDOS & VOZ ---
+    // Contadores
+    const onlineStaff = db.users ? db.users.filter(u => u.online && u.role !== 'viewer').length : 0;
+    const activeViewers = db.users ? db.users.filter(u => u.role === 'viewer' && (Date.now() - (u.lastActive || 0) < 600000)).length : 0; // 10 min
+
+    // --- SONIDO E IA DE VOZ ---
     const speak = (text) => {
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'es-MX';
-            utterance.rate = 1.1;
+            utterance.lang = 'es-MX'; utterance.rate = 1.1;
             window.speechSynthesis.speak(utterance);
         }
     };
+    const playBell = () => { try { const ctx = new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(523.25, ctx.currentTime); g.gain.setValueAtTime(0.3, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime+1.5); o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+1.5); } catch(e){} };
 
-    const playBell = () => {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 1.5);
-        } catch(e){}
-    };
-
-    // --- MONITOREO DE PEDIDOS ---
+    // --- MONITOREO DE CAMBIOS EN TIEMPO REAL ---
     useEffect(() => {
-        const prevOrders = prevOrdersRef.current;
-        const currentOrders = db.orders;
-
-        if (currentOrders.length > prevOrders.length) {
-            const newOrder = currentOrders.find(o => !prevOrders.find(p => p.id === o.id));
-            if (newOrder && Date.now() - lastWriteTime.current > 2000) {
+        const prev = prevOrdersRef.current;
+        const curr = db.orders;
+        if (curr.length > prev.length) {
+            const newOrder = curr.find(o => !prev.find(p => p.id === o.id));
+            if (newOrder && Date.now() - lastWriteTime.current > 2000) { // Solo si no fui yo quien lo creó hace poco
                 if (newOrder.source === 'web' && newOrder.status === 'web_pending_payment') {
-                    if (user && (user.role === 'cajero' || user.role === 'admin')) speak("Tienes un nuevo pedido por aceptar");
+                     if (user && (user.role === 'cajero' || user.role === 'admin')) speak("Tienes un nuevo pedido por aceptar");
                 }
             }
         } else {
-            currentOrders.forEach(curr => {
-                const old = prevOrders.find(p => p.id === curr.id);
-                if (old && old.status !== curr.status) {
-                    if (curr.status === 'preparing' && (user?.role === 'cocina' || user?.role === 'admin')) speak("Nueva orden para preparar, revisa ahora");
-                    if (curr.status === 'ready' && (user?.role === 'cajero' || user?.role === 'admin')) { playBell(); speak("Nueva orden lista para enviar"); }
-                }
-            });
+             // Detectar cambios de estado
+             curr.forEach(c => {
+                 const old = prev.find(p => p.id === c.id);
+                 if (old && old.status !== c.status) {
+                     if (c.status === 'preparing' && (user?.role === 'cocina' || user?.role === 'admin')) speak("Nueva orden para preparar");
+                     if (c.status === 'ready' && (user?.role === 'cajero' || user?.role === 'admin')) { playBell(); speak("Orden lista para enviar"); }
+                 }
+             });
         }
-        prevOrdersRef.current = currentOrders;
+        prevOrdersRef.current = curr;
     }, [db.orders, user]);
 
-    // --- SINCRONIZACIÓN DATOS ---
-    const updateDB = (newDataOrFn) => { 
+    // --- FUNCIÓN CENTRAL DE ACTUALIZACIÓN (OPTIMISTIC UI) ---
+    const updateDB = (newDataOrFn) => {
         let newData;
         if (typeof newDataOrFn === 'function') { newData = newDataOrFn(db); } else { newData = newDataOrFn; }
+        
         newData._ver = Date.now();
-        setDB(newData);
-        lastWriteTime.current = Date.now();
+        setDB(newData); // Actualizar UI Inmediatamente
+        lastWriteTime.current = Date.now(); // Marcar que acabamos de escribir
+        
+        // Guardar en nube con debounce
         if (saveTimeout.current) clearTimeout(saveTimeout.current);
         saveTimeout.current = setTimeout(() => { saveCloudDB(newData); }, 500);
     };
 
+    // --- INICIALIZACIÓN Y LOOP DE SINCRONIZACIÓN ---
     useEffect(() => {
         if(!localStorage.getItem('device_id')) localStorage.setItem('device_id', 'DEV_' + Math.random().toString(36).substr(2, 9));
         
@@ -2190,18 +1673,17 @@ const App = () => {
             try {
                 const cloudResp = await fetchCloudDB();
                 const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
-                if(remoteData && remoteData.products) {
-                    setDB(remoteData);
-                } else {
-                    await saveCloudDB(initialDB);
-                }
+                if(remoteData && remoteData.products) setDB(remoteData);
+                else await saveCloudDB(initialDB);
             } catch(e) { console.error(e); } 
             finally { setIsInitialLoading(false); }
         };
         init();
 
         const interval = setInterval(async () => {
+            // SI ACABO DE ESCRIBIR LOCALMENTE (hace menos de 2.5s), NO LEER DE LA NUBE PARA EVITAR PARPADEO
             if (Date.now() - lastWriteTime.current < 2500) return;
+
             try {
                 const cloudResp = await fetchCloudDB();
                 const remoteData = (cloudResp && cloudResp.data) ? cloudResp.data : cloudResp;
@@ -2209,30 +1691,30 @@ const App = () => {
                     setDB(remoteData);
                 }
             } catch (e) {}
-        }, 1500);
+        }, 1500); // Poll cada 1.5s
         return () => clearInterval(interval);
     }, []);
 
-    // --- AUTO-LOGIN CORREGIDO (SOLO SI URL TIENE ?menu=true) ---
+    // --- REGISTRO DE USUARIO ACTIVO (Mantiene viva la sesión de clientes) ---
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const devId = localStorage.getItem('device_id');
         
-        // CORRECCIÓN IMPORTANTE: Eliminamos 'hasActiveOrder' de la condición de entrada forzada
         if (params.get('menu') === 'true' || params.get('take_order')) {
             if(!user) setUser({role:'cliente', name:'Invitado', id: devId});
             
-            // Registro silencioso de viewer
+            // Registrar actividad cada 30s sin forzar re-render masivo
             const now = Date.now();
-            setDB(prevDB => {
-                if(!prevDB.users) return prevDB;
-                const me = prevDB.users.find(u => u.id === devId);
-                if(!me || (now - (me.lastActive||0) > 30000)) {
-                     const newUsers = prevDB.users.filter(u => u.id !== devId);
+            setDB(prev => {
+                if(!prev.users) return prev;
+                const me = prev.users.find(u => u.id === devId);
+                if(!me || (now - (me.lastActive||0) > 300000)) { // Si pasaron 5 min o no existe
+                     const newUsers = prev.users.filter(u => u.id !== devId);
                      newUsers.push({ id: devId, name: 'Cliente Web', role: 'viewer', online: true, lastActive: now });
-                     return { ...prevDB, users: newUsers };
+                     // Nota: No llamamos a updateDB aquí para evitar loops, se guardará en la próxima acción o sync
+                     return { ...prev, users: newUsers };
                 }
-                return prevDB;
+                return prev;
             });
         }
     }, [user]);
@@ -2256,12 +1738,7 @@ const App = () => {
         if(found) setUser(found); else showToast("Credenciales incorrectas"); 
     };
 
-    if (isInitialLoading) return (
-        <div className="app-loader">
-            <img src={LOGO_URL} className="loader-logo"/>
-            <h2 className="text-xl animate-pulse">CARGANDO EMI BURGERS...</h2>
-        </div>
-    );
+    if (isInitialLoading) return <div className="app-loader"><img src={LOGO_URL} className="loader-logo"/><h2 className="text-xl animate-pulse">CARGANDO...</h2></div>;
 
     if(!user) return (
         <div className="h-screen flex items-center justify-center bg-[var(--bg-body)] relative">
@@ -2278,7 +1755,7 @@ const App = () => {
     );
 
     return (
-        <div className={`h-screen w-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)]`}>
+        <div className={`h-screen w-full flex flex-col bg-[var(--bg-body)] text-[var(--text-main)] mesh-bg`}>
             {user.role !== 'cliente' && <div className="logout-ghost"><button onClick={()=>{if(confirm("Salir?")) setUser(null);}} className="bg-red-600 text-white px-3 py-1 rounded text-xs font-bold shadow-md">SALIR</button></div>}
             {centerNotification && <div className="center-alert"><h3 className="text-2xl font-brand text-[var(--gold)]">ATENCIÓN</h3><p>{centerNotification}</p></div>}
             
@@ -2288,7 +1765,6 @@ const App = () => {
             {user.role==='repartidor' && <DriverApp db={db} updateDB={updateDB} user={user}/>}
             {user.role==='cocina' && <Kitchen db={db} updateDB={updateDB}/>}
             
-            {/* Super Menu Flotante */}
             {user.name==='Super Admin' && (
                 <div className={`gods-eye group ${godMenuOpen ? 'active' : ''}`}>
                     <button className="bg-[var(--gold)] w-14 h-14 rounded-full flex items-center justify-center shadow-lg z-50 relative" onClick={()=>setGodMenuOpen(!godMenuOpen)}><Eye size={30} className="text-black"/></button>
