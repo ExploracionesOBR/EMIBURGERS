@@ -19,86 +19,78 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-   <style>
+  <style>
     :root {
         --gold: #FFD700; 
-        --accent: #FF4500; 
-        --bg-special: #F0EBEB; /* FONDO CLARO SOLICITADO */
+        --accent: #FF6600; /* CAMBIO A NARANJA */
+        --bg-special: #F0EBEB; /* FONDO CLARO */
         --text-main: #000000;
+        --border: #d1d5db;
+        
         --z-map: 0; --z-ui: 10; --z-fab: 2000; --z-modal: 5000; --z-toast: 6000; --z-loader: 10000;
     }
     
-    /* RESET GENERAL */
+    /* --- TEMA BLANCO FORZADO --- */
     body { 
         background-color: var(--bg-special); 
+        background-image: url('FONDO_APP.png'); /* IMAGEN DE FONDO */
+        background-size: cover; 
+        background-attachment: fixed;
         color: var(--text-main); 
         font-family: 'Roboto', sans-serif; 
         margin: 0; overflow: hidden; height: 100vh; width: 100vw; 
     }
 
-    #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
-    .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
-    
-    /* --- BANNERS Y VIDEO (15% Y FIT) --- */
-    .banner-container {
-        width: 100%;
-        height: 15vh; /* REDUCIDO AL 15% */
-        min-height: 120px;
-        background-color: #000;
-        position: relative;
-        overflow: hidden;
-    }
-    .mobile-banner { 
-        width: 100%; 
-        height: 100%; 
-        object-fit: contain; /* SE VE COMPLETA SIN RECORTES */
-        display: block; 
-    }
-    .mobile-video-container { 
-        position: fixed; bottom: 70px; left: 0; width: 100%; 
-        height: 15vh; /* REDUCIDO AL 15% */
-        z-index: 50; pointer-events: none; background: black; 
-        border-top: 2px solid var(--gold); 
-    }
-    .mobile-video-container video { 
-        width: 100%; height: 100%; 
-        object-fit: contain; /* SE VE COMPLETO */
-        opacity: 0.9; 
+    /* MALLA DECORATIVA SOBRE EL FONDO */
+    .mesh-bg {
+        background-image: radial-gradient(#ccc 1px, transparent 1px);
+        background-size: 20px 20px;
     }
 
-    /* --- INPUTS Y UI GENERAL --- */
-    .card { background-color: white; border: 1px solid #d1d5db; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    #root { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; background: rgba(255,255,255,0.6); backdrop-filter: blur(2px); }
+    .font-brand { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
     
+    /* --- COMPONENTES UI --- */
+    .card { 
+        background-color: white; 
+        border: 1px solid var(--border); 
+        border-radius: 0.75rem; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+    }
+    
+    /* INPUTS CLAROS */
     .input-std, .input-special { 
-        background-color: var(--bg-special) !important; 
-        border: 1px solid #d1d5db !important; 
+        background-color: #ffffff !important; 
+        border: 1px solid #ccc !important; 
         color: black !important; 
         padding: 0.75rem; width: 100%; outline: none; border-radius: 0.5rem; font-weight: 500;
     }
-    .input-std::placeholder, .input-special::placeholder { color: #666; }
+    .input-std::placeholder { color: #888; }
     
+    /* INPUT OSCURO PARA CASOS ESPECÍFICOS (IMAGEN 1) */
+    .input-dark-force {
+        background-color: #222 !important; color: white !important; border: 1px solid #444 !important;
+    }
+
+    /* BOTONES */
     .btn-gold { background: linear-gradient(180deg, var(--gold) 0%, #e6c200 100%); color: black; font-weight: 900; border-radius: 0.75rem; padding: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+    .btn-orange { background: var(--accent); color: white; font-weight: bold; border-radius: 0.5rem; padding: 0.8rem; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
 
-    /* --- INPUT DIRECCIÓN ESTILO DIDI (BOTÓN ADENTRO) --- */
-    .didi-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
-    .didi-input-internal { 
-        width: 100%; background: var(--bg-special); border: 1px solid #ccc; 
-        padding: 12px 110px 12px 12px; /* Espacio para botón */
-        border-radius: 8px; outline: none; font-size: 16px; color: black;
-    }
-    .didi-btn-internal {
-        position: absolute; right: 0; top: 0; bottom: 0;
-        background: #FF6600; color: white; font-weight: bold; font-size: 11px;
-        border: none; border-radius: 0 8px 8px 0; padding: 0 15px; cursor: pointer;
-        display: flex; align-items: center; gap: 5px;
-    }
+    /* --- BANNERS Y VIDEO (15% ALTURA + FIT) --- */
+    .banner-container { width: 100%; height: 15vh; min-height: 120px; background-color: #000; position: relative; overflow: hidden; }
+    .mobile-banner { width: 100%; height: 100%; object-fit: contain; display: block; }
+    
+    .mobile-video-container { position: fixed; bottom: 70px; left: 0; width: 100%; height: 15vh; z-index: 50; pointer-events: none; background: black; border-top: 2px solid var(--gold); }
+    .mobile-video-container video { width: 100%; height: 100%; object-fit: contain; opacity: 0.9; }
 
-    /* --- GPS AZUL PULSANTE --- */
+    /* --- MAPA Y GPS --- */
+    .leaflet-container { background: #e5e3df; width: 100%; height: 100%; z-index: 0; }
+    
+    /* GPS AZUL PULSANTE */
     .user-gps-dot {
         width: 18px; height: 18px; background-color: #4285F4;
         border: 3px solid white; border-radius: 50%;
-        box-shadow: 0 0 5px rgba(0,0,0,0.3);
-        position: relative;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3); position: relative;
     }
     .user-gps-dot::after {
         content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -107,36 +99,43 @@
     }
     @keyframes gps-pulse { 0% {transform: translate(-50%, -50%) scale(0.5); opacity: 1;} 100% {transform: translate(-50%, -50%) scale(1.5); opacity: 0;} }
 
-    /* --- FAB & POSICIONES --- */
+    /* --- INPUT DIDI (CLIENTE) --- */
+    .didi-wrapper { position: relative; width: 100%; display: flex; align-items: center; }
+    .didi-input-internal { width: 100%; background: white; border: 1px solid #ccc; padding: 12px 140px 12px 12px; border-radius: 8px; outline: none; font-size: 16px; color: black; }
+    .didi-btn-internal { position: absolute; right: 0; top: 0; bottom: 0; background: #FF6600; color: white; font-weight: bold; font-size: 11px; border: none; border-radius: 0 8px 8px 0; padding: 0 15px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+    /* --- UTILS & ADMIN --- */
     .admin-fab { position: fixed; bottom: 20px; right: 20px; z-index: var(--z-fab); display: flex; flex-direction: column; align-items: end; gap: 10px; }
     .admin-fab-menu { display: flex; flex-direction: column; align-items: end; gap: 10px; margin-bottom: 10px; }
-    
-    /* OJO DE DIOS EMPUJADO HACIA ARRIBA */
     .gods-eye { position: fixed; bottom: 100px; left: 20px; opacity: 0.8; transform: scale(0.9); z-index: var(--z-fab); }
     .logout-ghost { position: fixed; top: 10px; left: 10px; opacity: 0.8; z-index: var(--z-fab); }
     
-    body.client-mode .gods-eye, body.client-mode .admin-fab, body.client-mode .logout-ghost { display: none !important; }
+    /* BOTONES LATERALES CLIENTE */
+    .side-share-btn { position: fixed; top: 80px; right: 0; background: var(--gold); color: black; padding: 8px 12px 8px 15px; border-radius: 20px 0 0 20px; font-weight: bold; font-size: 11px; z-index: 100; cursor: pointer; box-shadow: -2px 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 5px; }
 
-    /* --- POS GRID & UTILS --- */
-    .gestion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-    .grid-cockpit { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1rem; height: 90vh; }
-    @media (max-width: 1024px) { .grid-cockpit { grid-template-columns: 1fr; overflow-y: auto; display: flex; flex-direction: column; height: auto; } }
+    /* Ocultar en modo cliente */
+    body.client-mode .gods-eye, body.client-mode .admin-fab, body.client-mode .logout-ghost, body.client-mode .theme-toggle { display: none !important; }
+
+    /* MODAL DRIVER & TICKET */
+    .driver-modal { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 6000; animation: slide-up 0.3s; padding-bottom: 80px; }
+    .ticket-logo-lg { width: 85px !important; display: block; margin: 0 auto 10px; } /* Logo ticket +20% */
     
-    .mode-btn { padding: 1rem; border-radius: 0.5rem; font-weight: bold; margin-bottom: 0.5rem; border: 1px solid #ccc; background: white; color: black; width: 100%; text-align: left; }
-    .mode-btn.active { background-color: var(--gold); border-color: black; transform: scale(1.02); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .bill-btn { background-size: cover; background-position: center; border-radius: 4px; height: 60px; width: 100%; border: 1px solid #ddd; cursor: pointer; background-color: white; }
-
-    /* --- EXTRAS --- */
+    /* EXTRAS */
+    @keyframes slide-up { from {transform: translateY(100%);} to {transform: translateY(0);} }
     .app-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: white; z-index: var(--z-loader); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); font-family: 'Bangers', cursive; }
     .loader-logo { width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; animation: pulse-load 1s infinite; margin-bottom: 20px; }
-    @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
-    
-    .leaflet-container { background: #f0f0f0; width: 100%; height: 100%; z-index: 0; }
+    @keyframes pulse-load { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
+
     .closed-store-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; background-image: url('./CERRADO_OFF.png'); background-size: contain; background-repeat: no-repeat; background-position: center; z-index: 10000; }
     
     .driver-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #eee; z-index: 1000; }
     .driver-nav-btn { display: flex; flex-direction: column; align-items: center; color: #999; background: none; border: none; font-size: 10px; font-weight: bold; flex: 1; }
-    .driver-nav-btn.active { color: var(--gold); }
+    .driver-nav-btn.active { color: var(--accent); }
+    
+    /* POS GRID */
+    .grid-cockpit { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1rem; height: 90vh; }
+    @media (max-width: 1024px) { .grid-cockpit { grid-template-columns: 1fr; overflow-y: auto; display: flex; flex-direction: column; height: auto; } }
+    .gestion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
 </style>
 </head>
 <body class="white">
@@ -336,55 +335,59 @@
         );
 
 const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route, radius, onMarkerClick }) => {
-            const containerRef = useRef(null);
-            const mapInstance = useRef(null);
-            const userInteracted = useRef(0);
+    const containerRef = useRef(null);
+    const mapInstance = useRef(null);
 
-            // Efecto de Inicialización y Actualización de Elementos
-            useEffect(() => {
-                if (!containerRef.current || typeof L === 'undefined') return;
+    useEffect(() => {
+        if (!containerRef.current || typeof L === 'undefined') return;
 
-                const safeCenter = (center && center[0] && center[1]) ? center : STORE_COORDS;
-                // URLs limpias y correctas
-                const whiteUrl = 'https://{s}.basemaps.cartocdn.com/white_all/{z}/{x}/{y}{r}.png';
-                const lightUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                const iswhite = document.body.classList.contains('white');
+        const safeCenter = (center && center[0]) ? center : STORE_COORDS;
+        
+        // ESTILO RELIEVE (GOOGLE STYLE)
+        const reliefUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
 
-                if (!mapInstance.current) {
-                    mapInstance.current = L.map(containerRef.current, { zoomControl: false, attributionControl: false }).setView(safeCenter, zoom);
-                    L.tileLayer(iswhite ? whiteUrl : lightUrl).addTo(mapInstance.current);
-                    
-                    mapInstance.current.on('mousedown touchstart zoomstart', () => { userInteracted.current = Date.now(); });
-                    if(onClickMap) mapInstance.current.on('click', (e) => onClickMap([e.latlng.lat, e.latlng.lng]));
-                } else {
-                    // Recentrado inteligente solo si el usuario no movió el mapa recientemente
-                    if(Date.now() - userInteracted.current > 10000) {
-                          const currentCenter = mapInstance.current.getCenter();
-                          const dist = Math.sqrt(Math.pow(currentCenter.lat - safeCenter[0], 2) + Math.pow(currentCenter.lng - safeCenter[1], 2));
-                          if (dist > 0.001) mapInstance.current.setView(safeCenter, zoom); 
-                    }
-                    setTimeout(() => mapInstance.current.invalidateSize(), 100);
-                }
+        if (!mapInstance.current) {
+            mapInstance.current = L.map(containerRef.current, { zoomControl: false, attributionControl: false }).setView(safeCenter, zoom);
+            L.tileLayer(reliefUrl).addTo(mapInstance.current);
+            if(onClickMap) mapInstance.current.on('click', (e) => onClickMap([e.latlng.lat, e.latlng.lng]));
+        } else {
+            mapInstance.current.setView(safeCenter, zoom);
+            setTimeout(() => mapInstance.current.invalidateSize(), 200);
+        }
 
-                // Limpieza de capas viejas
-                mapInstance.current.eachLayer(layer => {
-                    if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline || layer instanceof L.Polygon) mapInstance.current.removeLayer(layer);
-                });
+        // Limpiar capas
+        mapInstance.current.eachLayer(layer => {
+            if (layer instanceof L.Marker || layer instanceof L.Circle || layer instanceof L.Polyline || layer instanceof L.Polygon) mapInstance.current.removeLayer(layer);
+        });
 
-                // Dibujar Radio
-                if (radius) {
-                    const outerBounds = [[90, -180], [90, 180], [-90, 180], [-90, -180]];
-                    const hole = getCirclePoints(STORE_COORDS, radius);
-                    L.polygon([outerBounds, hole], { color: 'transparent', fillColor: '#111', fillOpacity: 0.6 }).addTo(mapInstance.current);
-                    L.circle(STORE_COORDS, { color: '#00e676', fillColor: 'transparent', weight: 2, radius: radius * 1000 }).addTo(mapInstance.current);
-                }
+        // --- ZONA DE COBERTURA GRIS (DONA) ---
+        if (radius) {
+            // Polígono mundial gigante
+            const world = [[90, -360], [90, 360], [-90, 360], [-90, -360]];
+            // Círculo permitido (agujero)
+            const hole = getCirclePoints(STORE_COORDS, radius); 
+            
+            // Capa oscura exterior
+            L.polygon([world, hole], { 
+                color: 'transparent', 
+                fillColor: '#333', 
+                fillOpacity: 0.5 
+            }).addTo(mapInstance.current);
 
-                // Marcadores
+            // Borde verde del área permitida
+            L.circle(STORE_COORDS, { 
+                color: '#00e676', 
+                fillColor: 'transparent', 
+                weight: 2, 
+                radius: radius * 1000 
+            }).addTo(mapInstance.current);
+        }
+
+        // Marcadores
         markers.forEach((m) => {
             if(m.pos && m.pos[0]) {
                 const el = document.createElement('div');
-                
-                // ESTILO GPS PUNTO AZUL
+                // GPS AZUL
                 if (m.isMyLoc) {
                     el.className = 'user-gps-dot'; 
                 } else if (m.isStore) {
@@ -401,7 +404,9 @@ const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route
                 const iconSize = m.isMyLoc ? [20,20] : [40,40];
                 const icon = L.divIcon({ className: 'bg-transparent', html: el, iconSize: iconSize, iconAnchor: [iconSize[0]/2, iconSize[1]/2] });
                 const marker = L.marker(m.pos, { icon }).addTo(mapInstance.current);
-                if(m.popup) marker.bindPopup(m.popup);
+                
+                if(m.data && onMarkerClick) marker.on('click', () => onMarkerClick(m.data));
+                else if(m.popup) marker.bindPopup(m.popup);
             }
         });
 
@@ -410,33 +415,10 @@ const LeafletMap = ({ center, markers, zoom = 14, onClickMap, showHeatmap, route
              const validRoute = route.filter(p => p && p[0]);
              if(validRoute.length >= 2) L.polyline(validRoute, {color: '#4285F4', weight: 6, opacity: 0.8}).addTo(mapInstance.current);
         }
-    }, [center, markers, route]);
-            // DETECTOR DE CAMBIO DE TEMA (Para cambiar el mapa automáticamente)
-            useEffect(() => {
-                if(!mapInstance.current) return;
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.attributeName === "class") {
-                            const iswhite = document.body.classList.contains('white');
-                            const url = iswhite 
-                                ? 'https://{s}.basemaps.cartocdn.com/white_all/{z}/{x}/{y}{r}.png' 
-                                : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-                            
-                            mapInstance.current.eachLayer(layer => {
-                                if (layer instanceof L.TileLayer) layer.setUrl(url);
-                            });
-                        }
-                    });
-                });
-                observer.observe(document.body, { attributes: true });
-                return () => observer.disconnect();
-            }, []);
-            
-            if (typeof L === 'undefined') return <div className="w-full h-full flex items-center justify-center bg-gray-800 text-white">Cargando Mapa...</div>;
+    }, [center, markers, route, radius]);
 
-            return <div ref={containerRef} className="h-full w-full rounded-lg bg-[var(--bg-card)] border border-[var(--border)] z-0 relative overflow-hidden"></div>;
-        };
-
+    return <div ref={containerRef} className="h-full w-full bg-white z-0 relative"></div>;
+};
         const QRScanner = ({ onScan, onClose }) => {
              useEffect(() => {
                 const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 }, false);
@@ -1937,166 +1919,121 @@ const ClientApp = ({ db, updateDB }) => {
         );
     }
 };
+/* --- DRIVER APP CORREGIDA --- */
 const DriverApp = ({ db, updateDB, user }) => {
-            const [tab, setTab] = useState('map'); 
-            const [showScanner, setShowScanner] = useState(false);
-            const [selectedOrder, setSelectedOrder] = useState(null); 
-            const [driverLoc, setDriverLoc] = useState(STORE_COORDS);
-            const [gpsActive, setGpsActive] = useState(false);
-            const [manualCode, setManualCode] = useState('');
-            const [cameraError, setCameraError] = useState(null);
-            const scannerRef = useRef(null);
+    const [tab, setTab] = useState('map'); 
+    const [showScanner, setShowScanner] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null); 
+    const [driverLoc, setDriverLoc] = useState(STORE_COORDS);
+    const [blockTime, setBlockTime] = useState(0); 
+    const [paymentConfirm, setPaymentConfirm] = useState(null); 
+
+    const myOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivering');
+    const deliveredToday = db.orders.filter(o => o.driver === user.username && o.status === 'delivered');
+    const cashDebt = deliveredToday.filter(o => o.method === 'cash' && !o.settled).reduce((a,b)=>a+b.total,0);
+
+    // CRONÓMETRO BLOQUEO
+    useEffect(() => {
+        const check = setInterval(() => {
+            const blockedUntil = localStorage.getItem(`driver_block_${user.id}`);
+            if(blockedUntil) {
+                const diff = Math.ceil((parseInt(blockedUntil) - Date.now()) / 1000);
+                if(diff > 0) setBlockTime(diff);
+                else { setBlockTime(0); localStorage.removeItem(`driver_block_${user.id}`); }
+            }
+        }, 1000);
+        return () => clearInterval(check);
+    }, [user.id]);
+
+    useEffect(() => {
+        const watch = navigator.geolocation.watchPosition(p => setDriverLoc([p.coords.latitude, p.coords.longitude]));
+        return () => navigator.geolocation.clearWatch(watch);
+    }, []);
+
+    const onScan = (text) => {
+        const code = text.replace('ORDER:', '').replace('GROUP:', '');
+        const target = db.orders.find(o => o.id === code || o.groupId === code);
+        if (target && target.status === 'ready') {
+            updateDB({...db, orders: db.orders.map(o => (o.id === target.id || o.groupId === target.groupId) ? {...o, status: 'delivering', driver: user.username} : o)});
+            showToast("¡Pedido Asignado!");
+            setShowScanner(false);
+        } else {
+            showToast("QR Inválido o no listo");
+        }
+    };
+
+    const handleDelivery = (success) => {
+        if (!selectedOrder) return;
+        if (success) {
+            if (selectedOrder.method === 'cash' && selectedOrder.paymentStatus !== 'paid') {
+                setPaymentConfirm(selectedOrder); 
+            } else {
+                finalizeDelivery(selectedOrder, 0);
+            }
+        } else {
+            if(confirm("¿No pudiste entregar? Se bloqueará tu app por 3 min.")) {
+                localStorage.setItem(`driver_block_${user.id}`, Date.now() + 180000);
+                const note = { id: Date.now(), target: 'cajero', message: `⚠️ FALLO ENTREGA: #${selectedOrder.orderNum} - ${user.name}` };
+                updateDB({...db, settings: {...db.settings, notification: note}});
+                setSelectedOrder(null);
+            }
+        }
+    };
+
+    const finalizeDelivery = (order, cash) => {
+        updateDB({
+            ...db,
+            orders: db.orders.map(o => o.id === order.id ? {...o, status: 'delivered', deliveredAt: new Date().toISOString(), paymentStatus: 'paid'} : o),
+            users: db.users.map(u => u.id === user.id ? {...u, cashOnHand: (u.cashOnHand||0) + (order.method==='cash'?order.total:0)} : u)
+        });
+        showToast("Entrega Registrada ✅");
+        setPaymentConfirm(null);
+        setSelectedOrder(null);
+    };
+
+    if(blockTime > 0) return (<div className="driver-timer-overlay"><h1 className="text-6xl font-mono text-red-500 mb-4">{Math.floor(blockTime/60)}:{(blockTime%60).toString().padStart(2,'0')}</h1><h2 className="text-2xl font-bold">BLOQUEADO</h2><p>Espera en la ubicación...</p></div>);
+
+    return (
+        <div className="h-full bg-white relative">
+            {tab === 'map' && (
+                <div className="h-full relative">
+                    <LeafletMap center={driverLoc} markers={[{pos:STORE_COORDS, isStore:true}, ...myOrders.map(o=>({pos:o.clientLoc||STORE_COORDS, emoji:'🍔', data:o}))]} onMarkerClick={setSelectedOrder} zoom={15}/>
+                    <button onClick={()=>setShowScanner(true)} className="absolute bottom-24 right-4 bg-[var(--gold)] w-16 h-16 rounded-full flex items-center justify-center shadow-xl border-4 border-black z-[500]"><QrCode size={32}/></button>
+                </div>
+            )}
             
-            // Referencia para no spammear la DB
-            const lastUpdateRef = useRef(0);
+            {selectedOrder && (
+                <div className="driver-modal">
+                    <div className="flex justify-between items-center mb-2 border-b pb-2"><div><h3 className="font-black text-2xl">#{selectedOrder.orderNum}</h3><p className="font-bold">{selectedOrder.clientName}</p></div><div className="text-right"><p className="text-xl font-bold">{formatCurrency(selectedOrder.total)}</p><span className="bg-gray-200 text-xs px-2 rounded">{selectedOrder.method}</span></div></div>
+                    <p className="text-sm text-gray-600 mb-4">{selectedOrder.address}</p>
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                        <a href={`tel:${selectedOrder.clientPhone}`} className="bg-gray-100 p-3 rounded flex flex-col items-center text-xs font-bold"><Phone size={20}/> LLAMAR</a>
+                        <a href={`https://wa.me/52${selectedOrder.clientPhone}?text=Hola, soy su repartidor.`} target="_blank" className="bg-green-100 text-green-700 p-3 rounded flex flex-col items-center text-xs font-bold"><MessageCircle size={20}/> WHATS</a>
+                        <a href={`https://www.google.com/maps/dir/?api=1&destination=${selectedOrder.clientLoc?.[0]},${selectedOrder.clientLoc?.[1]}`} target="_blank" className="bg-blue-100 text-blue-700 p-3 rounded flex flex-col items-center text-xs font-bold"><Navigation size={20}/> IR</a>
+                    </div>
+                    <div className="flex gap-2"><button onClick={()=>handleDelivery(false)} className="flex-1 bg-red-100 text-red-600 py-3 rounded font-bold">NO PUDE ❌</button><button onClick={()=>handleDelivery(true)} className="flex-1 bg-green-600 text-white py-3 rounded font-bold shadow">ENTREGAR ✅</button></div>
+                </div>
+            )}
 
-            const myOrders = db.orders.filter(o => o.driver === user.username && o.status === 'delivering');
-            const deliveredToday = db.orders.filter(o => o.driver === user.username && o.status === 'delivered' && new Date(o.deliveredAt).toDateString() === new Date().toDateString());
-            
-            const cashDebt = db.orders.filter(o => o.driver === user.username && o.status === 'delivered' && !o.settled && o.method === 'cash').reduce((a,b)=>a+b.total,0);
-            const earningsToday = deliveredToday.reduce((a,b)=>a+(b.deliveryFee||0),0);
-
-            useEffect(() => {
-                let watchId;
-                const startTracking = () => {
-                    watchId = navigator.geolocation.watchPosition(
-                        (p) => {
-                            const lat = p.coords.latitude;
-                            const lon = p.coords.longitude;
-                            setDriverLoc([lat, lon]);
-                            setGpsActive(true);
-                            
-                            // SUBIR UBICACIÓN A LA BASE DE DATOS (Cada 10 seg max)
-                            const now = Date.now();
-                            if (now - lastUpdateRef.current > 10000) {
-                                lastUpdateRef.current = now;
-                                // Actualizamos solo mi usuario en la lista de usuarios
-                                const updatedUsers = db.users.map(u => 
-                                    u.id === user.id 
-                                    ? { ...u, location: [lat, lon], online: true, lastActive: now } 
-                                    : u
-                                );
-                                // Llamamos a updateDB (que tiene el debounce de guardado)
-                                updateDB({ ...db, users: updatedUsers });
-                            }
-                        },
-                        (err) => console.log("Error GPS", err),
-                        { enableHighAccuracy: true }
-                    );
-                };
-                if (localStorage.getItem('driver_perms_granted') === 'true') startTracking();
-                return () => { if(watchId) navigator.geolocation.clearWatch(watchId); };
-            }, [db.users]); // Dependencia db.users para tener la lista fresca
-
-            const enableGPS = () => {
-                navigator.geolocation.getCurrentPosition(() => {
-                    localStorage.setItem('driver_perms_granted', 'true');
-                    window.location.reload();
-                }, (err) => showToast("Es necesario el permiso de ubicación"));
-            };
-
-            const processCode = (text) => {
-                text = text.trim().toUpperCase();
-                let ordersToTake = [];
-                if (text.startsWith('GROUP:')) {
-                    const ids = text.split(':')[1].split(',');
-                    ordersToTake = db.orders.filter(o => ids.includes(o.id));
-                } else if (text.startsWith('ORDER:')) {
-                    const id = text.split(':')[1];
-                    ordersToTake = db.orders.filter(o => o.id === id);
-                } else {
-                    ordersToTake = db.orders.filter(o => o.id === text || o.orderNum.toString() === text);
-                }
-
-                if (ordersToTake.length > 0) {
-                    const notReady = ordersToTake.some(o => o.status !== 'ready');
-                    if (notReady) { showToast("⚠️ Pedido no listo"); return; }
-                    if(!confirm(`¿Asignar ${ordersToTake.length} pedidos?`)) return;
-
-                    const newOrders = db.orders.map(o => {
-                        const target = ordersToTake.find(t => t.id === o.id);
-                        return target ? { ...o, status: 'delivering', driver: user.username } : o;
-                    });
-                    
-                    // Calcular deuda inicial si aplica
-                    const cashOrdersTotal = ordersToTake
-                        .filter(o => o.paymentStatus === 'pending' || (o.method === 'cash' && o.source === 'web' && o.paymentStatus !== 'paid'))
-                        .reduce((acc, o) => acc + o.total, 0);
-
-                    const updatedUsers = db.users.map(u => u.id === user.id ? {...u, cashOnHand: (u.cashOnHand || 0) + cashOrdersTotal} : u);
-
-                    updateDB({...db, orders: newOrders, users: updatedUsers});
-                    showToast(`¡Asignado!`);
-                    closeScanner();
-                } else { showToast("❌ Código no válido"); }
-            };
-
-            // ... (Resto de funciones de escáner igual que antes) ...
-            // Para ahorrar espacio, asumo que las funciones del scanner (useEffect, closeScanner) son las mismas del bloque anterior corregido.
-            // Si necesitas que las repita completas, avísame. Aquí pongo lo esencial visual.
-            const closeScanner = () => { setShowScanner(false); setManualCode(''); };
-
-            const markers = [
-                { pos: STORE_COORDS, isStore: true },
-                ...myOrders.map(o => ({
-                    pos: o.clientLoc || STORE_COORDS,
-                    type: 'driver-order', 
-                    label: o.orderNum,
-                    data: o 
-                }))
-            ];
-
-            return (
-                <div className="h-full flex flex-col bg-black pb-20 relative">
-                    {!gpsActive && !localStorage.getItem('driver_perms_granted') && (
-                        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1500]">
-                            <button onClick={enableGPS} className="bg-red-600 text-white px-6 py-2 rounded-full font-bold shadow-lg animate-pulse">📡 ACTIVAR GPS</button>
-                        </div>
-                    )}
-
-                    {tab === 'map' && (
-                        <div className="flex-1 relative overflow-hidden">
-                            <LeafletMap center={driverLoc} markers={markers} onMarkerClick={setSelectedOrder} zoom={15} />
-                            <button onClick={()=>setShowScanner(true)} className="absolute bottom-4 right-4 bg-[var(--gold)] w-14 h-14 rounded-full shadow-[0_0_20px_rgba(255,215,0,0.5)] z-[500] border-2 border-black flex items-center justify-center"><QrCode size={28} className="text-black"/></button>
-                        </div>
-                    )}
-
-                    {tab === 'history' && (
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                            <h2 className="text-[var(--gold)] font-bold text-xl mb-4">ENTREGAS DE HOY</h2>
-                            {deliveredToday.length === 0 ? <p className="text-gray-500">Sin entregas hoy.</p> : deliveredToday.map(o => (
-                                <div key={o.id} className="bg-[#111] p-3 rounded border-l-2 border-green-500 flex justify-between">
-                                    <div><p className="text-white font-bold">#{o.orderNum}</p><p className="text-xs text-gray-400">{o.address}</p></div>
-                                    <p className="text-green-500 font-bold">{formatCurrency(o.deliveryFee || 0)}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {tab === 'wallet' && (
-                        <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-                            <h2 className="text-2xl font-black text-white mb-2 uppercase">MI BILLETERA</h2>
-                            <p className="text-gray-400 text-xs mb-6">Muestra este QR en caja para liquidar</p>
-                            <div className="bg-white p-4 rounded-xl mb-8"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=LIQ:${user.id}`} className="w-48 h-48"/></div>
-                            <div className="flex gap-4 w-full">
-                                <div className="flex-1 bg-[#111] p-4 rounded border border-[#333]"><p className="text-[10px] text-gray-500 font-bold uppercase">GANANCIAS HOY</p><p className="text-xl font-black text-green-500">{formatCurrency(earningsToday)}</p></div>
-                                <div className="flex-1 bg-[#111] p-4 rounded border border-[#333]"><p className="text-[10px] text-gray-500 font-bold uppercase">DEUDA EFECTIVO</p><p className="text-xl font-black text-red-500">{formatCurrency(cashDebt)}</p></div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* MODALES DETALLE PEDIDO Y SCANNER (Idénticos al código anterior, asegúrate de incluirlos) */}
-                    {/* ... (Incluye aquí los modales selectedOrder y showScanner del código previo) ... */}
-                    {/* Para brevedad en la respuesta, usa el mismo código de modal de la respuesta anterior, ya que estaba correcto visualmente */}
-                    
-                    <div className="driver-nav">
-                        <button onClick={()=>setTab('map')} className={`driver-nav-btn ${tab==='map'?'active':''}`}><Map size={20}/>MAPA</button>
-                        <button onClick={()=>setTab('history')} className={`driver-nav-btn ${tab==='history'?'active':''}`}><History size={20}/>HISTORIAL</button>
-                        <button onClick={()=>setTab('wallet')} className={`driver-nav-btn ${tab==='wallet'?'active':''}`}><Wallet size={20}/>BILLETERA</button>
+            {paymentConfirm && (
+                <div className="fixed inset-0 bg-black/90 z-[8000] flex items-center justify-center p-6">
+                    <div className="bg-white w-full rounded-xl p-6 text-center">
+                        <h3 className="text-xl font-bold mb-2">COBRAR: {formatCurrency(paymentConfirm.total)}</h3>
+                        <input id="payInput" type="number" className="input-std text-center text-2xl mb-4" placeholder="$ Recibido"/>
+                        <div className="flex gap-2"><button onClick={()=>setPaymentConfirm(null)} className="flex-1 bg-gray-200 py-3 rounded">CANCELAR</button><button onClick={()=>{const v=parseFloat(document.getElementById('payInput').value)||0; if(v<paymentConfirm.total)return showToast("Falta"); finalizeDelivery(paymentConfirm,v);}} className="flex-1 btn-gold py-3 rounded">CONFIRMAR</button></div>
                     </div>
                 </div>
-            );
-        };
+            )}
+
+            {showScanner && <div className="fixed inset-0 bg-black z-[9000]"><QRScanner onScan={onScan}/><button onClick={()=>setShowScanner(false)} className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 rounded">CERRAR</button></div>}
+
+            <div className="driver-nav">
+                <button onClick={()=>setTab('map')} className={`driver-nav-btn ${tab==='map'?'active':''}`}><Map size={20}/>MAPA</button>
+                <button onClick={()=>setTab('wallet')} className={`driver-nav-btn ${tab==='wallet'?'active':''}`}><Wallet size={20}/>CARTERA</button>
+            </div>
+        </div>
+    );
+};
 const Kitchen = ({ db, updateDB }) => {
             const [detailOrder, setDetailOrder] = useState(null);
             const [showAuth, setShowAuth] = useState(false);
